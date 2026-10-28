@@ -153,9 +153,10 @@ function marketCard(key) {
   </button>`;
 }
 function lv(n) { return `<span class="lv" aria-label="重要度${n}">${[1, 2, 3].map(i => `<i class="${i <= n ? "on" : ""}"></i>`).join("")}</span>`; }
-const foot = () => `<p class="foot">ニュースの見出しと識者の発信をもとに、AI（Claude）が要点・つながり・見通しをまとめています。記事の全文は読んでいません。見通しは可能性の話で、投資の判断は元の記事や一次情報で確かめてください。<br>経済のつながり ${esc(VERSION)}</p>`;
+// 画面の下には版だけを出す（説明や注意書きは置かない）
+const foot = () => `<p class="foot">${esc(VERSION)}</p>`;
 const VERDICT = { 当たり: "hit", 一部当たり: "part", 外れ: "miss", まだわからない: "wait" };
-const HINT = `<p class="hint"><span class="term-demo">点線の言葉</span>はタップすると意味が出ます</p>`;
+const HINT = "";
 const relList = ids => ids.map(id => newsById[id]).filter(Boolean).slice(0, 4)
   .map(n => `<button data-news="${esc(n.id)}">${esc(newsTitle(n))}<span class="src">${esc(n.source)}・${esc(ago(n.time))}</span></button>`).join("");
 
@@ -168,31 +169,25 @@ function renderToday() {
   const wk = X.weekly;
   const showWeek = wk && (Date.now() - new Date(wk.made)) < 4 * 86400000;
   const rv = X.reviews[0];
-  const guide = store.get("guideDone", false) ? "" : `<div class="card guide">
-      <h3>このアプリの読み方</h3>
-      <ol><li><b>今日のテーマ</b>で、何が起きたかをつかむ</li><li>タップして、<b>なぜ・この先どうなるか</b>を読む</li><li><span class="term-demo">点線の言葉</span>はタップすると意味が出る</li></ol>
-      <button class="btn ghost" data-guide>わかった</button></div>`;
   $("#v-today").innerHTML = `
     <p class="date-line">${upd ? `${upd.getMonth() + 1}月${upd.getDate()}日（${WD[upd.getDay()]}）の世の中` : ""}</p>
     <h1 class="headline">${esc(b.headline || "今日のニュースを集めています")}</h1>
-    ${guide}
     <div class="markets">${["usdjpy", "jgb10", "ust10"].map(marketCard).join("")}</div>
-    ${showWeek ? `<button class="card week-card" data-weekly="${esc(wk.id)}"><div class="no">今週のまとめ・${esc(md(wk.from))}〜${esc(md(wk.to))}</div><h3>${esc(wk.title)}</h3><p class="more">読む →</p></button>` : ""}
-    <div class="sec"><h2>今日のテーマ</h2><span class="aside">タップでくわしく</span></div>
-    <div class="trows">${(b.themes || []).map(themeRow).join("") || `<div class="card"><p class="muted small">AI の読み解きは次の更新で表示されます。ニュースの一覧は「ニュース」から見られます。</p></div>`}</div>
+    ${showWeek ? `<button class="card week-card" data-weekly="${esc(wk.id)}"><div class="no">今週のまとめ・${esc(md(wk.from))}〜${esc(md(wk.to))}</div><h3>${esc(wk.title)}</h3><span class="chev-r" aria-hidden="true">›</span></button>` : ""}
+    <div class="sec"><h2>今日のテーマ</h2></div>
+    <div class="trows">${(b.themes || []).map(themeRow).join("") || `<p class="empty">次の更新で表示されます。</p>`}</div>
     ${agendaRows(3)}
-    ${moving ? `<div class="sec"><h2>いま動いているもの</h2><span class="aside">タップで仕組み</span></div><div class="chips">${moving}</div>` : ""}
-    ${rv && rv.reviewed === todayStr() ? `<div class="sec"><h2>答え合わせ</h2></div><a class="card link-card" href="#learn"><div class="no">${esc(md(rv.target))}の「この先どうなるかも」</div><p>${esc(rv.summary)}</p><span class="more">学ぶで見る →</span></a>` : ""}
-    ${(D.quiz || []).length ? `<div class="sec"><h2>考えてみる</h2></div><a class="card link-card" href="#learn"><p>${esc(D.quiz[0].q)}</p><span class="more">学ぶで答える →</span></a>` : ""}
+    ${moving ? `<div class="sec"><h2>いま動いているもの</h2></div><div class="chips">${moving}</div>` : ""}
+    ${rv && rv.reviewed === todayStr() ? `<div class="sec"><h2>答え合わせ</h2></div><a class="card link-card" href="#learn"><div class="no">${esc(md(rv.target))}の「この先どうなるかも」</div><p>${esc(rv.summary)}</p><span class="chev-r" aria-hidden="true">›</span></a>` : ""}
+    ${(D.quiz || []).length ? `<div class="sec"><h2>考えてみる</h2></div><a class="card link-card" href="#learn"><p>${esc(D.quiz[0].q)}</p><span class="chev-r" aria-hidden="true">›</span></a>` : ""}
     ${foot()}`;
 }
 function themeRow(t, i) {
   const th = threadByName[t.thread];
   return `<button class="card trow" data-theme="${i}">
-    <div class="tr-top"><span class="tr-no">${i + 1}</span><h3>${esc(t.title)}</h3></div>
-    <p class="tr-pt">${esc(t.point || firstSentence(t.what))}</p>
+    <div class="tr-top"><h3>${esc(t.title)}</h3><span class="chev-r" aria-hidden="true">›</span></div>
+    <p class="tr-pt">${esc(t.point || firstSentence(t.what))}${th && th.entries.length > 1 ? `<span class="tr-days">${th.entries.length}日目</span>` : ""}</p>
     <div class="chain">${chainHtml(t.chain, true)}</div>
-    <div class="tr-foot">${th && th.entries.length > 1 ? `<span>流れ：${th.entries.length}日目</span>` : "<span></span>"}<span class="more">くわしく →</span></div>
   </button>`;
 }
 function openTheme(i) {
@@ -205,11 +200,10 @@ function openTheme(i) {
     .map(e => `<div class="voice"><div class="who">${esc(e.name)}<span class="muted" style="font-weight:500">｜${esc(e.role)}</span></div>${gl(e.view, S)}</div>`).join("");
   const hasVoices = (t.experts || []).some(id => expertById[id]);
   const rel = relList(t.news || []);
-  const conf = (t.chain || []).filter(c => c.conflict).map(c => `<p class="conf-note">※ ${esc(c.conflict)}。ここでは仕組みとしての向きです。</p>`).join("")
-    + ((t.chain || []).some(c => c.known === false) ? `<p class="conf-note">※ 色の付いた矢印（→）は、つながり図の基本の関係にない、今回 AI が考えたつながりです。</p>` : "");
+  const conf = (t.chain || []).filter(c => c.conflict).map(c => `<p class="conf-note">※ ${esc(c.conflict)}</p>`).join("");
   const first = (t.chain || [])[0];
   openSheet(`
-    <p class="cat">テーマ ${i + 1}${th ? `・流れ「${esc(th.name)}」${th.entries.length}日目` : ""}</p>
+    ${th && th.entries.length > 1 ? `<p class="cat">流れ「${esc(th.name)}」${th.entries.length}日目</p>` : ""}
     <h2>${esc(t.title)}</h2>
     <div class="q-sec"><div class="q-h">何が起きた？</div><p>${gl(t.what, S)}</p></div>
     <div class="q-sec"><div class="q-h">どうつながる？</div><div class="chain">${chainHtml(t.chain)}</div><p>${gl(t.chain_text, S)}</p>${conf}</div>
@@ -243,13 +237,13 @@ function agendaItems() {
 function agendaRow(e, i) {
   return `<button class="ag-row" data-agi="${i}">
     <div class="ag-date">${e.date ? `${esc(md(e.date))}<span>${esc(dayLabel(e.date))}</span>` : `<span>日付未定</span>`}</div>
-    <div class="ag-main"><b>${esc(e.name)}</b><span>${e.date && e.date < todayStr() ? (e.scenario ? "結果が出ました。シナリオと照らす" : "結果が出ました") : e.scenario ? "結果しだいの2通りを見る" : esc(e.note || "")}</span></div>
+    <div class="ag-main"><b>${esc(e.name)}</b>${e.date && e.date < todayStr() ? `<span>結果が出ました</span>` : ""}</div>
     <span class="chev" aria-hidden="true">›</span></button>`;
 }
 function agendaRows(limit) {
   AGENDA = agendaItems();
   if (!AGENDA.length) return "";
-  return `<div class="sec"><h2>これからの予定</h2><span class="aside">結果しだいでどうなる？</span></div>
+  return `<div class="sec"><h2>これからの予定</h2></div>
     <div class="card ag-list">${AGENDA.slice(0, limit).map(agendaRow).join("")}
     ${AGENDA.length > limit ? `<button class="ag-all" data-agenda>予定をすべて見る（${AGENDA.length}）</button>` : ""}</div>`;
 }
@@ -262,15 +256,14 @@ function openAgendaItem(i) {
     <h2>${esc(e.name)}</h2>
     ${e.note ? `<p class="muted small">${esc(e.note)}</p>` : ""}
     ${(e.nodes || []).length ? `<div class="q-sec"><div class="q-h">動きそうなもの</div><div class="chips">${e.nodes.map(n => chip(n)).join("")}</div></div>` : ""}
-    ${e.date && e.date < todayStr() ? `<p class="note">結果が出ました。下の2通りのどちらに近かったか、「ニュース」で確かめてみましょう。</p>` : ""}
+    ${e.date && e.date < todayStr() ? `<p class="muted small">結果が出ました</p>` : ""}
     ${s ? `<div class="q-sec"><div class="q-h">焦点</div><p>${gl(s.focus, S)}</p></div>
       <div class="q-sec"><div class="q-h">結果しだいで、こう広がるかも</div>
-      <div class="cases">${s.cases.map((c, k) => `<div class="case c${k}"><div class="case-l">${esc(c.label)}</div><div class="chain">${chainHtml(c.chain)}</div><p>${gl(c.text, S)}</p></div>`).join("")}</div></div>` : `<p class="note">2週間以内になると、結果しだいのシナリオが付きます。</p>`}
+      <div class="cases">${s.cases.map((c, k) => `<div class="case c${k}"><div class="case-l">${esc(c.label)}</div><div class="chain">${chainHtml(c.chain)}</div><p>${gl(c.text, S)}</p></div>`).join("")}</div></div>` : ""}
     ${HINT}`);
 }
 function openAgenda() {
-  openSheet(`<p class="cat">これからの予定</p><h2>予定と、結果しだいの広がり</h2>
-    <p class="muted small" style="margin-top:6px">FRB・日銀・内閣府の公式の日程と、ニュースに出てきた予定。</p>
+  openSheet(`<p class="cat">これからの予定</p><h2>予定</h2>
     <div class="card ag-list" style="margin-top:14px">${AGENDA.map(agendaRow).join("")}</div>`);
 }
 
@@ -287,7 +280,6 @@ function newsOrder(a, b) {
 function newsSection(title, items, featured = false) {
   return `<section class="news-section${featured ? " news-featured" : ""}">
     <div class="news-section-head"><h2>${esc(title)}</h2><span>${items.length}本</span></div>
-    ${featured ? `<p class="news-section-note">重要度と分野の広がりから、全体をつかむ入口に。</p>` : ""}
     <div class="list">${items.map(n => newsRow(n, featured)).join("")}</div>
   </section>`;
 }
@@ -328,10 +320,8 @@ function renderNews() {
     $("#v-news").innerHTML = `
       <h1 class="page-title">ニュース</h1>
       ${modes}
-      <p class="page-sub" style="margin-top:12px">同じ話題が日をまたいでどう続いているか。</p>
-      ${X.threads.length ? X.threads.map(threadCard).join("") : `<p class="empty">流れは、更新のたびにたまっていきます。</p>`}
-      <div class="sec"><h2>週のまとめ</h2><span class="aside">土曜の朝に1本</span></div>
-      ${X.weeks.length ? `<div class="rel">${X.weeks.map(w => `<button data-weekly="${esc(w.id)}">${esc(w.title)}<span class="src">${esc(md(w.from))}〜${esc(md(w.to))}</span></button>`).join("")}</div>` : `<p class="note">最初の週のまとめは、土曜の朝の更新で作られます。</p>`}
+      <div style="margin-top:14px">${X.threads.map(threadCard).join("")}</div>
+      ${X.weeks.length ? `<div class="sec"><h2>週のまとめ</h2></div><div class="rel">${X.weeks.map(w => `<button data-weekly="${esc(w.id)}">${esc(w.title)}<span class="src">${esc(md(w.from))}〜${esc(md(w.to))}</span></button>`).join("")}</div>` : ""}
       ${foot()}`;
     return;
   }
@@ -343,7 +333,7 @@ function renderNews() {
   $("#v-news").innerHTML = `
     <h1 class="page-title">ニュース</h1>
     ${modes}
-    <p class="page-sub" style="margin-top:12px">${state.newsCat === "all" ? `全${all.length}本を表示。` : `${esc(selectedName)}の${list.length}本を表示。`}見出しをタップすると、要点とこの先が読めます。${(D.sources || []).length ? `<button class="src-link" data-sources>${D.sources.filter(x => x.collected).length}の媒体から集めています ›</button>` : ""}</p>
+    <p class="page-sub" style="margin-top:12px">${state.newsCat === "all" ? all.length : list.length}本${(D.sources || []).length ? `・<button class="src-link" data-sources>${D.sources.filter(x => x.collected).length}の媒体 ›</button>` : ""}</p>
     <div class="chips scroll news-filters" role="group" aria-label="分野で絞り込む">${filters.map(([id, name]) => `<button class="filter ${state.newsCat === id ? "on" : ""}" data-newscat="${esc(id)}" aria-pressed="${state.newsCat === id}">${esc(name)}</button>`).join("")}</div>
     ${body || `<p class="empty">この分野のニュースは、いまはありません。</p>`}
     ${foot()}`;
@@ -353,10 +343,9 @@ function threadCard(t) {
   const last = t.entries[t.entries.length - 1];
   const first = t.entries[0];
   return `<button class="card thread" data-thread="${esc(t.name)}">
-    <div class="no">${t.entries.length}日分・${esc(md(first.date))}〜${esc(md(last.date))}</div>
+    <div class="no">${t.entries.length > 1 ? `${t.entries.length}日分・${esc(md(first.date))}〜${esc(md(last.date))}` : esc(md(last.date))}</div>
     <h3>${esc(t.name)}</h3>
     <p class="what">${esc(last.title)}</p>
-    <div class="dots" aria-hidden="true">${t.entries.slice(-14).map(() => "<i></i>").join("")}</div>
   </button>`;
 }
 function openThread(name) {
@@ -378,9 +367,8 @@ function openSources() {
   for (const x of D.sources || []) { if (!groups.has(x.group)) groups.set(x.group, []); groups.get(x.group).push(x); }
   const total = (D.sources || []).reduce((a, x) => a + x.collected, 0);
   openSheet(`<p class="cat">ニュース</p><h2>集めている媒体</h2>
-    <p class="muted small" style="margin-top:6px">直近1日半の見出し ${total}本から、AI が経済の流れに大事なものを選んで載せています。1つの媒体に偏りすぎないよう、媒体ごとに取り込む本数に上限があります。</p>
-    ${[...groups].map(([g, list]) => `<div class="q-sec"><div class="q-h">${esc(g || "そのほか")}</div><div class="src-list">${list.map(x => `<div class="src-row"><span>${esc(x.name)}${x.lang === "en" ? `<small>英語</small>` : ""}</span><span class="muted small">集めた${x.collected}・載せた${x.shown}</span></div>`).join("")}</div></div>`).join("")}
-    <p class="note">識者の発信（note・記事・研究所のレポート）は「識者」の画面に出ます。</p>`);
+    <p class="muted small" style="margin-top:6px">集めた${total}本から選んで載せています。</p>
+    ${[...groups].map(([g, list]) => `<div class="q-sec"><div class="q-h">${esc(g || "そのほか")}</div><div class="src-list">${list.map(x => `<div class="src-row"><span>${esc(x.name)}${x.lang === "en" ? `<small>英語</small>` : ""}</span><span class="muted small">集めた${x.collected}・載せた${x.shown}</span></div>`).join("")}</div></div>`).join("")}`);
 }
 function newsRow(n, featured = false) {
   const category = G.cats.find(c => c.id === primaryNewsCat(n));
@@ -504,10 +492,10 @@ function egoSvg(id) {
   const inBoxes = inP.map(p => box(p, p.e.from, `${G.byId[p.e.from].up}→${dirWord(c, p.e.sign)}`, p.e.sign > 0 ? "up-f" : "down-f")).join("");
   const outBoxes = outP.map(p => box(p, p.e.to, `${c.up}→${dirWord(G.byId[p.e.to], p.e.sign)}`, p.e.sign > 0 ? "up-f" : "down-f")).join("");
   return `<svg class="ego" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(c.name)}のつながり"><defs>${markers()}</defs>
-    ${ins.length ? `<text class="elabel" x="${cx}" y="12">原因になるもの（タップでさかのぼる）</text>` : ""}
-    ${outs.length ? `<text class="elabel" x="${cx}" y="${outY - 16}">影響が出る先（タップで先へ）</text>` : ""}
+    ${ins.length ? `<text class="elabel" x="${cx}" y="12">原因</text>` : ""}
+    ${outs.length ? `<text class="elabel" x="${cx}" y="${outY - 16}">影響</text>` : ""}
     ${inEdges}${outEdges}${inBoxes}${outBoxes}
-    <g class="ecenter" data-node="${c.id}" role="button" tabindex="0" aria-label="${esc(c.name)}の仕組み"><rect x="${cx - CW / 2}" y="${cy}" width="${CW}" height="${CH}" rx="14"/><text class="ec" x="${cx}" y="${cy + 24}">${esc(c.name)}</text><text class="ecs" x="${cx}" y="${cy + 43}">タップで仕組みを読む</text></g>
+    <g class="ecenter" data-node="${c.id}" role="button" tabindex="0" aria-label="${esc(c.name)}の仕組み"><rect x="${cx - CW / 2}" y="${cy}" width="${CW}" height="${CH}" rx="14"/><text class="ec" x="${cx}" y="${cy + 29}">${esc(c.name)}</text></g>
   </svg>`;
 }
 function walkHtml() {
@@ -515,8 +503,7 @@ function walkHtml() {
   const n = G.byId[id];
   const trail = state.walk.length > 1 ? `<div class="trail"><span class="muted small">たどった道</span>${state.walk.map((w, i) => `${i ? `<span class="arrow">→</span>` : ""}<button class="tag ${i === state.walk.length - 1 ? "here" : ""}" data-trail="${i}"><span class="nm">${esc(G.byId[w].short)}</span></button>`).join("")}<button class="filter" data-trail="reset">最初から</button></div>` : "";
   return `${trail}
-    <div class="map-box ego-box">${egoSvg(id)}</div>
-    <p class="hint" style="margin-top:8px">小さな字は向きの関係（例：${esc(n.up)}→…）。線が太いほど強い関係、点線は条件しだい。</p>`;
+    <div class="map-box ego-box">${egoSvg(id)}</div>`;
 }
 function renderMap() {
   const p = G.byId[state.simPick];
@@ -529,16 +516,15 @@ function renderMap() {
   ];
   $("#v-map").innerHTML = `
     <h1 class="page-title">つながり</h1>
-    <p class="page-sub connect-intro">ニュースの「それで、どうなる？」を考える。暮らしや企業への影響を、原因からたどれます。</p>
     <div class="seg connect-tabs" role="group" aria-label="つながりの使い方">
       ${[["try", "影響を考える"], ["walk", "原因をたどる"], ["all", "全体図"]].map(([id, label]) => `<button class="${state.mapMode === id ? "on" : ""}" data-mapmode="${id}" aria-pressed="${state.mapMode === id}">${label}</button>`).join("")}
     </div>
     ${trying ? `<section class="connect-start" aria-labelledby="connect-start-title">
-      <h2 id="connect-start-title">${state.sim ? "別の条件でも考えてみる" : "まずは、身近な疑問から"}</h2>
-      <div class="scenario-list ${state.sim ? "compact" : ""}">${examples.map(([id, dir, title, desc]) => `<button class="scenario" data-sim="${id}:${dir}"><span><b>${title}</b>${state.sim ? "" : `<span class="scenario-desc">${desc}</span>`}</span><span class="scenario-go" aria-hidden="true">→</span></button>`).join("")}</div>
+      <h2 id="connect-start-title">${state.sim ? "ほかの例" : "例"}</h2>
+      <div class="scenario-list ${state.sim ? "compact" : ""}">${examples.map(([id, dir, title, desc]) => `<button class="scenario" data-sim="${id}:${dir}"><span><b>${title}</b></span><span class="scenario-go" aria-hidden="true">→</span></button>`).join("")}</div>
     </section>
     <section class="sim-workspace" aria-labelledby="sim-title">
-      <div class="sec" id="sim-sec"><h2 id="sim-title">${state.sim ? "考える条件" : "自分で条件を選ぶ"}</h2></div>
+      <div class="sec" id="sim-sec"><h2 id="sim-title">条件を選ぶ</h2></div>
       <button class="pick-btn" data-picker><span class="muted small">起点</span><b>${esc(p.name)}</b><span class="chg">変える</span></button>
       <div class="dir-toggle">
         <button class="up ${state.sim && state.simDir > 0 ? "on" : ""}" data-simdir="1" aria-pressed="${!!state.sim && state.simDir > 0}">↑ ${esc(p.up)}</button>
@@ -546,14 +532,13 @@ function renderMap() {
       </div>
       <div id="sim-result" aria-live="polite"></div>
     </section>` : walking ? `
-      <div class="connect-explain"><h2>なぜ動く？ 次はどこへ？</h2><p>上は原因、下は影響。項目をタップして進むと、ニュースの背景や次に注目する先が分かります。</p><button class="btn ghost" data-picker>別の項目からたどる</button></div>
+      <div class="row-btns" style="margin:12px 0"><button class="btn ghost" data-picker>別の項目からたどる</button></div>
       ${walkHtml()}
-      <button class="btn connect-next" data-sim="${esc(state.walk[state.walk.length - 1] || state.simPick)}:up">この項目が変わったら？ 影響を試す →</button>` : `
-    <div class="connect-explain"><h2>経済の中での位置をつかむ</h2><p>31項目をまとめた地図です。項目をタップすると、関係のある原因と影響だけを大きく見られます。</p></div>
+      <button class="btn connect-next" data-sim="${esc(state.walk[state.walk.length - 1] || state.simPick)}:up">影響を試す</button>` : `
     <div class="chips" style="margin-bottom:10px" id="map-mode"></div>
     <div class="map-box">${mapSvg()}</div>
     <div class="legend"><span><i style="background:var(--up)"></i>上がる方向</span><span><i style="background:var(--down)"></i>下がる方向</span><span><i style="background:var(--mix)"></i>逆向きの力</span></div>
-    <button class="btn connect-next" data-mapmode="try">条件を選んで、影響を考える →</button>`}
+`}
     ${foot()}`;
   if (state.mapMode === "all") paintMap();
   if (trying) renderSimResult();
@@ -627,34 +612,36 @@ function impactLife(n) {
 function renderSimResult() {
   const box = $("#sim-result");
   if (!box) return;
-  if (!state.sim) { box.innerHTML = `<p class="sim-prompt">上の疑問か、起点と向きを選ぶと、<b>何に影響するか・暮らしとどう関わるか</b>が出ます。</p>`; return; }
+  if (!state.sim) { box.innerHTML = ""; return; }
   const { res, waves } = simulate(G, state.sim.start, state.sim.dir);
   const s = G.byId[state.sim.start];
   // 身近な影響を先に3つ。経路そのものは下で必要なときに開く。
   const priority = ["mortgage", "import_prices", "exporters", "jp_cpi", "household", "wages", "consumption", "jp_economy", "usdjpy", "banks"];
   const affected = waves.flat();
+  // 「条件しだい」の弱い関係を通ってたどり着く影響は、身近な項目でも後ろに回す
+  const weakPath = id => {
+    for (let at = id, k = 0; res[at]?.via?.[0] && k < 6; at = res[at].via[0].from, k++) if (res[at].via[0].edge.strength < 2) return true;
+    return false;
+  };
   const focus = [...affected].sort((a, b) => {
-    const score = id => { const i = priority.indexOf(id); return i < 0 ? 100 + res[id].wave : i; };
+    const score = id => { const i = priority.indexOf(id); return (i < 0 ? 100 + res[id].wave : i) + (weakPath(id) ? 200 : 0); };
     return score(a) - score(b);
   }).slice(0, 3);
   const related = (D.news || []).filter(n => (n.tags || []).some(t => t.node === s.id)).slice(0, 2);
   box.innerHTML = `
     <section class="sim-takeaway" aria-labelledby="takeaway-title">
       <p class="eyebrow">${esc(s.name)}が「${esc(dirWord(s, state.sim.dir))}」なら</p>
-      <h2 id="takeaway-title">${focus.length ? "たとえば、ここに影響する" : "この図でたどれる先はありません"}</h2>
-      ${focus.length ? `<p class="takeaway-hint">暮らしや仕事と結び付けると？ タップで理由へ。</p><div class="impact-list">${focus.map(id => {
+      <h2 id="takeaway-title">${focus.length ? "影響が出るところ" : "この図でたどれる先はありません"}</h2>
+      ${focus.length ? `<div class="impact-list">${focus.map(id => {
         const n = G.byId[id], r = res[id];
-        return `<button class="impact-row" data-hop="${esc(id)}"><span class="impact-head"><b>${esc(n.name)}</b><span class="impact-dir ${dirClass(r.dir)}-t">${esc(dirWord(n, r.dir))}${r.dir ? "方向" : ""}</span></span><span class="impact-life">${esc(impactLife(n))}</span><span class="impact-more">${r.dir ? "どうつながる？" : "なぜ力がぶつかる？"} →</span></button>`;
-      }).join("")}</div>` : `<p>ほかの起点を選ぶか、「原因をたどる」でこの項目につながる元を探せます。</p>`}
-      <p class="sim-limit">ほかの条件が同じ場合の傾向です。実際には逆向きの力も働きます。</p>
+        return `<button class="impact-row" data-hop="${esc(id)}"><span class="impact-head"><b>${esc(n.name)}</b><span class="impact-dir ${dirClass(r.dir)}-t">${esc(dirWord(n, r.dir))}${r.dir ? "方向" : ""}</span></span><span class="impact-life">${esc(impactLife(n))}</span></button>`;
+      }).join("")}</div>` : ""}
     </section>
     ${affected.length ? `<details class="fold sim-paths"><summary>影響の道すじを順に見る（${affected.length}項目）</summary>
       ${waves.map((list, i) => `<div class="wave"><div class="wave-h">${i + 1}段目${i === 0 ? " · 直接の影響" : " · その先の影響"}</div><div class="hops">${list.map(v => simHop(v, res[v])).join("")}</div></div>`).join("")}
-      <p class="hint">段数はつながりの数で、影響が出るまでの時間ではありません。</p></details>` : ""}
+</details>` : ""}
     <div class="row-btns"><button class="btn ghost" data-mapmode="all">この条件を全体図で見る</button></div>
-    <section class="sim-reality"><h2>ニュースを読むときに使う</h2><p>「どこへ影響が広がるか」を考えたら、実際のニュースで同じ動きがあるか確かめてみましょう。</p>
-      ${related.length ? `<div class="rel">${relList(related.map(n => n.id))}</div>` : ""}
-      <a class="btn ghost connect-next" href="#news">ニュースで確かめる →</a></section>`;
+    ${related.length ? `<section class="sim-reality"><h2>関係するニュース</h2><div class="rel">${relList(related.map(n => n.id))}</div></section>` : ""}`;
 }
 // 段ごとの一覧は名前と向きだけにして、理由はタップで読む
 function simHop(v, r) {
@@ -706,11 +693,9 @@ function renderExperts() {
   const debates = (D.debates || []).map(debateCard).join("");
   $("#v-experts").innerHTML = `
     <h1 class="page-title">識者の見方</h1>
-    <p class="page-sub">エコノミストや経済ジャーナリストの、この1週間の発信を短くまとめています。</p>
     ${debates ? `<div class="sec" style="margin-top:8px"><h2>見方が分かれている点</h2></div>${debates}<div class="sec"><h2>それぞれの発信</h2></div>` : ""}
     <div class="chips scroll" role="group" aria-label="人で絞り込む">${[["all", "すべて"], ...names].map(([id, nm]) => `<button class="filter ${state.expert === id ? "on" : ""}" data-expert="${esc(id)}">${esc(nm)}</button>`).join("")}</div>
     <div style="margin-top:14px">${list.map(expertCard).join("") || `<p class="empty">いまは表示できる発信がありません。</p>`}</div>
-    <p class="note">X（旧Twitter）と YouTube は、いまは取り込んでいません。note・記事・研究所のレポートを集めています。</p>
     ${foot()}`;
 }
 function debateCard(d) {
@@ -724,7 +709,7 @@ function debateCard(d) {
 function expertCard(e) {
   const url = safeUrl(e.link);
   return `<article class="card">
-    <div class="ex-head"><div class="avatar">${esc(e.name.slice(0, 1))}</div><div><div class="n">${esc(e.name)}</div><div class="r">${esc(e.role)}</div></div><span class="stance s-${esc(e.stance)}">${esc(e.stance)}</span></div>
+    <div class="ex-head"><div><div class="n">${esc(e.name)}</div><div class="r">${esc(e.role)}</div></div><span class="stance s-${esc(e.stance)}">${esc(e.stance)}</span></div>
     <p class="ex-view">${gl(e.view, new Set())}</p>
     ${url ? `<a class="ex-src" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(e.kind)}・${esc(e.source)}・${esc(ago(e.time))}<br><b>${esc(e.title)}</b></a>` : ""}
   </article>`;
@@ -734,7 +719,7 @@ function expertCard(e) {
 function reviewHtml() {
   const rv = X.reviews[0];
   if (!rv) {
-    return `<div class="sec"><h2>答え合わせ</h2></div><p class="note">3日前に書いた「この先どうなるかも」が実際どうなったかを、毎日ここで確かめます。記録が3日分たまると始まります。</p>`;
+    return "";
   }
   const tally = {};
   for (const r of X.reviews) for (const i of r.items) tally[i.verdict] = (tally[i.verdict] || 0) + 1;
@@ -756,7 +741,7 @@ function glossaryHtml() {
   if (!cats.length) return "";
   const cur = state.glCat && cats.includes(state.glCat) ? state.glCat : cats[0];
   const list = Object.values(TERMS).filter(t => t.c === cur);
-  return `<div class="sec"><h2>用語集</h2><span class="aside">${Object.keys(TERMS).length}語・タップで意味</span></div>
+  return `<div class="sec"><h2>用語集</h2><span class="aside">${Object.keys(TERMS).length}語</span></div>
     <div class="chips scroll" role="group" aria-label="用語の分類">${cats.map(c => `<button class="filter ${c === cur ? "on" : ""}" data-glcat="${esc(c)}">${esc(c)}</button>`).join("")}</div>
     <div class="term-grid">${list.map(t => `<button class="term-btn" data-term="${esc(t.t)}">${esc(t.t)}</button>`).join("")}</div>`;
 }
@@ -766,7 +751,6 @@ function renderLearn() {
   const today = (D.quiz || []).map((q, i) => quizCard(q, `t${i}`, state.todayAnswers[i], "今日のニュースから")).join("");
   $("#v-learn").innerHTML = `
     <h1 class="page-title">学ぶ</h1>
-    <p class="page-sub">答え合わせ・クイズ・用語集。</p>
     ${reviewHtml()}
     <div class="sec"><h2>つながりクイズ</h2><span class="score">${sc.right} / ${sc.total} 問正解</span></div>
     ${quizCard(state.gq, "g", state.gqAnswered, state.gq.kind)}
