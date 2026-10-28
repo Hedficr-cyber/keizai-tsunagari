@@ -40,7 +40,7 @@ SYSTEM = """あなたは経済・金融ニュースの解説者です。経済�
 - 「起きたこと」と「この先の見通し」をはっきり分け、見通しは「〜かもしれない」「〜の可能性がある」と書く。
 - 特定の銘柄の売買をすすめない。
 - 識者の見方は、その人自身の発言・寄稿として読み取れるものだけを要約する。名前が出てくるだけの記事や、別人の記事は relevant を false にする。
-- 日本語で、短く、むずかしい言葉にはかんたんな言い換えを添える。"""
+- 日本語で書く。一文は40字くらいまでに短く切る。むずかしい言葉は少なくし、使うときはかんたんな言い換えを添える。"""
 
 DIR = {"type": "string", "enum": ["up", "down"]}
 
@@ -74,8 +74,9 @@ def main_schema(nodes):
         "headline": s("今日の世の中の動きを一言で（40字以内）"),
         "themes": arr(obj({
             "title": s("テーマ名（20字以内）"),
+            "point": s("ひとことで言うと（30字以内。一覧に出す）"),
             "thread": s("このテーマが続いている『流れ』の名前（15字以内）。既にある流れと同じ話題ならその名前をそのまま使う"),
-            "what": s("何が起きたか（事実だけ・120字以内）"),
+            "what": s("何が起きたか（事実だけ・100字以内・短い文で）"),
             "chain": arr(tag, 2, 6, "原因から影響へ、つながり図の項目を順に並べる"),
             "chain_text": s("そのつながりの説明（150字以内）"),
             "outlook": arr(s(), 2, 3, "今後こうなるかもしれないこと（各70字以内）"),
@@ -110,6 +111,8 @@ def main_schema(nodes):
                 "text": s("そうなったときの広がり（90字以内）"),
             }), 2, 2),
         }), 0, 5, "これからの予定ごとの2通りのシナリオ"),
+        "terms": arr(obj({"term": s("言葉（文中の書き方のまま）"), "explain": s("高校生にわかる説明（60字以内・1〜2文）")}), 0, 12,
+                     "今日の文章に出てくる難しい言葉のうち、下の用語集にないもの"),
         "moving": arr(obj({"node": {"type": "string", "enum": nodes}, "dir": DIR,
                            "why": s("いまそう動いている理由（50字以内）")}), 3, 10),
         "quiz": arr(obj({"q": s(), "choices": arr(s(), 3, 3),
@@ -197,6 +200,11 @@ def value_on(series, day):
     return pts[-1] if pts else None
 
 
+def glossary_words():
+    g = load(ROOT / "data" / "glossary.json", {"terms": []})
+    return [k for t in g["terms"] for k in [t["t"], *t.get("a", [])]]
+
+
 def build_prompt(graph, raw, experts_cfg, threads):
     nodes = "\n".join(f"{n['id']}｜{n['name']}｜上がる＝{n['up']}／下がる＝{n['down']}" for n in graph["nodes"])
     edges = " ".join(f"{e['from']}>{e['to']}({'+' if e['sign'] > 0 else '-'})" for e in graph["edges"])
@@ -236,6 +244,9 @@ def build_prompt(graph, raw, experts_cfg, threads):
 ## 識者の発信（ID｜名前（肩書き）｜種類｜媒体 日時｜題名｜要約）
 {exps}
 
+## 用語集にある言葉（アプリでタップすると説明が出る。terms には入れない）
+{"、".join(glossary_words())}
+
 ## 作るもの
 - headline: 今日の世の中の動きを一言で。
 - themes: 今日いちばん大事な動きを3〜5個。chain は原因から影響へ、項目を順に並べる（なるべく上の基本の関係に沿う。沿わないつながりは chain_text で理由を書く）。chain の向きは今日実際に起きている向き（相場の数字とニュース）に合わせ、まだ起きていない仮の向きを使うときは chain_text に「もし〜なら」と書く。outlook は「〜かもしれない」で。thread は、上の『流れ』と同じ話題ならその名前をそのまま使い、新しい話題なら短い名前を付ける。
@@ -244,7 +255,8 @@ def build_prompt(graph, raw, experts_cfg, threads):
 - debates: relevant な識者の発信のなかで、同じ話題について強気と慎重に見方が分かれているもの。無理に作らない。
 - scenarios: 上の予定のうち2週間以内のものそれぞれに、結果が2通りに分かれた場合の広がり。ニュースに日付つきで出てくる大きな予定（米雇用統計・米消費者物価など）があれば足してよい（日付がわからなければ date は空文字）。
 - moving: 今日のニュースから見て、いま動いている項目と向き。
-- quiz: 今日のニュースを使った3択クイズを3問。つながり（AならB）を考えさせる問題にする。"""
+- quiz: 今日のニュースを使った3択クイズを3問。つながり（AならB）を考えさせる問題にする。
+- terms: あなたが書いた文章（what・chain_text・outlook・plain・next・view など）に出てくる難しい言葉で、上の用語集にないもの。会社名・人名は入れない。"""
 
 
 def find_claude():
@@ -365,7 +377,7 @@ def daily(graph, cfg, raw):
                     used.add(i)
                     news.append(news_item(i, {"tags": [], "plain": "", "next": "", "level": 1}))
             themes.append({
-                "title": t.get("title", ""), "thread": (t.get("thread") or t.get("title", ""))[:20], "what": t.get("what", ""),
+                "title": t.get("title", ""), "point": t.get("point", ""), "thread": (t.get("thread") or t.get("title", ""))[:20], "what": t.get("what", ""),
                 "chain": chain, "chain_text": t.get("chain_text", ""), "outlook": t.get("outlook", []), "watch": t.get("watch", ""),
                 "news": [f"n{i}" for i in refs if i is not None],
                 "experts": [f"e{i}" for i in (ref("e", r, len(raw["experts"])) for r in t.get("experts", [])) if i is not None and f"e{i}" in shown],
@@ -395,7 +407,17 @@ def daily(graph, cfg, raw):
                 scenarios.append({"event": sc.get("event", ""), "date": dt if re.match(r"^\d{4}-\d{2}-\d{2}$", dt or "") else "",
                                   "focus": sc.get("focus", ""), "cases": cases})
         quiz = [q for q in ai.get("quiz", []) if len(q.get("choices", [])) == 3]
+        # 今日の用語：用語集にない言葉で、実際に文章に出てくるものだけ
+        known = set(glossary_words())
+        text = json.dumps([brief, news, experts, debates, scenarios], ensure_ascii=False)
+        terms, seen_t = [], set()
+        for t in ai.get("terms", []):
+            w = (t.get("term") or "").strip()
+            if w and w not in known and w not in seen_t and w in text and t.get("explain"):
+                seen_t.add(w)
+                terms.append({"term": w, "explain": t["explain"]})
     else:
+        terms = []
         news = [news_item(i, {"tags": keyword_tags(x["title"], graph), "plain": "", "next": "", "level": 1})
                 for i, x in enumerate(raw["news"][:80])]
         experts = [expert_item(i, {"view": "", "stance": "中立", "tags": keyword_tags(x["title"], graph)})
@@ -415,6 +437,7 @@ def daily(graph, cfg, raw):
         "calendar": raw.get("calendar", []),
         "markets": raw["markets"],
         "quiz": quiz,
+        "terms": terms,
     }
     save(OUT, data, pretty=True)
     save(ARCHIVE / f"{today}.json", data)
@@ -437,7 +460,7 @@ def daily(graph, cfg, raw):
         kept.sort(key=lambda t: (t["entries"][-1]["date"], len(t["entries"])), reverse=True)
         save(THREADS, {"updated": data["updated"], "threads": kept}, pretty=True)
     print(f"テーマ {len(brief['themes'])} / ニュース {len(news)} / 識者 {len(experts)} / 対立 {len(debates)} / シナリオ {len(scenarios)}"
-          f" / 動き {len(moving)} / 相場と逆向き {conflicts} / クイズ {len(quiz)}" + (f" / {meta}" if meta else "") + f" → {OUT}")
+          f" / 動き {len(moving)} / 相場と逆向き {conflicts} / クイズ {len(quiz)} / 今日の用語 {len(terms)}" + (f" / {meta}" if meta else "") + f" → {OUT}")
     return 0
 
 
