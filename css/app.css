@@ -341,7 +341,7 @@ button.card { display: block; width: 100%; text-align: left; }
 .trail .filter { height: 28px; font-size: 12px; margin-left: 6px; }
 
 /* ---------- v0.4.0：わかりやすさの整理と、用語のタップ説明 ---------- */
-.brand svg { width: 24px; height: 21px; }
+.brand svg { width: 25px; height: 18px; }
 /* 用語：点線の下線。タップで意味 */
 .term { border-bottom: 1.5px dotted var(--ink-3); cursor: pointer; padding-bottom: 0; }
 .term:active { background: var(--surface-2); }
