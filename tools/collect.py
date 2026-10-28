@@ -1,0 +1,304 @@
+"""ニュース・識者の発信・相場を集めて _work/raw/collected.json に保存する。
+
+使い方: /opt/homebrew/bin/python3 -X utf8 tools/collect.py
+外部ライブラリは使わない（標準ライブラリだけ）。
+"""
+import csv
+import html
+import io
+import json
+import re
+import sys
+import time
+import urllib.parse
+import urllib.request
+import xml.etree.ElementTree as ET
+from datetime import datetime, timedelta, timezone
+from email.utils import parsedate_to_datetime
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+OUT = ROOT / "_work" / "raw" / "collected.json"
+JST = timezone(timedelta(hours=9))
+UA = {
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130 Safari/537.36",
+    "Accept-Language": "ja,en;q=0.8",
+}
+NS = {
+    "atom": "http://www.w3.org/2005/Atom",
+    "rss1": "http://purl.org/rss/1.0/",
+    "dc": "http://purl.org/dc/elements/1.1/",
+    "media": "http://search.yahoo.com/mrss/",
+    "yt": "http://www.youtube.com/xml/schemas/2015",
+}
+NEWS_HOURS = 36
+EXPERT_DAYS = 7
+# 株価の銘柄ページなど、ニュースではない見出し
+JUNK = re.compile(r"Stock Price|Price Quote|Spot Rate|株価・株式情報|\| Stock|Latest News -")
+
+
+def fetch(url, timeout=25, tries=2):
+    last = None
+    for i in range(tries):
+        try:
+            with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=timeout) as r:
+                return r.read()
+        except Exception as e:  # noqa: BLE001
+            last = e
+            time.sleep(1.5 * (i + 1))
+    raise last
+
+
+def gnews_url(q):
+    return "https://news.google.com/rss/search?" + urllib.parse.urlencode({"q": q, "hl": "ja", "gl": "JP", "ceid": "JP:ja"})
+
+
+def clean(text, limit=300):
+    text = html.unescape(re.sub(r"<[^>]+>", " ", text or ""))
+    text = re.sub(r"\s+", " ", text).strip()
+    return text[:limit]
+
+
+def parse_time(s):
+    if not s:
+        return None
+    s = s.strip()
+    try:
+        d = parsedate_to_datetime(s)
+    except Exception:  # noqa: BLE001
+        try:
+            d = datetime.fromisoformat(s.replace("Z", "+00:00"))
+        except Exception:  # noqa: BLE001
+            return None
+    if d.tzinfo is None:
+        d = d.replace(tzinfo=JST)
+    return d.astimezone(JST)
+
+
+def text_of(el, *paths):
+    for p in paths:
+        x = el.find(p, NS)
+        if x is not None and (x.text or "").strip():
+            return x.text.strip()
+    return ""
+
+
+def parse_feed(data):
+    """RSS 2.0 / RSS 1.0(RDF) / Atom をまとめて読む。"""
+    root = ET.fromstring(data)
+    items = []
+    for it in root.iter("item"):
+        src = it.find("source")
+        items.append({
+            "title": text_of(it, "title"),
+            "link": text_of(it, "link"),
+            "time": parse_time(text_of(it, "pubDate", "dc:date")),
+            "summary": clean(text_of(it, "description")),
+            "publisher": (src.text or "").strip() if src is not None else "",
+        })
+    for it in root.iter("{%s}item" % NS["rss1"]):
+        items.append({
+            "title": text_of(it, "rss1:title"),
+            "link": text_of(it, "rss1:link"),
+            "time": parse_time(text_of(it, "dc:date")),
+            "summary": clean(text_of(it, "rss1:description")),
+            "publisher": "",
+        })
+    for it in root.iter("{%s}entry" % NS["atom"]):
+        link = it.find("atom:link", NS)
+        items.append({
+            "title": text_of(it, "atom:title"),
+            "link": link.get("href", "") if link is not None else "",
+            "time": parse_time(text_of(it, "atom:published", "atom:updated")),
+            "summary": clean(text_of(it, "media:group/media:description", "atom:summary"), 400),
+            "publisher": "",
+        })
+    return items
+
+
+def split_publisher(title, publisher):
+    """Googleニュースの「見出し - 媒体名」を分ける。"""
+    if publisher and title.endswith(" - " + publisher):
+        return title[: -len(publisher) - 3].strip(), publisher
+    m = re.match(r"^(.*) - ([^-]{2,30})$", title)
+    if m and not publisher:
+        return m.group(1).strip(), m.group(2).strip()
+    return title, publisher
+
+
+def norm(title):
+    return re.sub(r"[\s　、。,.・「」『』【】（）()!?！？:：\-－—…]", "", title)[:40]
+
+
+def feed_url(f):
+    if f["type"] == "gnews":
+        return gnews_url(f["q"])
+    if f["type"] == "youtube":
+        return "https://www.youtube.com/feeds/videos.xml?channel_id=" + f["channel"]
+    return f["url"]
+
+
+def collect_news(cfg, now, log):
+    out, seen = [], set()
+    for src in cfg["news"]:
+        try:
+            items = parse_feed(fetch(feed_url(src)))
+        except Exception as e:  # noqa: BLE001
+            log.append(f"NG ニュース {src['name']}: {type(e).__name__}")
+            continue
+        n = 0
+        google = src["type"] == "gnews" or "news.google.com" in feed_url(src)
+        for it in items:
+            title, pub = split_publisher(it["title"], it["publisher"]) if google else (it["title"], "")
+            if not title or JUNK.search(title) or JUNK.search(it["title"]):
+                continue
+            if it["time"] and now - it["time"] > timedelta(hours=NEWS_HOURS):
+                continue
+            key = norm(title)
+            if key in seen:
+                continue
+            seen.add(key)
+            out.append({
+                "title": title,
+                "link": it["link"],
+                "source": pub or src["name"],
+                "feed": src["id"],
+                "time": it["time"].isoformat() if it["time"] else None,
+                # Googleニュース経由の要約は見出しの繰り返しなので使わない
+                "summary": "" if google else it["summary"][:200],
+            })
+            n += 1
+        log.append(f"OK ニュース {src['name']}: {n}件")
+    out.sort(key=lambda x: x["time"] or "", reverse=True)
+    return out
+
+
+def collect_experts(cfg, now, log):
+    out, seen = [], set()
+    for ex in cfg["experts"]:
+        got = []
+        for f in ex["feeds"]:
+            try:
+                items = parse_feed(fetch(feed_url(f), tries=5 if f["type"] == "youtube" else 2))
+            except Exception as e:  # noqa: BLE001
+                log.append(f"NG 識者 {ex['name']}: {type(e).__name__}")
+                continue
+            for it in items:
+                title, pub = split_publisher(it["title"], it["publisher"]) if f["type"] == "gnews" else (it["title"], "")
+                if not title or (it["time"] and now - it["time"] > timedelta(days=EXPERT_DAYS)):
+                    continue
+                key = norm(title)
+                if key in seen:
+                    continue
+                seen.add(key)
+                kind = {"youtube": "動画", "gnews": "記事"}.get(f["type"], "投稿")
+                got.append({
+                    "expert": ex["id"],
+                    "title": title,
+                    "link": it["link"],
+                    "source": pub or ex["name"],
+                    "kind": kind,
+                    "time": it["time"].isoformat() if it["time"] else None,
+                    # 動画の説明欄は宣伝文の前までにする
+                    "summary": "" if f["type"] == "gnews" else re.split(r"[━▼■]|https?://", it["summary"])[0].strip()[:400],
+                })
+        got.sort(key=lambda x: x["time"] or "", reverse=True)
+        out.extend(got[:6])
+        log.append(f"OK 識者 {ex['name']}: {len(got[:6])}件")
+    return out
+
+
+def series_tail(points, days=35):
+    pts = [p for p in points if p[1] is not None][-days:]
+    return [{"d": d, "v": round(v, 3)} for d, v in pts]
+
+
+def markets(log):
+    res = {}
+    today = datetime.now(JST).date()
+    start = (today - timedelta(days=50)).isoformat()
+    # ドル円（欧州中央銀行の参考レート。土日祝は更新なし）
+    try:
+        d = json.loads(fetch(f"https://api.frankfurter.app/{start}..?from=USD&to=JPY"))
+        pts = sorted((k, v["JPY"]) for k, v in d["rates"].items())
+        res["usdjpy"] = {"name": "ドル円", "unit": "円", "source": "欧州中央銀行（frankfurter.app）", "series": series_tail(pts)}
+        log.append("OK 相場 ドル円")
+    except Exception as e:  # noqa: BLE001
+        log.append(f"NG 相場 ドル円: {type(e).__name__}")
+    # 日本の10年国債（財務省 国債金利情報）
+    try:
+        pts = []
+        for url in ("https://www.mof.go.jp/jgbs/reference/interest_rate/data/jgbcm_all.csv",
+                    "https://www.mof.go.jp/jgbs/reference/interest_rate/jgbcm.csv"):
+            try:
+                raw = fetch(url, timeout=40).decode("shift_jis", "replace")
+            except Exception:  # noqa: BLE001
+                continue
+            rows = list(csv.reader(io.StringIO(raw)))
+            head = next((r for r in rows if r and r[0] == "基準日"), None)
+            if not head or "10年" not in head:
+                continue
+            col = head.index("10年")
+            for r in rows:
+                m = re.match(r"^([RHS])(\d+)\.(\d+)\.(\d+)$", r[0]) if r else None
+                if m:
+                    era = {"R": 2018, "H": 1988, "S": 1925}[m.group(1)]
+                    dt = f"{era + int(m.group(2)):04d}-{int(m.group(3)):02d}-{int(m.group(4)):02d}"
+                elif r and re.match(r"^\d{4}/\d{1,2}/\d{1,2}$", r[0]):
+                    y, mo, da = r[0].split("/")
+                    dt = f"{int(y):04d}-{int(mo):02d}-{int(da):02d}"
+                else:
+                    continue
+                try:
+                    pts.append((dt, float(r[col])))
+                except (ValueError, IndexError):
+                    pass
+        if pts:
+            pts = sorted(dict(pts).items())
+            res["jgb10"] = {"name": "日本の10年国債利回り", "unit": "%", "source": "財務省 国債金利情報", "series": series_tail(pts)}
+            log.append("OK 相場 日本10年債")
+        else:
+            log.append("NG 相場 日本10年債: 読み取れず")
+    except Exception as e:  # noqa: BLE001
+        log.append(f"NG 相場 日本10年債: {type(e).__name__}")
+    # 米国の10年国債（米財務省）
+    try:
+        pts = []
+        for y in sorted({today.year, (today - timedelta(days=50)).year}):
+            raw = fetch("https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/"
+                        f"{y}/all?type=daily_treasury_yield_curve&field_tdr_date_value={y}&page&_format=csv", timeout=40).decode()
+            rows = list(csv.DictReader(io.StringIO(raw)))
+            for r in rows:
+                mo, da, yy = r["Date"].split("/")
+                try:
+                    pts.append((f"{yy}-{mo}-{da}", float(r["10 Yr"])))
+                except (ValueError, KeyError):
+                    pass
+        pts.sort()
+        res["ust10"] = {"name": "米国の10年国債利回り", "unit": "%", "source": "米財務省", "series": series_tail(pts)}
+        log.append("OK 相場 米10年債")
+    except Exception as e:  # noqa: BLE001
+        log.append(f"NG 相場 米10年債: {type(e).__name__}")
+    return res
+
+
+def main():
+    cfg = json.loads((ROOT / "tools" / "sources.json").read_text(encoding="utf-8"))
+    now = datetime.now(JST)
+    log = []
+    data = {
+        "collected": now.isoformat(timespec="seconds"),
+        "news": collect_news(cfg, now, log),
+        "experts": collect_experts(cfg, now, log),
+        "markets": markets(log),
+        "log": log,
+    }
+    OUT.parent.mkdir(parents=True, exist_ok=True)
+    OUT.write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
+    print("\n".join(log))
+    print(f"ニュース {len(data['news'])}件 / 識者 {len(data['experts'])}件 / 相場 {len(data['markets'])}種 → {OUT}")
+    return 0 if data["news"] else 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())
