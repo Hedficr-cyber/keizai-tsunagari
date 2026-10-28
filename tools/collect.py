@@ -14,7 +14,7 @@ import time
 import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from email.utils import parsedate_to_datetime
 from pathlib import Path
 
@@ -127,6 +127,27 @@ def split_publisher(title, publisher):
     return title, publisher
 
 
+# 見出しの前後に付く、媒体名・コーナー名・写真ページの印など（記事の中身ではないもの）
+TITLE_PREFIX = re.compile(r"^(写真ギャラリー\d+枚め|【?写真】?|動画)\s*[｜|]\s*")
+TITLE_HASHTAG = re.compile(r"\s+#\S.*$")
+
+
+def clean_title(title):
+    t = TITLE_PREFIX.sub("", title.strip())
+    t = TITLE_HASHTAG.sub("", t)
+    # 「見出し | コーナー | 媒体名」「見出し｜媒体名」の後ろ側を落とす（短いものだけ）
+    while True:
+        m = re.match(r"^(.*\S)\s*[|｜]\s*([^|｜]{1,24})$", t)
+        if not m or len(m.group(1)) < 12:
+            break
+        t = m.group(1)
+    # 「見出し - コーナー名」（ダイヤモンドなど）
+    m = re.match(r"^(.{12,}?)\s+[\-－]\s+([^\s\-－]{2,20})$", t)
+    if m:
+        t = m.group(1)
+    return t.strip()
+
+
 def norm(title):
     return re.sub(r"[\s　、。,.・「」『』【】（）()!?！？:：\-－—…]", "", title)[:40]
 
@@ -151,6 +172,7 @@ def collect_news(cfg, now, log):
         google = src["type"] == "gnews" or "news.google.com" in feed_url(src)
         for it in items:
             title, pub = split_publisher(it["title"], it["publisher"]) if google else (it["title"], "")
+            title = clean_title(title)
             if not title or JUNK.search(title) or JUNK.search(it["title"]):
                 continue
             if it["time"] and now - it["time"] > timedelta(hours=NEWS_HOURS):
@@ -223,6 +245,7 @@ def collect_experts(cfg, now, log):
                 continue
             for it in items:
                 title, pub = split_publisher(it["title"], it["publisher"]) if f["type"] == "gnews" else (it["title"], "")
+                title = clean_title(title)
                 if not title or (it["time"] and now - it["time"] > timedelta(days=EXPERT_DAYS)):
                     continue
                 # 名前で探した記事は、見出しに名字があるものだけ（本文に名前が出るだけの別人の記事を除く）
@@ -278,8 +301,11 @@ def calendar(now, log):
                 if not m or mon1 not in MONTHS:
                     continue
                 d = int(m.group(2) or m.group(1))
-                events.append({"date": f"{y:04d}-{MONTHS[mon1]:02d}-{d:02d}", "name": "FOMC（米国の金融政策の決定）",
-                               "note": "結果は日本時間の翌朝3〜4時ごろ" + ("。経済見通しの公表あり" if "*" in days else ""),
+                # 結果は米東部の2日目午後2時＝日本時間の次の日の朝。日付は日本時間に直す
+                us_day = date(y, MONTHS[mon1], d)
+                jp_day = us_day + timedelta(days=1)
+                events.append({"date": jp_day.isoformat(), "name": "FOMC（米国の金融政策の決定）",
+                               "note": f"結果は日本時間の朝3〜4時ごろ（米国では{us_day.month}/{us_day.day}）" + ("。経済見通しの公表あり" if "*" in days else ""),
                                "nodes": ["fed", "usdjpy", "us_stocks", "ust10"], "source": "FRB"})
         log.append("OK 予定 FOMC")
     except Exception as e:  # noqa: BLE001
@@ -311,7 +337,8 @@ def calendar(now, log):
         log.append("OK 予定 GDP")
     except Exception as e:  # noqa: BLE001
         log.append(f"NG 予定 GDP: {type(e).__name__}")
-    today = now.date().isoformat()
+    # 結果が出たあとも1日は残す（「結果が出ました」として、シナリオと照らせるように）
+    today = (now.date() - timedelta(days=1)).isoformat()
     until = (now.date() + timedelta(days=45)).isoformat()
     seen, out = set(), []
     for e in sorted(events, key=lambda x: x["date"]):

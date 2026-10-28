@@ -33,7 +33,7 @@ v0.5.0ではニュースの選定方針を、経済全体への重要度、幅�
 
 ## 自動更新
 
-- Mac の launchd（`~/Library/LaunchAgents/jp.hedficr.keizai-tsunagari.update.plist`）が、毎日 7:00・12:00・18:00 に `tools/auto_update.py` を動かす。Mac が眠っていた時刻の分は、起きたときに1回まとめて動く。
+- Mac の launchd（`~/Library/LaunchAgents/jp.hedficr.keizai-tsunagari.update.plist`）が、毎日 7:00・12:00・18:00 に `tools/auto_update.py` を動かす。Mac が眠っていた時刻の分は、起きたときに1回まとめて動く。更新している間は `caffeinate -i -s` で Mac を眠らせない（電源につないでいれば最後まで動く。バッテリーでフタを閉じていると、次に起きたときに続きが動く）。
 - 動かす場所は `~/Library/Application Support/keizai-app/repo`（GitHub の写し。毎回 GitHub の最新にそろえるので、手で直さない）。記録は `~/Library/Logs/keizai-app/update.log`。
 - 流れ：最新のコードにそろえる → 集める → 読み解く → `data/` だけをコミットして push → GitHub Pages が1分ほどで反映。
 - 読み解きに失敗した回は、公開中の版をそのまま残す。

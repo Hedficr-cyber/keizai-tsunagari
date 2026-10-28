@@ -117,7 +117,7 @@ const todayStr = () => new Date().toLocaleDateString("sv");
 function md(iso) { const d = new Date(iso + "T00:00:00"); return `${d.getMonth() + 1}/${d.getDate()}（${WD[d.getDay()]}）`; }
 function dayLabel(iso) {
   const n = Math.round((new Date(iso + "T00:00:00") - new Date(todayStr() + "T00:00:00")) / 86400000);
-  return n === 0 ? "今日" : n === 1 ? "あす" : n > 0 ? `あと${n}日` : `${-n}日前`;
+  return n === 0 ? "今日" : n === 1 ? "あす" : n === -1 ? "きのう" : n > 0 ? `あと${n}日` : `${-n}日前`;
 }
 // 要点がないときは、最初の一文を使う
 const firstSentence = s => { const t = String(s || "").split("。")[0]; return t ? (t.length > 60 ? t.slice(0, 58) + "…" : t + "。") : ""; };
@@ -205,7 +205,8 @@ function openTheme(i) {
     .map(e => `<div class="voice"><div class="who">${esc(e.name)}<span class="muted" style="font-weight:500">｜${esc(e.role)}</span></div>${gl(e.view, S)}</div>`).join("");
   const hasVoices = (t.experts || []).some(id => expertById[id]);
   const rel = relList(t.news || []);
-  const conf = (t.chain || []).filter(c => c.conflict).map(c => `<p class="conf-note">※ ${esc(c.conflict)}。ここでは仕組みとしての向きです。</p>`).join("");
+  const conf = (t.chain || []).filter(c => c.conflict).map(c => `<p class="conf-note">※ ${esc(c.conflict)}。ここでは仕組みとしての向きです。</p>`).join("")
+    + ((t.chain || []).some(c => c.known === false) ? `<p class="conf-note">※ 色の付いた矢印（→）は、つながり図の基本の関係にない、今回 AI が考えたつながりです。</p>` : "");
   const first = (t.chain || [])[0];
   openSheet(`
     <p class="cat">テーマ ${i + 1}${th ? `・流れ「${esc(th.name)}」${th.entries.length}日目` : ""}</p>
@@ -224,7 +225,10 @@ function openTheme(i) {
 let AGENDA = [];
 function agendaItems() {
   const today = todayStr();
-  const cal = (D.calendar || []).filter(e => e.date >= today);
+  // 結果が出たあとも、次の日までは残す（シナリオと照らせるように）
+  const y = new Date(); y.setDate(y.getDate() - 1);
+  const since = y.toLocaleDateString("sv");
+  const cal = (D.calendar || []).filter(e => e.date >= since);
   const sc = [...(D.scenarios || [])];
   const items = cal.map(e => {
     // 同じ日の予定にシナリオを合わせる（名前の一部が重なるものを優先）
@@ -233,13 +237,13 @@ function agendaItems() {
     return { ...e, scenario: j >= 0 ? sc.splice(j, 1)[0] : null };
   });
   // 公式の日程にない予定（ニュースから AI が拾ったもの）
-  for (const s of sc) if (!s.date || s.date >= today) items.push({ date: s.date, name: s.event, note: s.date ? "" : "日付はニュースから未確定", nodes: [], scenario: s });
+  for (const s of sc) if (!s.date || s.date >= since) items.push({ date: s.date, name: s.event, note: s.date ? "" : "日付はニュースから未確定", nodes: [], scenario: s });
   return items.sort((a, b) => (a.date || "9999") < (b.date || "9999") ? -1 : 1);
 }
 function agendaRow(e, i) {
   return `<button class="ag-row" data-agi="${i}">
     <div class="ag-date">${e.date ? `${esc(md(e.date))}<span>${esc(dayLabel(e.date))}</span>` : `<span>日付未定</span>`}</div>
-    <div class="ag-main"><b>${esc(e.name)}</b><span>${e.scenario ? "結果しだいの2通りを見る" : esc(e.note || "")}</span></div>
+    <div class="ag-main"><b>${esc(e.name)}</b><span>${e.date && e.date < todayStr() ? (e.scenario ? "結果が出ました。シナリオと照らす" : "結果が出ました") : e.scenario ? "結果しだいの2通りを見る" : esc(e.note || "")}</span></div>
     <span class="chev" aria-hidden="true">›</span></button>`;
 }
 function agendaRows(limit) {
@@ -258,6 +262,7 @@ function openAgendaItem(i) {
     <h2>${esc(e.name)}</h2>
     ${e.note ? `<p class="muted small">${esc(e.note)}</p>` : ""}
     ${(e.nodes || []).length ? `<div class="q-sec"><div class="q-h">動きそうなもの</div><div class="chips">${e.nodes.map(n => chip(n)).join("")}</div></div>` : ""}
+    ${e.date && e.date < todayStr() ? `<p class="note">結果が出ました。下の2通りのどちらに近かったか、「ニュース」で確かめてみましょう。</p>` : ""}
     ${s ? `<div class="q-sec"><div class="q-h">焦点</div><p>${gl(s.focus, S)}</p></div>
       <div class="q-sec"><div class="q-h">結果しだいで、こう広がるかも</div>
       <div class="cases">${s.cases.map((c, k) => `<div class="case c${k}"><div class="case-l">${esc(c.label)}</div><div class="chain">${chainHtml(c.chain)}</div><p>${gl(c.text, S)}</p></div>`).join("")}</div></div>` : `<p class="note">2週間以内になると、結果しだいのシナリオが付きます。</p>`}
@@ -270,10 +275,12 @@ function openAgenda() {
 }
 
 // ---------- ニュース ----------
-function newsCats(n) { return new Set((n.tags || []).map(t => G.byId[t.node]?.cat).filter(Boolean)); }
+// 分類は AI が選んだ1つ（古いデータは、いちばん目の項目札の分類）
 function primaryNewsCat(n) {
-  return [...newsCats(n)].find(id => G.cats.some(c => c.id === id)) || "other";
+  if (n.cat && G.cats.some(c => c.id === n.cat)) return n.cat;
+  return (n.tags || []).map(t => G.byId[t.node]?.cat).find(id => G.cats.some(c => c.id === id)) || "other";
 }
+function newsCats(n) { return new Set([primaryNewsCat(n)]); }
 function newsOrder(a, b) {
   return (b.level || 1) - (a.level || 1) || (Date.parse(b.time) || 0) - (Date.parse(a.time) || 0);
 }
@@ -367,7 +374,7 @@ function newsRow(n, featured = false) {
   const category = G.cats.find(c => c.id === primaryNewsCat(n));
   return `<button class="item news-item" data-news="${esc(n.id)}">
     <span class="news-item-main"><span class="t">${esc(n.title)}</span>
-    <span class="m">${featured && category ? `<span class="news-category">${esc(category.name)}</span>` : ""}${n.level >= 3 ? `<span class="news-importance">重要</span>` : ""}<span>${esc(n.source)}</span><span>${esc(ago(n.time))}</span></span></span>
+    <span class="m">${featured && category ? `<span class="news-category">${esc(category.name)}</span>` : ""}${n.level >= 3 ? `<span class="news-importance">重要</span>` : ""}<span>${esc(n.source)}</span><span>${esc(ago(n.time))}</span>${(n.related || []).length ? `<span class="news-more">ほか${n.related.length}本</span>` : ""}</span></span>
     <span class="news-chevron" aria-hidden="true">›</span>
   </button>`;
 }
@@ -390,6 +397,7 @@ function openNews(id) {
     ${n.plain ? `<div class="q-sec"><div class="q-h">ひとことで</div><p>${gl(n.plain, S)}</p></div>` : ""}
     ${n.next ? `<div class="q-sec"><div class="q-h">この先</div><p>${gl(n.next, S)}</p></div>` : ""}
     ${url ? `<a class="outbtn" href="${esc(url)}" target="_blank" rel="noopener noreferrer">元の記事を読む</a>` : ""}
+    ${(n.related || []).length ? `<details class="fold"><summary>同じ出来事の別の記事（${n.related.length}）</summary><div class="rel">${n.related.map(r => safeUrl(r.link) ? `<a href="${esc(safeUrl(r.link))}" target="_blank" rel="noopener noreferrer">${esc(r.title)}<span class="src">${esc(r.source)}・${esc(ago(r.time))}</span></a>` : "").join("")}</div></details>` : ""}
     ${(n.tags || []).length || ripple ? `<details class="fold news-connections"><summary>このニュースは何につながる？</summary>
       ${(n.tags || []).length ? `<div class="q-sec"><div class="q-h">関係するもの</div><div class="chips">${n.tags.map(t => chip(t.node, t.dir, { full: true })).join("")}</div></div>` : ""}
       ${ripple}</details>` : ""}

@@ -480,3 +480,8 @@ details.fold[open] summary::after { content: "閉じる"; }
 .news-connections .q-sec { margin-top: 12px; }
 .news-connections .tag { min-height: 44px; height: auto; padding: 10px 12px; }
 .news-connections .btn, .news-connections .link-row { min-height: 44px; }
+
+/* v0.5.1：まとめた記事の数 */
+.news-more { border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; font-size: 10px; color: var(--ink-2); }
+.rel a { display: block; padding: 10px 0; border-top: 1px solid var(--line); font-size: 13px; line-height: 1.55; text-decoration: none; }
+.rel a .src { display: block; font-size: 11px; color: var(--ink-2); margin-top: 2px; }
