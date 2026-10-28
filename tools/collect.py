@@ -7,6 +7,7 @@ import csv
 import html
 import io
 import json
+import os
 import re
 import sys
 import time
@@ -173,13 +174,50 @@ def collect_news(cfg, now, log):
     return out
 
 
+# YouTube の公式の配信（RSS）は 2026-10 時点で止まっている。動画一覧のページを機械で読むのは
+# 利用規約で禁じられているので、公式の YouTube Data API（無料・キーが要る）があるときだけ使う。
+YT_KEY_FILE = Path.home() / "Library" / "Application Support" / "keizai-app" / "youtube_api_key"
+
+
+def youtube_key():
+    k = os.environ.get("KEIZAI_YT_KEY", "").strip()
+    if not k and YT_KEY_FILE.exists():
+        k = YT_KEY_FILE.read_text(encoding="utf-8").strip()
+    return k
+
+
+def youtube_items(channel, key):
+    """チャンネルの新しい動画（アップロード一覧）を YouTube Data API で取る。1回1ユニット。"""
+    url = "https://www.googleapis.com/youtube/v3/playlistItems?" + urllib.parse.urlencode({
+        "part": "snippet", "maxResults": 8, "playlistId": "UU" + channel[2:], "key": key})
+    data = json.loads(fetch(url))
+    items = []
+    for it in data.get("items", []):
+        sn = it.get("snippet", {})
+        vid = sn.get("resourceId", {}).get("videoId")
+        if not vid:
+            continue
+        items.append({"title": sn.get("title", ""), "link": f"https://www.youtube.com/watch?v={vid}", "channel": sn.get("channelTitle", ""),
+                      "time": parse_time(sn.get("publishedAt")), "summary": clean(sn.get("description", ""), 400),
+                      "publisher": ""})
+    return items
+
+
 def collect_experts(cfg, now, log):
     out, seen = [], set()
+    yt_key = youtube_key()
+    yt_skipped = []
     for ex in cfg["experts"]:
         got = []
         for f in ex["feeds"]:
             try:
-                items = parse_feed(fetch(feed_url(f), tries=5 if f["type"] == "youtube" else 2))
+                if f["type"] == "youtube":
+                    if not yt_key:
+                        yt_skipped.append(ex["name"])
+                        continue
+                    items = youtube_items(f["channel"], yt_key)
+                else:
+                    items = parse_feed(fetch(feed_url(f)))
             except Exception as e:  # noqa: BLE001
                 log.append(f"NG 識者 {ex['name']}: {type(e).__name__}")
                 continue
@@ -187,11 +225,14 @@ def collect_experts(cfg, now, log):
                 title, pub = split_publisher(it["title"], it["publisher"]) if f["type"] == "gnews" else (it["title"], "")
                 if not title or (it["time"] and now - it["time"] > timedelta(days=EXPERT_DAYS)):
                     continue
+                # 名前で探した記事は、見出しに名字があるものだけ（本文に名前が出るだけの別人の記事を除く）
+                if f["type"] == "gnews" and ex.get("key") and ex["key"] not in title:
+                    continue
                 key = norm(title)
                 if key in seen:
                     continue
                 seen.add(key)
-                kind = {"youtube": "動画", "gnews": "記事"}.get(f["type"], "投稿")
+                kind = {"youtube": "動画", "gnews": "記事"}.get(f["type"], f.get("kind", "投稿"))
                 got.append({
                     "expert": ex["id"],
                     "title": title,
@@ -202,9 +243,82 @@ def collect_experts(cfg, now, log):
                     # 動画の説明欄は宣伝文の前までにする
                     "summary": "" if f["type"] == "gnews" else re.split(r"[━▼■]|https?://", it["summary"])[0].strip()[:400],
                 })
+        if not got and any(f["type"] == "youtube" for f in ex["feeds"]) and not yt_key:
+            continue
         got.sort(key=lambda x: x["time"] or "", reverse=True)
-        out.extend(got[:6])
-        log.append(f"OK 識者 {ex['name']}: {len(got[:6])}件")
+        out.extend(got[:ex.get("max", 6)])
+        chan = next((i.get("channel") for i in locals().get("items", []) if i.get("channel")), "")
+        # YouTube はチャンネル名も記録する（チャンネルIDの取り違えに気づけるように）
+        log.append(f"OK 識者 {ex['name']}: {len(got[:ex.get('max', 6)])}件" + (f"（チャンネル名：{chan}）" if chan else ""))
+    if yt_skipped:
+        log.append(f"-- YouTube はキー未設定のため取らない（{'・'.join(yt_skipped)}）")
+    return out
+
+
+MONTHS = {m: i for i, m in enumerate(["January", "February", "March", "April", "May", "June", "July", "August",
+                                      "September", "October", "November", "December"], 1)}
+
+
+def calendar(now, log):
+    """これからの大きな予定（公式の日程ページから）。date は結果が出る日（現地）。"""
+    events = []
+    year = now.year
+    # FRB（FOMC）。2日目の午後2時（米東部）に結果。日本時間では翌日の朝
+    try:
+        page = fetch("https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm").decode("utf-8", "replace")
+        for y in (year, year + 1):
+            i = page.find(f"{y} FOMC Meetings")
+            if i < 0:
+                continue
+            j = page.find(f"{y - 1} FOMC Meetings", i)
+            seg = page[i:j if j > i else i + 20000]
+            for mon, days in re.findall(r'fomc-meeting__month[^>]*>\s*<strong>([^<]+)</strong>.*?fomc-meeting__date[^>]*>([^<]+)<', seg, re.S):
+                m = re.match(r"(\d+)(?:-(\d+))?", days.strip())
+                mon1 = mon.split("/")[-1].strip()
+                if not m or mon1 not in MONTHS:
+                    continue
+                d = int(m.group(2) or m.group(1))
+                events.append({"date": f"{y:04d}-{MONTHS[mon1]:02d}-{d:02d}", "name": "FOMC（米国の金融政策の決定）",
+                               "note": "結果は日本時間の翌朝3〜4時ごろ" + ("。経済見通しの公表あり" if "*" in days else ""),
+                               "nodes": ["fed", "usdjpy", "us_stocks", "ust10"], "source": "FRB"})
+        log.append("OK 予定 FOMC")
+    except Exception as e:  # noqa: BLE001
+        log.append(f"NG 予定 FOMC: {type(e).__name__}")
+    # 日銀の金融政策決定会合。2日目の昼ごろに結果
+    try:
+        page = fetch("https://www.boj.or.jp/mopo/mpmsche_minu/index.htm").decode("utf-8", "replace")
+        text = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", page))
+        for y in (year, year + 1):
+            i = text.find(f"{y}年 金融政策決定会合")
+            if i < 0:
+                continue
+            j = text.find("年 金融政策決定会合", i + 10)
+            seg = text[i:j if j > i else len(text)]
+            for mo, d1, d2 in re.findall(r"(\d{1,2})月\s?(\d{1,2})日（.）・(\d{1,2})日（.）", seg):
+                events.append({"date": f"{y:04d}-{int(mo):02d}-{int(d2):02d}", "name": "日銀の金融政策決定会合",
+                               "note": "結果は2日目の昼ごろ。終わったあと総裁会見", "nodes": ["boj", "usdjpy", "jgb10", "banks"],
+                               "source": "日本銀行"})
+        log.append("OK 予定 日銀")
+    except Exception as e:  # noqa: BLE001
+        log.append(f"NG 予定 日銀: {type(e).__name__}")
+    # 日本の GDP（内閣府の公表予定）
+    try:
+        page = fetch("https://www.esri.cao.go.jp/jp/sna/kouhyou/kouhyou_top.html").decode("utf-8", "replace")
+        text = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", page))
+        for q, kind, y, mo, d in re.findall(r"(\d{4}年\d{1,2}-\d{1,2}月期)（(\d次速報)） (\d{4})（[^）]+）年(\d{1,2})月(\d{1,2})日", text):
+            events.append({"date": f"{int(y):04d}-{int(mo):02d}-{int(d):02d}", "name": f"日本のGDP（{q}・{kind}）",
+                           "note": "朝8時50分に公表", "nodes": ["jp_economy", "consumption"], "source": "内閣府"})
+        log.append("OK 予定 GDP")
+    except Exception as e:  # noqa: BLE001
+        log.append(f"NG 予定 GDP: {type(e).__name__}")
+    today = now.date().isoformat()
+    until = (now.date() + timedelta(days=45)).isoformat()
+    seen, out = set(), []
+    for e in sorted(events, key=lambda x: x["date"]):
+        k = (e["date"], e["name"])
+        if today <= e["date"] <= until and k not in seen:
+            seen.add(k)
+            out.append(e)
     return out
 
 
@@ -291,12 +405,13 @@ def main():
         "news": collect_news(cfg, now, log),
         "experts": collect_experts(cfg, now, log),
         "markets": markets(log),
+        "calendar": calendar(now, log),
         "log": log,
     }
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
     print("\n".join(log))
-    print(f"ニュース {len(data['news'])}件 / 識者 {len(data['experts'])}件 / 相場 {len(data['markets'])}種 → {OUT}")
+    print(f"ニュース {len(data['news'])}件 / 識者 {len(data['experts'])}件 / 相場 {len(data['markets'])}種 / 予定 {len(data['calendar'])}件 → {OUT}")
     return 0 if data["news"] else 1
 
 

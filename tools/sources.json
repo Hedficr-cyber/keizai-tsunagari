@@ -1,32 +1,166 @@
 {
-  "note": "集める元の一覧。足すときは news か experts に1行ずつ足す。type は rss（RSS/Atom）・gnews（Googleニュース検索。q に検索語）・youtube（channel にチャンネルID）。",
+  "note": "集める元の一覧。足すときは news か experts に1行ずつ足す。type は rss（RSS/Atom）・gnews（Googleニュース検索。q に検索語。key があると見出しにその文字がある記事だけ）・youtube（channel にチャンネルID。YouTube Data API のキーがあるときだけ取る）。",
   "news": [
-    { "id": "nikkei", "name": "日本経済新聞", "type": "gnews", "q": "site:nikkei.com when:1d" },
-    { "id": "gn_business", "name": "Googleニュース ビジネス", "type": "rss", "url": "https://news.google.com/rss/headlines/section/topic/BUSINESS?hl=ja&gl=JP&ceid=JP:ja" },
-    { "id": "nhk", "name": "NHK", "type": "rss", "url": "https://www.nhk.or.jp/rss/news/cat5.xml" },
-    { "id": "toyokeizai", "name": "東洋経済オンライン", "type": "rss", "url": "https://toyokeizai.net/list/feed/rss" },
-    { "id": "diamond", "name": "ダイヤモンド・オンライン", "type": "rss", "url": "https://diamond.jp/list/feed/rss/dol" },
-    { "id": "itmedia", "name": "ITmedia ビジネス", "type": "rss", "url": "https://rss.itmedia.co.jp/rss/2.0/business.xml" },
-    { "id": "boj", "name": "日本銀行", "type": "rss", "url": "https://www.boj.or.jp/rss/whatsnew.xml" }
+    {
+      "id": "nikkei",
+      "name": "日本経済新聞",
+      "type": "gnews",
+      "q": "site:nikkei.com when:1d"
+    },
+    {
+      "id": "gn_business",
+      "name": "Googleニュース ビジネス",
+      "type": "rss",
+      "url": "https://news.google.com/rss/headlines/section/topic/BUSINESS?hl=ja&gl=JP&ceid=JP:ja"
+    },
+    {
+      "id": "nhk",
+      "name": "NHK",
+      "type": "rss",
+      "url": "https://www.nhk.or.jp/rss/news/cat5.xml"
+    },
+    {
+      "id": "toyokeizai",
+      "name": "東洋経済オンライン",
+      "type": "rss",
+      "url": "https://toyokeizai.net/list/feed/rss"
+    },
+    {
+      "id": "diamond",
+      "name": "ダイヤモンド・オンライン",
+      "type": "rss",
+      "url": "https://diamond.jp/list/feed/rss/dol"
+    },
+    {
+      "id": "itmedia",
+      "name": "ITmedia ビジネス",
+      "type": "rss",
+      "url": "https://rss.itmedia.co.jp/rss/2.0/business.xml"
+    },
+    {
+      "id": "boj",
+      "name": "日本銀行",
+      "type": "rss",
+      "url": "https://www.boj.or.jp/rss/whatsnew.xml"
+    }
   ],
   "experts": [
-    { "id": "goto", "name": "後藤達也", "role": "経済ジャーナリスト（元日経記者）", "feeds": [
-      { "type": "rss", "url": "https://note.com/goto_finance/rss" } ] },
-    { "id": "karakama", "name": "唐鎌大輔", "role": "エコノミスト（みずほ銀行）", "feeds": [
-      { "type": "gnews", "q": "\"唐鎌大輔\" when:7d" } ] },
-    { "id": "nagahama", "name": "永濱利廣", "role": "エコノミスト（第一生命経済研究所）", "feeds": [
-      { "type": "gnews", "q": "\"永濱利廣\" when:7d" } ] },
-    { "id": "kumano", "name": "熊野英生", "role": "エコノミスト（第一生命経済研究所）", "feeds": [
-      { "type": "gnews", "q": "\"熊野英生\" when:7d" } ] },
-    { "id": "kiuchi", "name": "木内登英", "role": "エコノミスト（野村総合研究所・元日銀審議委員）", "feeds": [
-      { "type": "gnews", "q": "\"木内登英\" when:7d" } ] },
-    { "id": "kono", "name": "河野龍太郎", "role": "エコノミスト", "feeds": [
-      { "type": "gnews", "q": "\"河野龍太郎\" when:7d" } ] },
-    { "id": "pivot", "name": "PIVOT", "role": "ビジネス映像メディア", "feeds": [
-      { "type": "youtube", "channel": "UC8yHePe_RgUBE-waRWy6olw" } ] },
-    { "id": "nikkei_video", "name": "日本経済新聞（動画）", "role": "日経の解説動画", "feeds": [
-      { "type": "youtube", "channel": "UCa5GTH97HPtpXNuysWvWL_A" } ] },
-    { "id": "tvtokyo", "name": "テレ東BIZ", "role": "経済ニュース番組", "feeds": [
-      { "type": "youtube", "channel": "UCkKVQ_GNjd8FbAuT6xDcWgg" } ] }
+    {
+      "id": "goto",
+      "name": "後藤達也",
+      "role": "経済ジャーナリスト（元日経記者）",
+      "feeds": [
+        {
+          "type": "rss",
+          "url": "https://note.com/goto_finance/rss"
+        }
+      ]
+    },
+    {
+      "id": "karakama",
+      "name": "唐鎌大輔",
+      "role": "エコノミスト（みずほ銀行）",
+      "feeds": [
+        {
+          "type": "gnews",
+          "q": "\"唐鎌大輔\" when:7d"
+        }
+      ],
+      "key": "唐鎌"
+    },
+    {
+      "id": "nagahama",
+      "name": "永濱利廣",
+      "role": "エコノミスト（第一生命経済研究所）",
+      "feeds": [
+        {
+          "type": "gnews",
+          "q": "\"永濱利廣\" when:7d"
+        }
+      ],
+      "key": "永濱"
+    },
+    {
+      "id": "kumano",
+      "name": "熊野英生",
+      "role": "エコノミスト（ABC経済研究所 代表）",
+      "feeds": [
+        {
+          "type": "gnews",
+          "q": "\"熊野英生\" when:7d"
+        }
+      ],
+      "key": "熊野"
+    },
+    {
+      "id": "kiuchi",
+      "name": "木内登英",
+      "role": "エコノミスト（野村総合研究所・元日銀審議委員）",
+      "feeds": [
+        {
+          "type": "gnews",
+          "q": "\"木内登英\" when:7d"
+        }
+      ],
+      "key": "木内"
+    },
+    {
+      "id": "kono",
+      "name": "河野龍太郎",
+      "role": "エコノミスト",
+      "feeds": [
+        {
+          "type": "gnews",
+          "q": "\"河野龍太郎\" when:7d"
+        }
+      ],
+      "key": "河野"
+    },
+    {
+      "id": "nli",
+      "name": "ニッセイ基礎研究所",
+      "role": "シンクタンク（研究員のレポート）",
+      "max": 5,
+      "feeds": [
+        {
+          "type": "rss",
+          "url": "https://www.nli-research.co.jp/rss/",
+          "kind": "レポート"
+        }
+      ]
+    },
+    {
+      "id": "pivot",
+      "name": "PIVOT",
+      "role": "ビジネス映像メディア",
+      "feeds": [
+        {
+          "type": "youtube",
+          "channel": "UC8yHePe_RgUBE-waRWy6olw"
+        }
+      ]
+    },
+    {
+      "id": "nikkei_video",
+      "name": "日本経済新聞（動画）",
+      "role": "日経の解説動画",
+      "feeds": [
+        {
+          "type": "youtube",
+          "channel": "UCa5GTH97HPtpXNuysWvWL_A"
+        }
+      ]
+    },
+    {
+      "id": "tvtokyo",
+      "name": "テレ東BIZ",
+      "role": "経済ニュース番組",
+      "feeds": [
+        {
+          "type": "youtube",
+          "channel": "UCkKVQ_GNjd8FbAuT6xDcWgg"
+        }
+      ]
+    }
   ]
 }

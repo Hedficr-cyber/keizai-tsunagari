@@ -1,7 +1,7 @@
 """Mac の定時実行（launchd）から呼ぶ自動更新。
 
-最新のコードにそろえ → ニュースを集め → Claude で読み解き → data/ だけをコミットして GitHub に送る。
-GitHub Pages がそれを配信するので、iPhone のアプリに反映される。
+最新のコードにそろえ → ニュースを集め → Claude で読み解き → （1日1回）答え合わせ → （週末）週のまとめ
+→ data/ だけをコミットして GitHub に送る。GitHub Pages がそれを配信するので、iPhone のアプリに反映される。
 動かす場所は ~/Library/Application Support/keizai-app/repo（手で作業する Documents の写しとは別。
 こちらは毎回 GitHub の最新にそろえるので、手で直さない）。
 """
@@ -17,8 +17,13 @@ GIT = shutil.which("git", path="/opt/homebrew/bin:/usr/bin") or "git"
 PY = sys.executable
 
 
+def log(msg):
+    # 時刻を付けておく（途中で Mac が眠ると、どこで止まったかがわかる）
+    print(f"[{datetime.now():%H:%M:%S}] {msg}", flush=True)
+
+
 def run(*cmd, check=True):
-    print("$", " ".join(cmd), flush=True)
+    log("$ " + " ".join(cmd))
     return subprocess.run(cmd, cwd=ROOT, check=check, env={**os.environ, "GIT_TERMINAL_PROMPT": "0"})
 
 
@@ -29,23 +34,26 @@ def main():
     run(GIT, "fetch", "-q", "origin")
     run(GIT, "reset", "-q", "--hard", "origin/main")
     if run(PY, "-X", "utf8", "tools/collect.py", check=False).returncode != 0:
-        print("ニュースを集められなかったので終える", flush=True)
+        log("ニュースを集められなかったので終える")
         return 1
     if run(PY, "-X", "utf8", "tools/analyze.py", check=False).returncode != 0:
-        print("読み解きに失敗したので、公開中の版をそのまま残す", flush=True)
+        log("読み解きに失敗したので、公開中の版をそのまま残す")
         return 2
+    # 答え合わせ（1日1回）と週のまとめ（土日に1回）。失敗しても今日の読み解きは公開する
+    run(PY, "-X", "utf8", "tools/analyze.py", "--review", check=False)
+    run(PY, "-X", "utf8", "tools/analyze.py", "--weekly", check=False)
     run(GIT, "add", "data")
     if run(GIT, "diff", "--cached", "--quiet", check=False).returncode == 0:
-        print("変化なし", flush=True)
+        log("変化なし")
         return 0
     run(GIT, "commit", "-q", "-m", f"データ更新 {datetime.now():%Y-%m-%d %H:%M}")
     for _ in range(3):
         if run(GIT, "push", "-q", "origin", "HEAD:main", check=False).returncode == 0:
-            print("公開した", flush=True)
+            log("公開した")
             return 0
         # 手元の作業から先に送られていたら、その上に今回のデータを載せ直す（データは今回のものを優先）
         run(GIT, "pull", "-q", "--rebase", "-X", "theirs", "origin", "main", check=False)
-    print("送れなかった", flush=True)
+    log("送れなかった")
     return 3
 
 
