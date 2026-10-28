@@ -1,47 +1,195 @@
 {
-  "note": "集める元の一覧。足すときは news か experts に1行ずつ足す。type は rss（RSS/Atom）・gnews（Googleニュース検索。q に検索語。key があると見出しにその文字がある記事だけ）・youtube（channel にチャンネルID。YouTube Data API のキーがあるときだけ取る）。",
+  "note": "集める元の一覧。足すときは news か experts に1行ずつ足す。type は rss（RSS/Atom）・gnews（Googleニュース検索。q に検索語。key があると見出しにその文字がある記事だけ）・youtube（channel にチャンネルID。YouTube Data API のキーがあるときだけ取る）。 news の group は画面の「集めている媒体」の分け方、max はその媒体から取り込む上限（偏りを減らすため）、pub は Googleニュース検索で媒体名を絞る正規表現、lang が en の記事は AI が日本語の見出しを付ける。",
   "news": [
     {
       "id": "nikkei",
       "name": "日本経済新聞",
       "type": "gnews",
-      "q": "site:nikkei.com when:1d"
+      "q": "site:nikkei.com when:1d",
+      "group": "新聞・放送・通信",
+      "max": 45
     },
     {
       "id": "gn_business",
       "name": "Googleニュース ビジネス",
       "type": "rss",
-      "url": "https://news.google.com/rss/headlines/section/topic/BUSINESS?hl=ja&gl=JP&ceid=JP:ja"
+      "url": "https://news.google.com/rss/headlines/section/topic/BUSINESS?hl=ja&gl=JP&ceid=JP:ja",
+      "group": "ニュースのまとめ",
+      "max": 30
     },
     {
       "id": "nhk",
       "name": "NHK",
       "type": "rss",
-      "url": "https://www.nhk.or.jp/rss/news/cat5.xml"
+      "url": "https://www.nhk.or.jp/rss/news/cat5.xml",
+      "group": "新聞・放送・通信",
+      "max": 25
     },
     {
       "id": "toyokeizai",
       "name": "東洋経済オンライン",
       "type": "rss",
-      "url": "https://toyokeizai.net/list/feed/rss"
+      "url": "https://toyokeizai.net/list/feed/rss",
+      "group": "経済誌・ネットメディア",
+      "max": 15
     },
     {
       "id": "diamond",
       "name": "ダイヤモンド・オンライン",
       "type": "rss",
-      "url": "https://diamond.jp/list/feed/rss/dol"
+      "url": "https://diamond.jp/list/feed/rss/dol",
+      "group": "経済誌・ネットメディア",
+      "max": 15
     },
     {
       "id": "itmedia",
       "name": "ITmedia ビジネス",
       "type": "rss",
-      "url": "https://rss.itmedia.co.jp/rss/2.0/business.xml"
+      "url": "https://rss.itmedia.co.jp/rss/2.0/business.xml",
+      "group": "経済誌・ネットメディア",
+      "max": 12
     },
     {
       "id": "boj",
       "name": "日本銀行",
       "type": "rss",
-      "url": "https://www.boj.or.jp/rss/whatsnew.xml"
+      "url": "https://www.boj.or.jp/rss/whatsnew.xml",
+      "group": "公的機関",
+      "max": 8
+    },
+    {
+      "id": "reuters",
+      "name": "ロイター",
+      "type": "gnews",
+      "q": "ロイター 経済 when:1d",
+      "pub": "Reuters|ロイター",
+      "group": "新聞・放送・通信",
+      "max": 25
+    },
+    {
+      "id": "bloomberg",
+      "name": "ブルームバーグ",
+      "type": "gnews",
+      "q": "ブルームバーグ when:1d",
+      "pub": "Bloomberg|ブルームバーグ",
+      "group": "新聞・放送・通信",
+      "max": 25
+    },
+    {
+      "id": "asahi",
+      "name": "朝日新聞",
+      "type": "rss",
+      "url": "https://www.asahi.com/rss/asahi/business.rdf",
+      "group": "新聞・放送・通信",
+      "max": 20
+    },
+    {
+      "id": "jiji",
+      "name": "時事通信",
+      "type": "gnews",
+      "q": "site:jiji.com 経済 when:1d",
+      "group": "新聞・放送・通信",
+      "max": 20
+    },
+    {
+      "id": "kyodo",
+      "name": "共同通信",
+      "type": "gnews",
+      "q": "site:47news.jp 経済 when:1d",
+      "group": "新聞・放送・通信",
+      "max": 20
+    },
+    {
+      "id": "nikkeibusiness",
+      "name": "日経ビジネス",
+      "type": "rss",
+      "url": "https://business.nikkei.com/rss/sns/nb.rdf",
+      "group": "経済誌・ネットメディア",
+      "max": 15
+    },
+    {
+      "id": "jbpress",
+      "name": "JBpress",
+      "type": "rss",
+      "url": "https://jbpress.ismedia.jp/list/feed/rss",
+      "group": "経済誌・ネットメディア",
+      "max": 10
+    },
+    {
+      "id": "fsa",
+      "name": "金融庁",
+      "type": "rss",
+      "url": "https://www.fsa.go.jp/fsaNewsListAll_rss2.xml",
+      "group": "公的機関",
+      "max": 8
+    },
+    {
+      "id": "mof",
+      "name": "財務省",
+      "type": "rss",
+      "url": "https://www.mof.go.jp/news.rss",
+      "group": "公的機関",
+      "max": 8
+    },
+    {
+      "id": "cao",
+      "name": "内閣府",
+      "type": "rss",
+      "url": "https://www.cao.go.jp/rss/news.rdf",
+      "group": "公的機関",
+      "max": 8
+    },
+    {
+      "id": "bbc_ja",
+      "name": "BBCニュース日本語",
+      "type": "rss",
+      "url": "https://feeds.bbci.co.uk/japanese/rss.xml",
+      "group": "海外（日本語）",
+      "max": 12
+    },
+    {
+      "id": "cnn_ja",
+      "name": "CNN.co.jp",
+      "type": "rss",
+      "url": "https://feeds.cnn.co.jp/rss/cnn/cnn.rdf",
+      "group": "海外（日本語）",
+      "max": 12
+    },
+    {
+      "id": "cnbc",
+      "name": "CNBC",
+      "type": "rss",
+      "url": "https://www.cnbc.com/id/10001147/device/rss/rss.html",
+      "group": "海外（英語）",
+      "max": 15,
+      "lang": "en"
+    },
+    {
+      "id": "bbc_business",
+      "name": "BBC Business",
+      "type": "rss",
+      "url": "https://feeds.bbci.co.uk/news/business/rss.xml",
+      "group": "海外（英語）",
+      "max": 15,
+      "lang": "en"
+    },
+    {
+      "id": "marketwatch",
+      "name": "MarketWatch",
+      "type": "rss",
+      "url": "https://feeds.content.dowjones.io/public/rss/mw_topstories",
+      "group": "海外（英語）",
+      "max": 10,
+      "lang": "en"
+    },
+    {
+      "id": "ft",
+      "name": "Financial Times",
+      "type": "rss",
+      "url": "https://www.ft.com/rss/home",
+      "group": "海外（英語）",
+      "max": 10,
+      "lang": "en"
     }
   ],
   "experts": [

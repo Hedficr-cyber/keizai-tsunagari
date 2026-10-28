@@ -170,8 +170,15 @@ def collect_news(cfg, now, log):
             continue
         n = 0
         google = src["type"] == "gnews" or "news.google.com" in feed_url(src)
+        pub_only = re.compile(src["pub"]) if src.get("pub") else None
+        # 新しい順に、媒体ごとの上限まで（1つの媒体に偏りすぎないように）
+        items.sort(key=lambda it: it["time"].isoformat() if it["time"] else "", reverse=True)
         for it in items:
+            if n >= src.get("max", 40):
+                break
             title, pub = split_publisher(it["title"], it["publisher"]) if google else (it["title"], "")
+            if pub_only and not pub_only.search(pub or ""):
+                continue
             title = clean_title(title)
             if not title or JUNK.search(title) or JUNK.search(it["title"]):
                 continue
@@ -186,6 +193,8 @@ def collect_news(cfg, now, log):
                 "link": it["link"],
                 "source": pub or src["name"],
                 "feed": src["id"],
+                "group": src.get("group", ""),
+                "lang": src.get("lang", "ja"),
                 "time": it["time"].isoformat() if it["time"] else None,
                 # Googleニュース経由の要約は見出しの繰り返しなので使わない
                 "summary": "" if google else it["summary"][:200],

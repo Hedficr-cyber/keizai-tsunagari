@@ -157,7 +157,7 @@ const foot = () => `<p class="foot">ニュースの見出しと識者の発信�
 const VERDICT = { 当たり: "hit", 一部当たり: "part", 外れ: "miss", まだわからない: "wait" };
 const HINT = `<p class="hint"><span class="term-demo">点線の言葉</span>はタップすると意味が出ます</p>`;
 const relList = ids => ids.map(id => newsById[id]).filter(Boolean).slice(0, 4)
-  .map(n => `<button data-news="${esc(n.id)}">${esc(n.title)}<span class="src">${esc(n.source)}・${esc(ago(n.time))}</span></button>`).join("");
+  .map(n => `<button data-news="${esc(n.id)}">${esc(newsTitle(n))}<span class="src">${esc(n.source)}・${esc(ago(n.time))}</span></button>`).join("");
 
 // ---------- 今日 ----------
 // 一覧では要点だけを見せ、くわしい中身はタップで開く
@@ -343,7 +343,7 @@ function renderNews() {
   $("#v-news").innerHTML = `
     <h1 class="page-title">ニュース</h1>
     ${modes}
-    <p class="page-sub" style="margin-top:12px">${state.newsCat === "all" ? `全${all.length}本を表示。` : `${esc(selectedName)}の${list.length}本を表示。`}見出しをタップすると、要点とこの先が読めます。</p>
+    <p class="page-sub" style="margin-top:12px">${state.newsCat === "all" ? `全${all.length}本を表示。` : `${esc(selectedName)}の${list.length}本を表示。`}見出しをタップすると、要点とこの先が読めます。${(D.sources || []).length ? `<button class="src-link" data-sources>${D.sources.filter(x => x.collected).length}の媒体から集めています ›</button>` : ""}</p>
     <div class="chips scroll news-filters" role="group" aria-label="分野で絞り込む">${filters.map(([id, name]) => `<button class="filter ${state.newsCat === id ? "on" : ""}" data-newscat="${esc(id)}" aria-pressed="${state.newsCat === id}">${esc(name)}</button>`).join("")}</div>
     ${body || `<p class="empty">この分野のニュースは、いまはありません。</p>`}
     ${foot()}`;
@@ -370,11 +370,23 @@ function openThread(name) {
         <div class="chain" style="margin-top:8px">${chainHtml(e.chain)}</div></div></div>`).join("")}</div>
     ${HINT}`);
 }
+// 英語の記事は、AI が付けた日本語の見出しを出す（元の見出しは詳細に）
+const newsTitle = n => n.title_ja || n.title;
+// 集めている媒体（分け方ごとに、集めた本数と、AI が選んで載せた本数）
+function openSources() {
+  const groups = new Map();
+  for (const x of D.sources || []) { if (!groups.has(x.group)) groups.set(x.group, []); groups.get(x.group).push(x); }
+  const total = (D.sources || []).reduce((a, x) => a + x.collected, 0);
+  openSheet(`<p class="cat">ニュース</p><h2>集めている媒体</h2>
+    <p class="muted small" style="margin-top:6px">直近1日半の見出し ${total}本から、AI が経済の流れに大事なものを選んで載せています。1つの媒体に偏りすぎないよう、媒体ごとに取り込む本数に上限があります。</p>
+    ${[...groups].map(([g, list]) => `<div class="q-sec"><div class="q-h">${esc(g || "そのほか")}</div><div class="src-list">${list.map(x => `<div class="src-row"><span>${esc(x.name)}${x.lang === "en" ? `<small>英語</small>` : ""}</span><span class="muted small">集めた${x.collected}・載せた${x.shown}</span></div>`).join("")}</div></div>`).join("")}
+    <p class="note">識者の発信（note・記事・研究所のレポート）は「識者」の画面に出ます。</p>`);
+}
 function newsRow(n, featured = false) {
   const category = G.cats.find(c => c.id === primaryNewsCat(n));
   return `<button class="item news-item" data-news="${esc(n.id)}">
-    <span class="news-item-main"><span class="t">${esc(n.title)}</span>
-    <span class="m">${featured && category ? `<span class="news-category">${esc(category.name)}</span>` : ""}${n.level >= 3 ? `<span class="news-importance">重要</span>` : ""}<span>${esc(n.source)}</span><span>${esc(ago(n.time))}</span>${(n.related || []).length ? `<span class="news-more">ほか${n.related.length}本</span>` : ""}</span></span>
+    <span class="news-item-main"><span class="t">${esc(newsTitle(n))}</span>
+    <span class="m">${featured && category ? `<span class="news-category">${esc(category.name)}</span>` : ""}${n.level >= 3 ? `<span class="news-importance">重要</span>` : ""}${n.lang === "en" ? `<span class="news-more">英語</span>` : ""}<span>${esc(n.source)}</span><span>${esc(ago(n.time))}</span>${(n.related || []).length ? `<span class="news-more">ほか${n.related.length}本</span>` : ""}</span></span>
     <span class="news-chevron" aria-hidden="true">›</span>
   </button>`;
 }
@@ -393,7 +405,8 @@ function openNews(id) {
   const url = safeUrl(n.link);
   openSheet(`
     <p class="cat">${esc(n.source)}・${esc(fmtTime(n.time))}</p>
-    <h2>${gl(n.title, S)}</h2>
+    <h2>${gl(newsTitle(n), S)}</h2>
+    ${n.title_ja ? `<p class="muted small" lang="en">元の見出し（英語）：${esc(n.title)}</p>` : ""}
     ${n.plain ? `<div class="q-sec"><div class="q-h">ひとことで</div><p>${gl(n.plain, S)}</p></div>` : ""}
     ${n.next ? `<div class="q-sec"><div class="q-h">この先</div><p>${gl(n.next, S)}</p></div>` : ""}
     ${url ? `<a class="outbtn" href="${esc(url)}" target="_blank" rel="noopener noreferrer">元の記事を読む</a>` : ""}
@@ -439,7 +452,7 @@ function openNode(id) {
     <div class="row-btns"><button class="btn" data-walkto="${esc(id)}">つながりを図でたどる</button><button class="btn up" data-sim="${esc(id)}:up">${esc(n.up)}したら？</button><button class="btn down" data-sim="${esc(id)}:down">${esc(n.down)}したら？</button></div>
     ${outs ? `<details class="fold"><summary>影響を与える先（${G.out[id].length}）</summary><div class="links">${outs}</div></details>` : ""}
     ${ins ? `<details class="fold"><summary>影響を受ける元（${G.inn[id].length}）</summary><div class="links">${ins}</div></details>` : ""}
-    ${news.length ? `<div class="q-sec"><div class="q-h">関係する今日のニュース</div><div class="rel">${news.map(x => `<button data-news="${esc(x.id)}">${esc(x.title)}<span class="src">${esc(x.source)}・${esc(ago(x.time))}</span></button>`).join("")}</div></div>` : ""}
+    ${news.length ? `<div class="q-sec"><div class="q-h">関係する今日のニュース</div><div class="rel">${news.map(x => `<button data-news="${esc(x.id)}">${esc(newsTitle(x))}<span class="src">${esc(x.source)}・${esc(ago(x.time))}</span></button>`).join("")}</div></div>` : ""}
     ${HINT}`);
 }
 
@@ -854,7 +867,7 @@ document.addEventListener("click", ev => {
   }
   const term = ev.target.closest("[data-term]");
   if (term) { ev.preventDefault(); ev.stopPropagation(); showTerm(term.dataset.term); return; }
-  const t = ev.target.closest("[data-node],[data-news],[data-sim],[data-newscat],[data-newsmode],[data-expert],[data-pick],[data-simdir],[data-q],[data-next-quiz],[data-today-map],[data-walk],[data-walkto],[data-trail],[data-mapmode],[data-thread],[data-weekly],[data-agenda],[data-agi],[data-reviews],[data-reviewfull],[data-theme],[data-guide],[data-picker],[data-hop],[data-glcat]");
+  const t = ev.target.closest("[data-node],[data-news],[data-sim],[data-newscat],[data-newsmode],[data-expert],[data-pick],[data-simdir],[data-q],[data-next-quiz],[data-today-map],[data-walk],[data-walkto],[data-trail],[data-mapmode],[data-thread],[data-weekly],[data-agenda],[data-agi],[data-reviews],[data-reviewfull],[data-theme],[data-guide],[data-picker],[data-hop],[data-glcat],[data-sources]");
   if (!t) return;
   const ds = t.dataset;
   // history.back() は遅れて効くので、詳細から画面を移るときは閉じるだけにする
@@ -873,6 +886,7 @@ document.addEventListener("click", ev => {
   else if (ds.q !== undefined && ds.c !== undefined) answer(ds.q, +ds.c);
   else if (ds.nextQuiz !== undefined) { state.gq = makeGraphQuiz(G); state.gqAnswered = null; const y = window.scrollY; renderLearn(); window.scrollTo(0, y); }
   else if (ds.newsmode) { state.newsMode = ds.newsmode; renderNews(); $(`#v-news [data-newsmode="${state.newsMode}"]`)?.focus({ preventScroll: true }); }
+  else if (ds.sources !== undefined) openSources();
   else if (ds.newscat) { state.newsCat = ds.newscat; renderNews(); $(`#v-news [data-newscat="${state.newsCat}"]`)?.focus({ preventScroll: true }); }
   else if (ds.expert) { state.expert = ds.expert; renderExperts(); }
   else if (ds.glcat) { state.glCat = ds.glcat; const y = window.scrollY; renderLearn(); window.scrollTo(0, y); }

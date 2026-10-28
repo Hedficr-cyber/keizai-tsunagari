@@ -485,3 +485,9 @@ details.fold[open] summary::after { content: "閉じる"; }
 .news-more { border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; font-size: 10px; color: var(--ink-2); }
 .rel a { display: block; padding: 10px 0; border-top: 1px solid var(--line); font-size: 13px; line-height: 1.55; text-decoration: none; }
 .rel a .src { display: block; font-size: 11px; color: var(--ink-2); margin-top: 2px; }
+
+/* v0.6.0：集めている媒体 */
+.src-link { display: inline; margin-left: 4px; font-size: inherit; color: var(--ink); font-weight: 600; border-bottom: 1px solid var(--line); }
+.src-list { display: grid; gap: 0; }
+.src-row { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+.src-row small { margin-left: 6px; font-size: 10px; border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; color: var(--ink-2); }

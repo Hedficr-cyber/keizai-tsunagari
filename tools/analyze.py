@@ -22,7 +22,7 @@ ROOT = Path(__file__).resolve().parent.parent
 RAW = ROOT / "_work" / "raw" / "collected.json"
 JST = timezone(timedelta(hours=9))
 MODEL = os.environ.get("KEIZAI_MODEL", "sonnet")
-MAX_NEWS = 140
+MAX_NEWS = 420  # 媒体ごとの上限は collect.py（sources.json の max）でかけている
 MAX_EXPERTS = 45
 ARGS = set(sys.argv[1:])
 DATA = ROOT / "_work" / "dry" if "--dry-run" in ARGS else ROOT / "data"
@@ -88,6 +88,7 @@ def main_schema(nodes, cats):
             "id": s(), "tags": arr(tag, hi=3),
             "cat": {"type": "string", "enum": cats, "description": "分類を1つ（そのニュースのいちばん大事な面で選ぶ）"},
             "same": arr(s(), desc="同じ出来事を伝える別の記事のID（この1本にまとめたもの）"),
+            "title_ja": s("英語の記事（[英語]の印）のときだけ、内容がわかる短い日本語の見出し（40字以内）。日本語の記事は空文字"),
             "plain": s("やさしい要点（60字以内）"), "next": s("この先どうつながるか（70字以内）"),
             "level": {"type": "integer", "minimum": 1, "maximum": 3, "description": "重要度 3=大きい"},
         })),
@@ -211,7 +212,7 @@ def build_prompt(graph, raw, experts_cfg, threads):
     nodes = "\n".join(f"{n['id']}｜{n['name']}｜上がる＝{n['up']}／下がる＝{n['down']}" for n in graph["nodes"])
     edges = " ".join(f"{e['from']}>{e['to']}({'+' if e['sign'] > 0 else '-'})" for e in graph["edges"])
     news = "\n".join(
-        f"[n{i}] {x['source']} {short_time(x['time'])}｜{x['title']}" + (f"｜{x['summary'][:110]}" if x["summary"] else "")
+        f"[n{i}] {'[英語] ' if x.get('lang') == 'en' else ''}{x['source']} {short_time(x['time'])}｜{x['title']}" + (f"｜{x['summary'][:90]}" if x["summary"] else "")
         for i, x in enumerate(raw["news"][:MAX_NEWS]))
     who = {e["id"]: e for e in experts_cfg}
     exps = "\n".join(
@@ -255,7 +256,7 @@ def build_prompt(graph, raw, experts_cfg, threads):
 ## 作るもの
 - headline: 今日の世の中の動きを一言で。
 - themes: 今日いちばん大事な動きを3〜5個。経済への影響が大きい動きだけにする（情報流出・サイバー攻撃などの事件は、相場や業績を大きく動かしたときだけ）。chain は原因から影響へ、項目を順に並べる（なるべく上の基本の関係に沿う。沿わないつながりは chain_text で理由を書く）。chain の向きは今日実際に起きている向き（相場の数字とニュース）に合わせ、まだ起きていない仮の向きを使うときは chain_text に「もし〜なら」と書く。outlook は「〜かもしれない」で。thread は、上の『流れ』と同じ話題ならその名前をそのまま使い、新しい話題なら短い名前を付ける。つながり図の基本の関係でうまくつながらないときは、chain を2項目にとどめ、無理に項目を足さない。
-- news: 経済・金融・ビジネスに関係し、世の中の流れを知るために押さえておきたいものを30〜50本選び、重要な順に並べる。個人の好みやクリックされやすさでは選ばない。金融政策・為替・物価や景気・企業や産業・海外や政治の動きを広く見渡し、原資料に大事な動きがある分野を落とさない。一つの人気業界や銘柄だけで埋めない。ただし原資料にない話題を分野の穴埋めのために作らない。スポーツ・事件・芸能などは入れない。同じ出来事の続報・別の媒体・見出し違いは、いちばん詳しい1本だけを選び、残りの ID を same に入れる（別の意味を持つ変化だけ分ける）。cat は下の分類から1つ選ぶ（例：日経平均の動き→market、日銀の決定→policy、企業の決算→industry、物価の統計→economy、海外の景気→global、政府の予算や選挙→politics、家計や住宅→life）。情報流出・サイバー攻撃・事件・選挙制度などは、経済への影響がはっきりしているときだけ入れ、level は1にする。level=3 は経済全体に広く影響する動きや重要な政策・統計、level=2 はその分野の流れを知るために押さえる動き、level=1 は補足。plain は見出しの繰り返しだけでなく、何が変わりなぜ押さえたいかを、原資料から分かる範囲の短い一文で書く。tags はそのニュースが動かす項目と向き（関係が薄ければ空でよい）。
+- news: 経済・金融・ビジネスに関係し、世の中の流れを知るために押さえておきたいものを30〜50本選び、重要な順に並べる。個人の好みやクリックされやすさでは選ばない。金融政策・為替・物価や景気・企業や産業・海外や政治の動きを広く見渡し、原資料に大事な動きがある分野を落とさない。一つの人気業界や銘柄だけで埋めない。新聞・通信社・経済誌・公的機関・海外の媒体を広く見渡し、同じ大事さなら一つの媒体ばかりにならないようにする。海外の媒体（[英語] を含む）は、日本の経済や世界の流れに関わる大事な動きを拾う。公的機関の発表は、政策や統計として大事なものだけにする。ただし原資料にない話題を分野の穴埋めのために作らない。スポーツ・事件・芸能などは入れない。同じ出来事の続報・別の媒体・見出し違いは、いちばん詳しい1本だけを選び、残りの ID を same に入れる（別の意味を持つ変化だけ分ける）。cat は下の分類から1つ選ぶ（例：日経平均の動き→market、日銀の決定→policy、企業の決算→industry、物価の統計→economy、海外の景気→global、政府の予算や選挙→politics、家計や住宅→life）。情報流出・サイバー攻撃・事件・選挙制度などは、経済への影響がはっきりしているときだけ入れ、level は1にする。level=3 は経済全体に広く影響する動きや重要な政策・統計、level=2 はその分野の流れを知るために押さえる動き、level=1 は補足。plain は見出しの繰り返しだけでなく、何が変わりなぜ押さえたいかを、原資料から分かる範囲の短い一文で書く。tags はそのニュースが動かす項目と向き（関係が薄ければ空でよい）。
 - experts: すべての識者の発信について、その人の見方として読めるかを判断する（relevant）。
 - debates: relevant な識者の発信のなかで、同じ話題について強気と慎重に見方が分かれているもの。無理に作らない。
 - scenarios: 上の予定のうち2週間以内のものそれぞれに、結果が2通りに分かれた場合の広がり。ニュースに日付つきで出てくる大きな予定（米雇用統計・米消費者物価など）があれば足してよい（日付がわからなければ date は空文字）。
@@ -302,6 +303,20 @@ def run_claude(prompt, schema, name):
     meta = {"model": MODEL, "cost_usd": out.get("total_cost_usd"), "ms": out.get("duration_ms")}
     save(keep, {"data": data, "meta": meta}, pretty=True)
     return data, meta
+
+
+def source_stats(cfg, raw, news):
+    """媒体ごとの、集めた本数と載せた本数（画面の「集めている媒体」に出す）。"""
+    got, shown = {}, {}
+    feed_of = {}
+    for i, x in enumerate(raw["news"]):
+        got[x["feed"]] = got.get(x["feed"], 0) + 1
+        feed_of[f"n{i}"] = x["feed"]
+    for n in news:
+        f = feed_of.get(n["id"])
+        shown[f] = shown.get(f, 0) + 1
+    return [{"name": s["name"], "group": s.get("group", ""), "lang": s.get("lang", "ja"),
+             "collected": got.get(s["id"], 0), "shown": shown.get(s["id"], 0)} for s in cfg["news"]]
 
 
 def bigrams(t):
@@ -355,7 +370,11 @@ def daily(graph, cfg, raw):
 
     def news_item(i, extra=None):
         x = raw["news"][i]
-        return {"id": f"n{i}", "title": x["title"], "link": x["link"], "source": x["source"], "time": x["time"], **(extra or {})}
+        item = {"id": f"n{i}", "title": x["title"], "link": x["link"], "source": x["source"], "time": x["time"],
+                "group": x.get("group", ""), **(extra or {})}
+        if x.get("lang") == "en":
+            item["lang"] = "en"
+        return item
 
     def expert_item(i, extra=None):
         x = raw["experts"][i]
@@ -395,7 +414,8 @@ def daily(graph, cfg, raw):
                     used.add(j)
                     alias[f"n{j}"] = f"n{i}"
                     related.append(brief_item(j))
-            news.append(news_item(i, {"tags": tags, "cat": cat_of(n.get("cat"), tags), "plain": n.get("plain", ""),
+            extra_ja = {"title_ja": n["title_ja"].strip()} if raw["news"][i].get("lang") == "en" and (n.get("title_ja") or "").strip() else {}
+            news.append(news_item(i, {**extra_ja, "tags": tags, "cat": cat_of(n.get("cat"), tags), "plain": n.get("plain", ""),
                                       "next": n.get("next", ""), "level": n.get("level", 1), "related": related}))
         news, more = merge_similar(news)
         alias.update(more)
@@ -487,6 +507,7 @@ def daily(graph, cfg, raw):
         "markets": raw["markets"],
         "quiz": quiz,
         "terms": terms,
+        "sources": source_stats(cfg, raw, news),
     }
     save(OUT, data, pretty=True)
     save(ARCHIVE / f"{today}.json", data)

@@ -23,7 +23,7 @@
 
 ## データの流れ
 
-1. `tools/collect.py` … RSS（日経の見出しは Google ニュース経由、NHK、東洋経済、ダイヤモンド、ITmedia、日銀）、識者（note・Google ニュースの名前検索・YouTube）、相場（欧州中央銀行のドル円、財務省の国債金利、米財務省の国債金利）を集めて `_work/raw/collected.json` へ。
+1. `tools/collect.py` … RSS と Google ニュースの検索で 23 媒体（日経・ロイター・ブルームバーグ・NHK・朝日・時事・共同・東洋経済・ダイヤモンド・ITmedia・日経ビジネス・JBpress・日銀・金融庁・財務省・内閣府・BBC 日本語・CNN 日本語・CNBC・BBC Business・MarketWatch・FT など。媒体ごとに上限あり）、識者（note・Google ニュースの名前検索・YouTube）、相場（欧州中央銀行のドル円、財務省の国債金利、米財務省の国債金利）を集めて `_work/raw/collected.json` へ。
 2. `tools/analyze.py` … Mac に入っている Claude Code（デスクトップアプリの claude コマンド）を1回呼び、テーマ・つながり・見通し・識者の見方・クイズを作って `data/latest.json` へ。日ごとの控えは `data/archive/`。
 3. アプリは `data/graph.json`（つながり図。手で整えた基本の因果）と `data/latest.json` を読むだけ。
 
