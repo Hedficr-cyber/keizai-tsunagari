@@ -1,0 +1,125 @@
+/* 光の縁を持つガラスの土台と、指に追従する選択レンズ。 */
+.nav {
+  --nav-fill: color-mix(in srgb, var(--surface) 66%, transparent);
+  --nav-highlight: rgba(255,255,255,.72);
+  --nav-lowlight: rgba(20,20,24,.12);
+  --nav-lens-fill: color-mix(in srgb, var(--surface) 54%, transparent);
+  isolation: isolate;
+  border-radius: 30px;
+  border-color: color-mix(in srgb, var(--glass-edge) 78%, var(--line));
+  background: var(--surface);
+  box-shadow: 0 10px 32px rgba(15,15,20,.14), 0 2px 6px rgba(15,15,20,.05), inset 0 1px 0 var(--nav-highlight), inset 0 -1px 0 var(--nav-lowlight);
+  touch-action: pan-y pinch-zoom;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.nav::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: linear-gradient(112deg, rgba(255,255,255,.22), transparent 32%, transparent 68%, rgba(255,255,255,.13));
+  pointer-events: none;
+}
+.nav-lens {
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: calc((100% - 12px) / 4);
+  transform: translateX(6px);
+  border: 1px solid color-mix(in srgb, var(--glass-edge) 80%, var(--line));
+  border-radius: 23px;
+  background: color-mix(in srgb, var(--surface-2) 92%, transparent);
+  box-shadow: 0 2px 8px rgba(15,15,20,.09), inset 0 1px 0 var(--nav-highlight), inset 0 -1px 0 var(--nav-lowlight);
+  pointer-events: none;
+  transition: transform .32s cubic-bezier(.22,.8,.24,1), opacity .18s ease;
+}
+.nav-lens::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: linear-gradient(155deg, rgba(255,255,255,.3), transparent 38%, transparent 68%, rgba(255,255,255,.13));
+  opacity: .7;
+  transition: transform .2s ease, opacity .2s ease;
+}
+.nav a {
+  position: relative;
+  z-index: 1;
+  min-height: 48px;
+  justify-content: center;
+  padding: 6px 0;
+  border-radius: 23px;
+  color: var(--ink-2);
+  font-size: 11px;
+  line-height: 1.35;
+  white-space: nowrap;
+  touch-action: pan-y pinch-zoom;
+  -webkit-user-drag: none;
+  transition: color .16s ease;
+}
+.nav a svg { flex: none; }
+.nav a[aria-current="page"] {
+  color: var(--ink);
+  font-weight: 700;
+  background: transparent;
+}
+.nav a:focus-visible { outline-offset: -3px; }
+.nav.is-dragging { cursor: grabbing; }
+.nav.is-dragging a { cursor: grabbing; }
+.nav.is-dragging .nav-lens { transition: none; }
+.nav.is-dragging .nav-lens::after { opacity: 1; transform: scale(1.025,1.045); }
+.nav.is-dragging[data-preview] a[aria-current="page"] { color: var(--ink-2); font-weight: 500; }
+.nav.is-dragging[data-preview="today"] a[data-v="today"],
+.nav.is-dragging[data-preview="news"] a[data-v="news"],
+.nav.is-dragging[data-preview="map"] a[data-v="map"],
+.nav.is-dragging[data-preview="experts"] a[data-v="experts"] { color: var(--ink); font-weight: 700; }
+
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .nav {
+    background: var(--nav-fill);
+    backdrop-filter: blur(26px) saturate(1.35);
+    -webkit-backdrop-filter: blur(26px) saturate(1.35);
+  }
+  .nav-lens {
+    background: linear-gradient(135deg, rgba(255,255,255,.12), transparent 52%), var(--nav-lens-fill);
+    backdrop-filter: blur(9px) saturate(1.25);
+    -webkit-backdrop-filter: blur(9px) saturate(1.25);
+  }
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .nav {
+    --nav-fill: rgba(32,32,36,.76);
+    --nav-highlight: rgba(255,255,255,.19);
+    --nav-lowlight: rgba(0,0,0,.38);
+    --nav-lens-fill: rgba(93,93,103,.36);
+  }
+}
+:root[data-theme="dark"] .nav {
+  --nav-fill: rgba(32,32,36,.76);
+  --nav-highlight: rgba(255,255,255,.19);
+  --nav-lowlight: rgba(0,0,0,.38);
+  --nav-lens-fill: rgba(93,93,103,.36);
+}
+@media (prefers-reduced-motion: reduce) {
+  .nav-lens, .nav-lens::after, .nav a { transition: none; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .nav, .nav-lens { background: var(--surface); backdrop-filter: none; -webkit-backdrop-filter: none; }
+  .nav-lens { background: var(--surface-2); }
+  .nav::before, .nav-lens::after { display: none; }
+}
+@media (forced-colors: active) {
+  .nav { background: Canvas; border: 1px solid CanvasText; box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
+  .nav::before, .nav-lens { display: none; }
+  .nav a { color: LinkText !important; }
+  .nav a[aria-current="page"] { color: HighlightText !important; background: Highlight; }
+}
+/* 横操作だけをアプリへ渡し、縦読みとピンチ拡大はブラウザが扱う。 */
+.view { touch-action: pan-y pinch-zoom; }
+.view.on { animation: none; }
+.chips.scroll { touch-action: pan-x pan-y pinch-zoom; }
+main { overflow-x: clip; }
+.page-zoomed .view, .page-zoomed .nav, .page-zoomed .nav a { touch-action: pan-x pan-y pinch-zoom; }

@@ -1,6 +1,7 @@
 import { makeGraph, dirWord, dirNum, dirClass } from "./graph.js";
 import { renderRelationships, relationshipDetail } from "./relationships.js";
 import { VERSION } from "./versions.js";
+import { initNavigation } from "./navigation.js";
 
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -742,6 +743,15 @@ function syncSheetHistory() {
 
 // ---------- 画面の切り替え ----------
 const RENDER = { today: renderToday, news: renderNews, map: renderMap, experts: renderExperts };
+const navigation = initNavigation({
+  nav: $(".nav"), main: $("main"), getView: () => state.view,
+  canNavigate: () => !!D && !activeModal(),
+  navigate: view => {
+    if (!RENDER[view] || view === state.view || activeModal()) return;
+    history.pushState({}, "", `#${view}`);
+    syncNavigation();
+  },
+});
 function viewFromHash() {
   const view = (location.hash || "#today").slice(1);
   if (view === "learn") {
@@ -753,15 +763,18 @@ function viewFromHash() {
 }
 function route() {
   const next = viewFromHash();
+  const focusInOldView = next !== state.view && $("#v-" + state.view)?.contains(document.activeElement);
   if (next !== state.view) state.viewScroll[state.view] = window.scrollY;
   state.view = next;
   $$(".view").forEach(el => el.classList.toggle("on", el.id === "v-" + state.view));
   $$(".nav a").forEach(a => { if (a.dataset.v === state.view) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
   RENDER[state.view]();
+  navigation.sync(state.view);
   requestAnimationFrame(() => {
     if (state.view !== next) return;
     if (!(next === "map" && state.connectionTarget)) window.scrollTo(0, state.viewScroll[next] || 0);
     focusMapDestination();
+    if (focusInOldView) focusHeading($("#v-" + state.view));
   });
 }
 if ("scrollRestoration" in history) history.scrollRestoration = "manual";

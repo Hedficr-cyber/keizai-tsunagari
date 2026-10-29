@@ -1,6 +1,6 @@
 // いつも新しい内容を取りに行き（ネットがあれば最新）、つながらないときだけ手元に保存した分を出す
-const CACHE = "keizai-v0.7.0";
-const SHELL = ["./", "index.html", "css/app.css", "css/relationships.css", "js/app.js", "js/graph.js", "js/relationships.js", "js/versions.js", "data/graph.json", "data/glossary.json", "data/latest.json", "manifest.webmanifest", "icons/mark.svg"];
+const CACHE = "keizai-v0.7.1";
+const SHELL = ["./", "index.html", "css/app.css", "css/relationships.css", "css/navigation.css", "js/app.js", "js/graph.js", "js/relationships.js", "js/navigation.js", "js/versions.js", "data/graph.json", "data/glossary.json", "data/latest.json", "manifest.webmanifest", "icons/mark.svg"];
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL.map(u => new Request(u, { cache: "reload" })))).then(() => self.skipWaiting()));
 });
