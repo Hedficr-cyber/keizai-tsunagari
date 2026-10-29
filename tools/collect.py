@@ -1,4 +1,4 @@
-"""ニュース・識者の発信・相場を集めて _work/raw/collected.json に保存する。
+"""ニュース・有識者の発信・相場を集めて _work/raw/collected.json に保存する。
 
 使い方: /opt/homebrew/bin/python3 -X utf8 tools/collect.py
 外部ライブラリは使わない（標準ライブラリだけ）。
@@ -250,7 +250,7 @@ def collect_experts(cfg, now, log):
                 else:
                     items = parse_feed(fetch(feed_url(f)))
             except Exception as e:  # noqa: BLE001
-                log.append(f"NG 識者 {ex['name']}: {type(e).__name__}")
+                log.append(f"NG 有識者 {ex['name']}: {type(e).__name__}")
                 continue
             for it in items:
                 title, pub = split_publisher(it["title"], it["publisher"]) if f["type"] == "gnews" else (it["title"], "")
@@ -281,7 +281,7 @@ def collect_experts(cfg, now, log):
         out.extend(got[:ex.get("max", 6)])
         chan = next((i.get("channel") for i in locals().get("items", []) if i.get("channel")), "")
         # YouTube はチャンネル名も記録する（チャンネルIDの取り違えに気づけるように）
-        log.append(f"OK 識者 {ex['name']}: {len(got[:ex.get('max', 6)])}件" + (f"（チャンネル名：{chan}）" if chan else ""))
+        log.append(f"OK 有識者 {ex['name']}: {len(got[:ex.get('max', 6)])}件" + (f"（チャンネル名：{chan}）" if chan else ""))
     if yt_skipped:
         log.append(f"-- YouTube はキー未設定のため取らない（{'・'.join(yt_skipped)}）")
     return out
@@ -447,7 +447,7 @@ def main():
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
     print("\n".join(log))
-    print(f"ニュース {len(data['news'])}件 / 識者 {len(data['experts'])}件 / 相場 {len(data['markets'])}種 / 予定 {len(data['calendar'])}件 → {OUT}")
+    print(f"ニュース {len(data['news'])}件 / 有識者 {len(data['experts'])}件 / 相場 {len(data['markets'])}種 / 予定 {len(data['calendar'])}件 → {OUT}")
     return 0 if data["news"] else 1
 
 

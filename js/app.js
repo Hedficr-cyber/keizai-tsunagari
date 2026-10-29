@@ -1,15 +1,11 @@
-import { makeGraph, simulate, dirWord, dirNum, dirClass, STRENGTH, edgePath, makeGraphQuiz, MAP_W, MAP_H, NODE_W, NODE_H } from "./graph.js";
+import { makeGraph, dirWord, dirNum, dirClass } from "./graph.js";
+import { renderRelationships, relationshipDetail } from "./relationships.js";
 import { VERSION } from "./versions.js";
 
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const safeUrl = u => (/^https:\/\//.test(u || "") ? u : "");
-const store = {
-  get(k, d) { try { const v = localStorage.getItem("kz." + k); return v ? JSON.parse(v) : d; } catch { return d; } },
-  set(k, v) { try { localStorage.setItem("kz." + k, JSON.stringify(v)); } catch { /* 保存できない環境では覚えない */ } },
-};
-
 let G = null;
 let D = null;
 let GLOSSARY = null;
@@ -23,17 +19,10 @@ const state = {
   newsMode: "list",
   newsCat: "all",
   expert: "all",
-  mapMode: "try",
-  walk: [], // たどった項目（最後が真ん中）
-  sim: null, // { start, dir }
-  simPick: "boj",
-  simDir: 1,
-  gq: null,
-  gqAnswered: null,
-  todayAnswers: {},
-  glCat: null,
+  connectionCat: "all",
+  connectionDirections: {},
+  connectionTarget: null,
   viewScroll: {},
-  mapScrollTarget: null,
 };
 
 // ---------- 用語をタップで説明 ----------
@@ -221,8 +210,7 @@ function renderToday() {
     <div class="trows">${(b.themes || []).map(themeRow).join("") || `<p class="empty">次の更新で表示されます。</p>`}</div>
     ${agendaRows(3)}
     ${moving ? `<div class="sec"><h2>いま動いているもの</h2></div><div class="chips">${moving}</div>` : ""}
-    ${rv && rv.reviewed === todayStr() ? `<div class="sec"><h2>答え合わせ</h2></div><a class="card link-card" href="#learn"><div class="no">${esc(md(rv.target))}の「この先どうなるかも」</div><p>${esc(rv.summary)}</p><span class="chev-r" aria-hidden="true">›</span></a>` : ""}
-    ${(D.quiz || []).length ? `<div class="sec"><h2>考えてみる</h2></div><a class="card link-card" href="#learn"><p>${esc(D.quiz[0].q)}</p><span class="chev-r" aria-hidden="true">›</span></a>` : ""}
+    ${rv && rv.reviewed === todayStr() ? `<div class="sec"><h2>答え合わせ</h2></div><button class="card link-card" data-reviewfull><div class="no">${esc(md(rv.target))}の「この先どうなるかも」</div><p>${esc(rv.summary)}</p><span class="chev-r" aria-hidden="true">›</span></button>` : ""}
     ${foot()}`;
 }
 function themeRow(t, i) {
@@ -238,7 +226,7 @@ function openTheme(i, context = detailContext()) {
   if (!t) return;
   const S = new Set();
   const th = context.threads[t.thread];
-  // 点線は画面の上から最初の1回だけ付けるので、表示の順に組み立てる（識者の見方は下で作る）
+  // 点線は画面の上から最初の1回だけ付けるので、表示の順に組み立てる（有識者の見方は下で作る）
   const voices = () => (t.experts || []).map(id => context.experts[id]).filter(Boolean).slice(0, 2)
     .map(e => `<div class="voice"><div class="who">${esc(e.name)}<span class="muted" style="font-weight:500">｜${esc(e.role)}</span></div>${gl(e.view, S, context)}</div>`).join("");
   const hasVoices = (t.experts || []).some(id => context.experts[id]);
@@ -252,9 +240,9 @@ function openTheme(i, context = detailContext()) {
     <div class="q-sec"><div class="q-h">どうつながる？</div><div class="chain">${chainHtml(t.chain)}</div><p>${gl(t.chain_text, S, context)}</p>${conf}</div>
     <div class="q-sec"><div class="q-h">この先どうなるかも</div><ul class="outlook">${(t.outlook || []).map(o => `<li>${gl(o, S, context)}</li>`).join("")}</ul></div>
     ${t.watch ? `<div class="q-sec"><div class="q-h">次に見るもの</div><p>${gl(t.watch, S, context)}</p></div>` : ""}
-    ${hasVoices ? `<div class="q-sec"><div class="q-h">識者はどう見ている？</div>${voices()}</div>` : ""}
+    ${hasVoices ? `<div class="q-sec"><div class="q-h">有識者はどう見ている？</div>${voices()}</div>` : ""}
     ${rel ? `<div class="q-sec"><div class="q-h">元のニュース</div><div class="rel">${rel}</div></div>` : ""}
-    <div class="row-btns">${first ? `<button class="btn" data-sim="${esc(first.node)}:${esc(first.dir)}">広がる影響を図で見る</button>` : ""}${th && th.entries.length > 1 ? `<button class="btn ghost" data-thread="${esc(th.name)}">これまでの流れ</button>` : ""}</div>
+    <div class="row-btns">${first ? `<button class="btn" data-connection-to="${esc(first.node)}:${esc(first.dir)}">つながりを見る</button>` : ""}${th && th.entries.length > 1 ? `<button class="btn ghost" data-thread="${esc(th.name)}">これまでの流れ</button>` : ""}</div>
     ${HINT}`, context);
 }
 
@@ -423,36 +411,21 @@ function openNews(id, context = detailContext()) {
   const n = context.news[id];
   if (!n) return;
   const S = new Set();
-  const t0 = (n.tags || []).find(t => G.byId[t.node] && [1, -1].includes(dirNum(t.dir)));
-  let ripple = "";
-  if (t0) {
-    const { res, waves } = simulate(G, t0.node, dirNum(t0.dir), 2);
-    ripple = `<div class="q-sec"><div class="q-h">ここから広がる影響</div>
-      <div class="links">${waves.flat().slice(0, 4).map(v => hopRow(v, res[v])).join("")}</div>
-      <div class="row-btns"><button class="btn ghost" data-sim="${esc(t0.node)}:${dirNum(t0.dir) > 0 ? "up" : "down"}">広がる影響を図で見る</button></div></div>`;
-  }
-  const url = safeUrl(n.link);
+  const tags = (n.tags || []).filter(t => G.byId[t.node]);
+  const first = tags[0];
+  const section = (title, text) => text ? `<div class="q-sec"><div class="q-h">${esc(title)}</div><p>${gl(text, S, context)}</p></div>` : "";
+  const sources = [{ title: n.title, link: n.link, source: n.source, time: n.time }, ...(n.related || [])].filter(x => safeUrl(x.link));
   openSheet(`
     <p class="cat">${esc(n.source)}・${esc(fmtTime(n.time))}</p>
     <h2>${gl(newsTitle(n), S, context)}</h2>
-    ${n.title_ja ? `<p class="muted small" lang="en">元の見出し（英語）：${esc(n.title)}</p>` : ""}
-    ${n.plain ? `<div class="q-sec"><div class="q-h">ひとことで</div><p>${gl(n.plain, S, context)}</p></div>` : ""}
-    ${n.next ? `<div class="q-sec"><div class="q-h">この先</div><p>${gl(n.next, S, context)}</p></div>` : ""}
-    ${url ? `<a class="outbtn" href="${esc(url)}" target="_blank" rel="noopener noreferrer">元の記事を読む</a>` : ""}
-    ${(n.related || []).length ? `<details class="fold"><summary>同じ出来事の別の記事（${n.related.length}）</summary><div class="rel">${n.related.map(r => safeUrl(r.link) ? `<a href="${esc(safeUrl(r.link))}" target="_blank" rel="noopener noreferrer">${esc(r.title)}<span class="src">${esc(r.source)}・${esc(ago(r.time))}</span></a>` : "").join("")}</div></details>` : ""}
-    ${(n.tags || []).length || ripple ? `<details class="fold news-connections"><summary>このニュースは何につながる？</summary>
-      ${(n.tags || []).length ? `<div class="q-sec"><div class="q-h">関係するもの</div><div class="chips">${n.tags.map(t => chip(t.node, t.dir, { full: true })).join("")}</div></div>` : ""}
-      ${ripple}</details>` : ""}
+    ${section("何が起きた？", n.plain || newsTitle(n))}
+    ${section("背景・仕組み", n.context)}
+    ${section("この先の影響", n.impact || n.next)}
+    ${section("次に見ること", n.watch)}
+    ${tags.length ? `<div class="q-sec"><div class="q-h">経済のつながり</div><div class="chips">${tags.map(t => chip(t.node, t.dir, { full: true })).join("")}</div>
+      <div class="row-btns"><button class="btn ghost" data-connection-to="${esc(first.node)}:${esc(first.dir || "up")}">つながりを見る</button></div></div>` : ""}
+    ${sources.length ? `<details class="fold news-sources"><summary>出典・関連記事</summary><div class="rel">${sources.map(r => `<a href="${esc(safeUrl(r.link))}" target="_blank" rel="noopener noreferrer">${esc(r.source)}<span class="src">${esc(r.title)}</span></a>`).join("")}</div></details>` : ""}
     ${HINT}`, context);
-}
-function hopRow(v, r) {
-  const n = G.byId[v];
-  const from = [...new Set(r.via.map(a => G.byId[a.from].short))].join("・");
-  const via = r.via[0];
-  const f = G.byId[via.from];
-  const why = r.dir === 0 ? "逆向きの力がぶつかる（綱引き）"
-    : res0(via) < 0 ? `${f.short}が${dirWord(f, res0(via))}すると、${n.short}は${dirWord(n, via.dir)}方向。` : via.edge.why;
-  return `<button class="link-row" data-node="${esc(v)}"><div class="hd">${chip(v, r.dir, { span: true })}<span class="from muted small">← ${esc(from)}</span></div><p class="why">${esc(why)}</p></button>`;
 }
 
 // ---------- 項目の詳細 ----------
@@ -472,8 +445,8 @@ function openNode(id, context = detailContext()) {
       <p class="muted small">${esc(last.d)} 時点（前の営業日の値）・${esc(m.source)}</p></div>`;
   }
   const mv = (context.data.moving || []).find(x => x.node === id);
-  const outs = G.out[id].map(e => `<button class="link-row" data-node="${esc(e.to)}"><div class="hd"><span class="small muted">${esc(n.up)}すると</span>${chip(e.to, e.sign, { span: true })}</div><p class="why">${esc(e.why)}</p></button>`).join("");
-  const ins = G.inn[id].map(e => `<button class="link-row" data-node="${esc(e.from)}"><div class="hd">${chip(e.from, 1, { span: true })}<span class="small muted">→ ${esc(n.short)}は${esc(dirWord(n, e.sign))}</span></div><p class="why">${esc(e.why)}</p></button>`).join("");
+  const outs = G.out[id].map(e => `<button class="link-row" data-relation="${esc(id)}:${esc(e.to)}:up"><div class="hd"><span class="small muted">${esc(n.up)}すると</span>${chip(e.to, e.sign, { span: true })}</div><p class="why">${esc(e.why)}</p></button>`).join("");
+  const ins = G.inn[id].map(e => `<button class="link-row" data-relation="${esc(e.from)}:${esc(id)}:up"><div class="hd">${chip(e.from, 1, { span: true })}<span class="small muted">→ ${esc(n.short)}は${esc(dirWord(n, e.sign))}</span></div><p class="why">${esc(e.why)}</p></button>`).join("");
   const news = (context.data.news || []).filter(x => (x.tags || []).some(t => t.node === id)).slice(0, 4);
   openSheet(`
     <p class="cat">${esc(G.catName[n.cat])}</p>
@@ -482,264 +455,48 @@ function openNode(id, context = detailContext()) {
     <div class="q-sec"><div class="q-h">暮らしでは</div><p>${gl(n.life, S, context)}</p></div>
     ${mv ? `<div class="q-sec"><div class="q-h">今日の動き</div><div class="hd" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">${chip(id, mv.dir, { full: true })}<span class="small">${gl(mv.why, S, context)}</span></div></div>` : ""}
     ${market}
-    <div class="row-btns"><button class="btn" data-walkto="${esc(id)}">つながりを図でたどる</button><button class="btn up" data-sim="${esc(id)}:up">${esc(n.up)}したら？</button><button class="btn down" data-sim="${esc(id)}:down">${esc(n.down)}したら？</button></div>
+    <div class="row-btns"><button class="btn" data-connection-to="${esc(id)}">この項目のつながり</button></div>
     ${outs ? `<details class="fold"><summary>影響を与える先（${G.out[id].length}）</summary><div class="links">${outs}</div></details>` : ""}
     ${ins ? `<details class="fold"><summary>影響を受ける元（${G.inn[id].length}）</summary><div class="links">${ins}</div></details>` : ""}
     ${news.length ? `<div class="q-sec"><div class="q-h">関係する今日のニュース</div><div class="rel">${news.map(x => `<button data-news="${esc(x.id)}">${esc(newsTitle(x))}<span class="src">${esc(x.source)}・${esc(ago(x.time))}</span></button>`).join("")}</div></div>` : ""}
     ${HINT}`, context);
 }
 
-// ---------- つながり図 ----------
-function mapSvg() {
-  const edges = G.edges.map(e => `<path class="edge" data-e="${e.from}>${e.to}" d="${edgePath(G, e)}" marker-end="url(#ar)"/>`).join("");
-  const nodes = G.nodes.map(n => {
-    const p = G.pos[n.id];
-    return `<g class="node" data-walk="${n.id}" role="button" tabindex="0" aria-label="${esc(n.name)}"><rect x="${p.x - NODE_W / 2}" y="${p.y - NODE_H / 2}" width="${NODE_W}" height="${NODE_H}" rx="9"/><text x="${p.x}" y="${p.y}">${esc(n.short)}</text></g>`;
-  }).join("");
-  return `<svg class="map" id="map" viewBox="0 0 ${MAP_W} ${MAP_H}" role="img" aria-label="経済のつながり図">
-    <defs>${markers()}</defs><g>${edges}</g><g>${nodes}</g></svg>`;
-}
-const markers = () => [["ar", "--line"], ["ar-up", "--up"], ["ar-down", "--down"], ["ar-mix", "--mix"], ["ar-ink", "--ink-3"]]
-  .map(([id, v]) => `<marker id="${id}" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L8,4 L0,8 z" style="fill:var(${v})"/></marker>`).join("");
-
-// 1つの項目を真ん中に、原因（上）と影響（下）だけを大きく描く
-function egoSvg(id) {
-  const c = G.byId[id];
-  const W = 360, BW = 106, BH = 46, GX = 10, GY = 12, PER = 3, CW = 236, CH = 58;
-  const ins = G.inn[id], outs = G.out[id];
-  const rows = n => Math.ceil(n / PER);
-  const place = (list, y0) => list.map((e, i) => {
-    const r = Math.floor(i / PER), cnt = Math.min(PER, list.length - r * PER), k = i % PER;
-    const x0 = (W - (cnt * BW + (cnt - 1) * GX)) / 2;
-    return { e, x: x0 + k * (BW + GX), y: y0 + r * (BH + GY) };
-  });
-  const inY = ins.length ? 24 : 0;
-  const inP = place(ins, inY);
-  const cy = ins.length ? inY + rows(ins.length) * (BH + GY) + 34 : 8;
-  const outY = cy + CH + (outs.length ? 52 : 0);
-  const outP = place(outs, outY);
-  const H = outs.length ? outY + rows(outs.length) * (BH + GY) : cy + CH + 8;
-  const cx = W / 2;
-  const sw = s => (s === 3 ? 2.2 : s === 2 ? 1.5 : 1);
-  const curve = (x1, y1, x2, y2) => `M${x1},${y1} C${x1},${(y1 + y2) / 2} ${x2},${(y1 + y2) / 2} ${x2},${y2}`;
-  const box = (p, nodeId, sub, subCls) => {
-    const n = G.byId[nodeId];
-    return `<g class="enode" data-walk="${n.id}" role="button" tabindex="0" aria-label="${esc(n.name)}"><rect x="${p.x}" y="${p.y}" width="${BW}" height="${BH}" rx="11"/><text class="en" x="${p.x + BW / 2}" y="${p.y + 17}">${esc(n.short)}</text><text class="es ${subCls}" x="${p.x + BW / 2}" y="${p.y + 34}">${esc(sub)}</text></g>`;
-  };
-  const inEdges = inP.map(p => {
-    const spread = (p.x + BW / 2 - cx) * 0.35;
-    return `<path class="eedge ${p.e.strength === 1 ? "weak" : ""}" d="${curve(p.x + BW / 2, p.y + BH, cx + spread, cy - 2)}" style="stroke-width:${sw(p.e.strength)}" marker-end="url(#ar-ink)"/>`;
-  }).join("");
-  const outEdges = outP.map(p => {
-    const spread = (p.x + BW / 2 - cx) * 0.35;
-    return `<path class="eedge ${p.e.strength === 1 ? "weak" : ""}" d="${curve(cx + spread, cy + CH + 2, p.x + BW / 2, p.y - 2)}" style="stroke-width:${sw(p.e.strength)}" marker-end="url(#ar-ink)"/>`;
-  }).join("");
-  const inBoxes = inP.map(p => box(p, p.e.from, `${G.byId[p.e.from].up}→${dirWord(c, p.e.sign)}`, p.e.sign > 0 ? "up-f" : "down-f")).join("");
-  const outBoxes = outP.map(p => box(p, p.e.to, `${c.up}→${dirWord(G.byId[p.e.to], p.e.sign)}`, p.e.sign > 0 ? "up-f" : "down-f")).join("");
-  return `<svg class="ego" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(c.name)}のつながり"><defs>${markers()}</defs>
-    ${ins.length ? `<text class="elabel" x="${cx}" y="12">原因</text>` : ""}
-    ${outs.length ? `<text class="elabel" x="${cx}" y="${outY - 16}">影響</text>` : ""}
-    ${inEdges}${outEdges}${inBoxes}${outBoxes}
-    <g class="ecenter" data-node="${c.id}" role="button" tabindex="0" aria-label="${esc(c.name)}の仕組み"><rect x="${cx - CW / 2}" y="${cy}" width="${CW}" height="${CH}" rx="14"/><text class="ec" x="${cx}" y="${cy + 29}">${esc(c.name)}</text></g>
-  </svg>`;
-}
-function walkHtml() {
-  const id = state.walk[state.walk.length - 1] || "boj";
-  const n = G.byId[id];
-  const trail = state.walk.length > 1 ? `<div class="trail"><span class="muted small">たどった道</span>${state.walk.map((w, i) => `${i ? `<span class="arrow">→</span>` : ""}<button class="tag ${i === state.walk.length - 1 ? "here" : ""}" data-trail="${i}"><span class="nm">${esc(G.byId[w].short)}</span></button>`).join("")}<button class="filter" data-trail="reset">最初から</button></div>` : "";
-  return `${trail}
-    <div class="map-box ego-box">${egoSvg(id)}</div>`;
-}
+// ---------- つながりの一覧 ----------
 function renderMap() {
-  const p = G.byId[state.simPick];
-  const walking = state.mapMode === "walk";
-  const trying = state.mapMode === "try";
-  const examples = [
-    ["boj", "up", "日銀が利上げしたら？", "住宅ローンや円相場に、どう広がる？"],
-    ["usdjpy", "down", "円高になると？", "輸入品と輸出企業で、影響はどう違う？"],
-    ["oil", "up", "原油が値上がりしたら？", "ガソリン代から、ほかの物価にも広がる？"],
-  ];
-  $("#v-map").innerHTML = `
-    <h1 class="page-title">つながり</h1>
-    <div class="seg connect-tabs" role="group" aria-label="つながりの使い方">
-      ${[["try", "影響を考える"], ["walk", "原因をたどる"], ["all", "全体図"]].map(([id, label]) => `<button class="${state.mapMode === id ? "on" : ""}" data-mapmode="${id}" aria-pressed="${state.mapMode === id}">${label}</button>`).join("")}
-    </div>
-    ${trying ? `<section class="connect-start" aria-labelledby="connect-start-title">
-      <h2 id="connect-start-title">${state.sim ? "ほかの例" : "例"}</h2>
-      <div class="scenario-list ${state.sim ? "compact" : ""}">${examples.map(([id, dir, title, desc]) => `<button class="scenario" data-sim="${id}:${dir}"><span><b>${title}</b></span><span class="scenario-go" aria-hidden="true">→</span></button>`).join("")}</div>
-    </section>
-    <section class="sim-workspace" aria-labelledby="sim-title">
-      <div class="sec" id="sim-sec"><h2 id="sim-title">条件を選ぶ</h2></div>
-      <button class="pick-btn" data-picker><span class="muted small">起点</span><b>${esc(p.name)}</b><span class="chg">変える</span></button>
-      <div class="dir-toggle">
-        <button class="up ${state.sim && state.simDir > 0 ? "on" : ""}" data-simdir="1" aria-pressed="${!!state.sim && state.simDir > 0}">↑ ${esc(p.up)}</button>
-        <button class="down ${state.sim && state.simDir < 0 ? "on" : ""}" data-simdir="-1" aria-pressed="${!!state.sim && state.simDir < 0}">↓ ${esc(p.down)}</button>
-      </div>
-      <div id="sim-result" aria-live="polite"></div>
-    </section>` : walking ? `
-      <div class="row-btns" style="margin:12px 0"><button class="btn ghost" data-picker>別の項目からたどる</button></div>
-      ${walkHtml()}
-      <button class="btn connect-next" data-sim="${esc(state.walk[state.walk.length - 1] || state.simPick)}:up">影響を試す</button>` : `
-    <div class="chips" style="margin-bottom:10px" id="map-mode"></div>
-    <div class="map-box">${mapSvg()}</div>
-    <div class="legend"><span><i style="background:var(--up)"></i>上がる方向</span><span><i style="background:var(--down)"></i>下がる方向</span><span><i style="background:var(--mix)"></i>逆向きの力</span></div>
-`}
-    ${foot()}`;
-  if (state.mapMode === "all") paintMap();
-  if (trying) renderSimResult();
+  const filtersScroll = $("#v-map .relationship-filters")?.scrollLeft || 0;
+  $("#v-map").innerHTML = `<h1 class="page-title">つながり</h1>${renderRelationships({
+    graph: G, data: D, category: state.connectionCat, directions: state.connectionDirections, esc, gl,
+  })}${foot()}`;
+  const filters = $("#v-map .relationship-filters");
+  if (filters) filters.scrollLeft = filtersScroll;
 }
-function openPicker() {
-  const selected = state.mapMode === "walk" ? state.walk[state.walk.length - 1] || state.simPick : state.simPick;
-  const groups = G.cats.map(c => {
-    const ns = G.nodes.filter(n => n.cat === c.id);
-    return `<div class="q-sec"><div class="q-h">${esc(c.name)}</div><div class="chips">${ns.map(n => `<button class="filter ${selected === n.id ? "on" : ""}" data-pick="${n.id}" aria-pressed="${selected === n.id}">${esc(n.short)}</button>`).join("")}</div></div>`;
-  }).join("");
-  openSheet(`<p class="cat">${state.mapMode === "walk" ? "原因をたどる" : "影響を考える"}</p><h2>気になる項目を選ぶ</h2><div class="connect-picker">${groups}</div>`);
+function openRelationship(value, context = detailContext()) {
+  const [from, to, direction] = value.split(":");
+  const html = relationshipDetail({ graph: G, data: context.data, from, to, direction, esc,
+    gl: (text, seen) => gl(text, seen, context) });
+  if (html) openSheet(html, context);
 }
-function walkTo(id, fresh = false) {
-  if (fresh || !state.walk.length) state.walk = [id];
-  else if (state.walk[state.walk.length - 1] !== id) state.walk = [...state.walk, id].slice(-8);
-  state.mapMode = "walk";
-  if (state.view !== "map") { state.mapScrollTarget = "walk"; location.hash = "#map"; return; }
-  const y = window.scrollY;
-  renderMap();
-  window.scrollTo(0, Math.max(0, Math.min(y, $("#v-map .seg")?.getBoundingClientRect().top + window.scrollY - 70)));
-  focusMapDestination();
-}
-function paintMap() {
-  const svg = $("#map");
-  if (!svg) return;
-  const mode = $("#map-mode");
-  $$(".node", svg).forEach(el => { el.className.baseVal = "node"; });
-  $$(".edge", svg).forEach(el => { el.setAttribute("class", "edge"); el.setAttribute("marker-end", "url(#ar)"); });
-  if (state.sim) {
-    const { res } = simulate(G, state.sim.start, state.sim.dir);
-    svg.classList.add("active");
-    for (const [v, r] of Object.entries(res)) {
-      const el = $(`.node[data-walk="${v}"]`, svg);
-      el.className.baseVal = `node lit ${dirClass(r.dir)} ${r.wave === 0 ? "origin" : ""}`;
-      setTimeout(() => el.classList.add("pulse"), r.wave * 380);
-      for (const a of r.via) {
-        const pe = $(`.edge[data-e="${a.from}>${v}"]`, svg);
-        if (pe) { pe.setAttribute("class", `edge hot ${dirClass(r.dir)}`); pe.setAttribute("marker-end", `url(#ar-${dirClass(r.dir)})`); }
-      }
-    }
-    const s = G.byId[state.sim.start];
-    mode.innerHTML = `<span class="tag ${dirClass(state.sim.dir)}"><span class="nm">${esc(s.short)}</span>${esc(dirWord(s, state.sim.dir))}した場合</span>${(D.moving || []).length ? `<button class="filter" data-today-map>ニュースの注目項目に戻す</button>` : ""}`;
-  } else {
-    const mv = D.moving || [];
-    if (mv.length) {
-      svg.classList.add("active");
-      const set = new Map(mv.map(m => [m.node, dirNum(m.dir)]));
-      for (const [v, d] of set) $(`.node[data-walk="${v}"]`, svg).className.baseVal = `node lit ${dirClass(d)}`;
-      for (const e of G.edges) {
-        if (set.has(e.from) && set.has(e.to) && set.get(e.from) * e.sign === set.get(e.to)) {
-          const pe = $(`.edge[data-e="${e.from}>${e.to}"]`, svg);
-          const c = dirClass(set.get(e.to));
-          pe.setAttribute("class", `edge hot ${c}`); pe.setAttribute("marker-end", `url(#ar-${c})`);
-        }
-      }
-      mode.innerHTML = `<span class="tag"><span class="nm">ニュースで注目の項目</span></span>`;
-    } else {
-      svg.classList.remove("active");
-      mode.innerHTML = "";
-    }
-  }
-}
-// 上下どちらにも使う文なので、上昇だけを前提にした元の説明は中立にする。
-function impactLife(n) {
-  return ({
-    import_prices: "ガソリン・電気・食品など、身近な値段に関わる。",
-    labor_shortage: "賃金、サービスの値段や営業時間に関わる。",
-    banks: "預金金利や、銀行株の値動きにつながる。",
-    risk_off: "株価、金や国債の値動きとして表れる。",
-  })[n.id] || n.life;
-}
-function renderSimResult() {
-  const box = $("#sim-result");
-  if (!box) return;
-  if (!state.sim) { box.innerHTML = ""; return; }
-  const { res, waves } = simulate(G, state.sim.start, state.sim.dir);
-  const s = G.byId[state.sim.start];
-  // 身近な影響を先に3つ。経路そのものは下で必要なときに開く。
-  const priority = ["mortgage", "import_prices", "exporters", "jp_cpi", "household", "wages", "consumption", "jp_economy", "usdjpy", "banks"];
-  const affected = waves.flat();
-  // 「条件しだい」の弱い関係を通ってたどり着く影響は、身近な項目でも後ろに回す
-  const weakPath = id => {
-    for (let at = id, k = 0; res[at]?.via?.[0] && k < 6; at = res[at].via[0].from, k++) if (res[at].via[0].edge.strength < 2) return true;
-    return false;
-  };
-  const focus = [...affected].sort((a, b) => {
-    const score = id => { const i = priority.indexOf(id); return (i < 0 ? 100 + res[id].wave : i) + (weakPath(id) ? 200 : 0); };
-    return score(a) - score(b);
-  }).slice(0, 3);
-  const related = (D.news || []).filter(n => (n.tags || []).some(t => t.node === s.id)).slice(0, 2);
-  box.innerHTML = `
-    <section class="sim-takeaway" aria-labelledby="takeaway-title">
-      <p class="eyebrow">${esc(s.name)}が「${esc(dirWord(s, state.sim.dir))}」なら</p>
-      <h2 id="takeaway-title">${focus.length ? "影響が出るところ" : "この図でたどれる先はありません"}</h2>
-      ${focus.length ? `<div class="impact-list">${focus.map(id => {
-        const n = G.byId[id], r = res[id];
-        return `<button class="impact-row" data-hop="${esc(id)}"><span class="impact-head"><b>${esc(n.name)}</b><span class="impact-dir ${dirClass(r.dir)}-t">${esc(dirWord(n, r.dir))}${r.dir ? "方向" : ""}</span></span><span class="impact-life">${esc(impactLife(n))}</span></button>`;
-      }).join("")}</div>` : ""}
-    </section>
-    ${affected.length ? `<details class="fold sim-paths"><summary>影響の道すじを順に見る（${affected.length}項目）</summary>
-      ${waves.map((list, i) => `<div class="wave"><div class="wave-h">${i + 1}段目${i === 0 ? " · 直接の影響" : " · その先の影響"}</div><div class="hops">${list.map(v => simHop(v, res[v])).join("")}</div></div>`).join("")}
-</details>` : ""}
-    <div class="row-btns"><button class="btn ghost" data-mapmode="all">この条件を全体図で見る</button></div>
-    ${related.length ? `<section class="sim-reality"><h2>関係するニュース</h2><div class="rel">${relList(related.map(n => n.id))}</div></section>` : ""}`;
-}
-// 段ごとの一覧は名前と向きだけにして、理由はタップで読む
-function simHop(v, r) {
-  const from = [...new Set(r.via.map(a => G.byId[a.from].short))].join("・");
-  return `<button class="hop2" data-hop="${esc(v)}">${chip(v, r.dir, { span: true })}<span class="from">← ${esc(from)}</span></button>`;
-}
-function openHop(v, context = detailContext()) {
-  const sim = context.sim;
-  if (!sim) return openNode(v, context);
-  const { res } = simulate(G, sim.start, sim.dir);
-  const r = res[v], n = G.byId[v];
-  if (!r) return openNode(v, context);
-  const lines = r.via.slice(0, 3).map(a => {
-    const f = G.byId[a.from], fd = res0(a);
-    // 説明文は「上がる場合」で書いてあるので、下がる向きのときはそう添える
-    return `<div class="q-sec"><div class="q-h">${esc(f.short)}が${esc(dirWord(f, fd))} → ${esc(n.short)}は${esc(dirWord(n, a.dir))}</div><p>${gl(a.edge.why, null, context)}</p>${fd < 0 ? `<p class="muted small">（説明は${esc(f.up)}の場合。${esc(f.down)}のときは逆に働く）</p>` : ""}<p class="meta-line">時間の目安：${esc(a.edge.lag)}・関係の強さ：${esc(STRENGTH[a.edge.strength])}</p></div>`;
-  }).join("");
-  const path = [];
-  let at = v;
-  const visited = new Set();
-  while (res[at] && !visited.has(at)) {
-    visited.add(at); path.unshift({ node: at, dir: res[at].dir });
-    const prev = res[at].via[0];
-    if (!prev) break;
-    at = prev.from;
-  }
-  openSheet(`<p class="cat">なぜ、ここに影響する？</p><h2>${esc(n.name)}は${esc(dirWord(n, r.dir))}${r.dir === 0 ? "（逆向きの力がぶつかる）" : "方向"}</h2>
-    <div class="q-sec"><div class="q-h">起点からの道すじ${r.dir === 0 ? "の一例" : ""}</div><div class="chain">${chainHtml(path)}</div></div>
-    <div class="q-sec"><div class="q-h">暮らしや仕事との関わり</div><p>${gl(impactLife(n), null, context)}</p></div>${lines}
-    <div class="row-btns"><button class="btn ghost" data-node="${esc(v)}">${esc(n.short)}の仕組みを読む</button></div>${HINT}`, context);
-}
-// 経由した項目の向き（a.dir は到着先の向き、edge.sign で割り戻す）
-function res0(a) { return a.dir * a.edge.sign; }
-function runSim(node, dir) {
-  if (!G.byId[node] || ![1, -1].includes(dir)) return;
-  state.sim = { start: node, dir };
-  state.simPick = node;
-  state.simDir = dir;
-  state.mapMode = "try";
-  if (state.view !== "map") { state.mapScrollTarget = "sim"; location.hash = "#map"; return; }
-  renderMap();
-  requestAnimationFrame(() => { $("#sim-sec")?.scrollIntoView({ block: "start" }); focusMapDestination(); });
+function goConnection(value) {
+  const [id, direction] = value.split(":");
+  if (!G.byId[id]) return;
+  state.connectionCat = "all";
+  if (direction === "up" || direction === "down") state.connectionDirections[id] = direction;
+  state.connectionTarget = id;
+  focusMapAfterSheet = true;
+  leaveSheetForMap();
+  if (state.view !== "map") location.hash = "#map";
+  else { renderMap(); requestAnimationFrame(focusMapDestination); }
 }
 
-// ---------- 識者 ----------
+// ---------- 有識者 ----------
 function renderExperts() {
   const all = D.experts || [];
   const names = [...new Map(all.map(e => [e.expert, e.name])).entries()];
   const list = all.filter(e => state.expert === "all" || e.expert === state.expert);
   const debates = (D.debates || []).map(debateCard).join("");
   $("#v-experts").innerHTML = `
-    <h1 class="page-title">識者の見方</h1>
+    <h1 class="page-title">有識者の見方</h1>
     ${debates ? `<div class="sec" style="margin-top:8px"><h2>見方が分かれている点</h2></div>${debates}<div class="sec"><h2>それぞれの発信</h2></div>` : ""}
     <div class="chips scroll" role="group" aria-label="人で絞り込む">${[["all", "すべて"], ...names].map(([id, nm]) => `<button class="filter ${state.expert === id ? "on" : ""}" data-expert="${esc(id)}">${esc(nm)}</button>`).join("")}</div>
     <div style="margin-top:14px">${list.map(expertCard).join("") || `<p class="empty">いまは表示できる発信がありません。</p>`}</div>
@@ -762,18 +519,7 @@ function expertCard(e) {
   </article>`;
 }
 
-// ---------- 学ぶ ----------
-function reviewHtml() {
-  const rv = X.reviews[0];
-  if (!rv) {
-    return "";
-  }
-  const tally = {};
-  for (const r of X.reviews) for (const i of r.items) tally[i.verdict] = (tally[i.verdict] || 0) + 1;
-  return `<div class="sec"><h2>答え合わせ</h2><span class="aside">${Object.entries(tally).map(([k, v]) => `${k} ${v}`).join("・")}</span></div>
-    ${reviewCard(rv, 3)}
-    <div class="row-btns" style="margin-top:-2px">${rv.items.length > 3 ? `<button class="btn ghost" data-reviewfull>残り${rv.items.length - 3}件も見る</button>` : ""}${X.reviews.length > 1 ? `<button class="btn ghost" data-reviews>これまでの答え合わせ</button>` : ""}</div>`;
-}
+// ---------- 見通しの答え合わせ ----------
 function reviewCard(rv, limit = 99, context = null) {
   const S = new Set();
   return `<article class="card review"><div class="no">${esc(md(rv.target))}の見通し → ${esc(md(rv.reviewed))}に確認</div>
@@ -781,60 +527,6 @@ function reviewCard(rv, limit = 99, context = null) {
     ${rv.items.slice(0, limit).map(i => `<div class="rv-item"><div class="rv-h"><span class="verdict v-${VERDICT[i.verdict] || "wait"}">${esc(i.verdict)}</span><span class="muted small">${esc(i.theme)}</span></div>
       <p class="rv-o">「${gl(i.outlook, S, context)}」</p><p class="rv-a"><b>実際</b>${gl(i.actual, S, context)}</p><p class="rv-l"><b>学び</b>${gl(i.lesson, S, context)}</p></div>`).join("")}
   </article>`;
-}
-function glossaryHtml() {
-  const cats = [...(GLOSSARY?.cats || [])];
-  if ((D.terms || []).length) cats.unshift("今日の用語");
-  if (!cats.length) return "";
-  const cur = state.glCat && cats.includes(state.glCat) ? state.glCat : cats[0];
-  const list = Object.values(TERMS).filter(t => t.c === cur);
-  return `<div class="sec"><h2>用語集</h2><span class="aside">${Object.keys(TERMS).length}語</span></div>
-    <div class="chips scroll" role="group" aria-label="用語の分類">${cats.map(c => `<button class="filter ${c === cur ? "on" : ""}" data-glcat="${esc(c)}">${esc(c)}</button>`).join("")}</div>
-    <div class="term-grid">${list.map(t => `<button class="term-btn" data-term="${esc(t.t)}">${esc(t.t)}</button>`).join("")}</div>`;
-}
-function renderLearn() {
-  const sc = store.get("score", { right: 0, total: 0 });
-  if (!state.gq) { state.gq = makeGraphQuiz(G); state.gqAnswered = null; }
-  const today = (D.quiz || []).map((q, i) => quizCard(q, `t${i}`, state.todayAnswers[i], "今日のニュースから")).join("");
-  $("#v-learn").innerHTML = `
-    <h1 class="page-title">学ぶ</h1>
-    ${reviewHtml()}
-    <div class="sec"><h2>つながりクイズ</h2><span class="score">${sc.right} / ${sc.total} 問正解</span></div>
-    ${quizCard(state.gq, "g", state.gqAnswered, state.gq.kind)}
-    ${state.gqAnswered !== null ? `<div class="row-btns" style="margin-top:-2px;margin-bottom:8px"><button class="btn" data-next-quiz>次の問題</button></div>` : ""}
-    ${today ? `<div class="sec"><h2>今日のニュースで考える</h2></div>${today}` : ""}
-    ${glossaryHtml()}
-    <div class="sec"><h2>つながり図の項目</h2><span class="aside">${G.nodes.length}項目</span></div>
-    <div class="glossary">${G.nodes.map(n => `<button class="gl" data-node="${n.id}"><div class="n">${esc(n.name)}</div><div class="d">${esc(n.desc)}</div></button>`).join("")}</div>
-    ${foot()}`;
-}
-function quizCard(q, key, answered, kind) {
-  const done = answered !== null && answered !== undefined;
-  const choices = q.choices.map((c, i) => {
-    const cls = done ? (i === q.answer ? "right" : i === answered ? "wrong" : "") : "";
-    return `<button class="choice ${cls}" data-q="${esc(key)}" data-c="${i}" ${done ? "disabled" : ""}>${esc(c)}</button>`;
-  }).join("");
-  const nodes = (q.nodes || []).map(id => chip(id)).join("");
-  return `<article class="card quiz">
-    <div class="kind">${esc(kind)}</div>
-    <p class="q">${esc(q.q)}</p>
-    <div class="choices">${choices}</div>
-    ${done ? `<p class="explain"><b>${answered === q.answer ? "正解。" : `答えは「${esc(q.choices[q.answer])}」。`}</b>${gl(q.explain, new Set()).replace(/\n/g, "<br>")}</p>${nodes ? `<div class="chips" style="margin-top:10px">${nodes}</div>` : ""}` : ""}
-  </article>`;
-}
-function answer(key, c) {
-  const sc = store.get("score", { right: 0, total: 0 });
-  let q;
-  if (key === "g") { if (state.gqAnswered !== null) return; q = state.gq; }
-  else { const i = +key.slice(1); if (state.todayAnswers[i] !== undefined) return; q = D.quiz?.[i]; }
-  if (!q || !Number.isInteger(c) || c < 0 || c >= q.choices.length) return;
-  if (key === "g") state.gqAnswered = c;
-  else state.todayAnswers[+key.slice(1)] = c;
-  sc.total += 1; if (c === q.answer) sc.right += 1;
-  store.set("score", sc);
-  const y = window.scrollY;
-  renderLearn();
-  window.scrollTo(0, y);
 }
 
 // ---------- 週のまとめ ----------
@@ -932,9 +624,15 @@ function trapModalTab(ev) {
   }
 }
 function focusMapDestination() {
-  if (!focusMapAfterSheet || state.view !== 'map') return;
+  if (!focusMapAfterSheet || state.view !== "map") return;
   focusMapAfterSheet = false;
-  focusHeading(state.mapMode === 'try' ? $("#sim-sec") : $("#v-map"));
+  const id = state.connectionTarget;
+  state.connectionTarget = null;
+  const card = id ? $(`[data-connection-card="${CSS.escape(id)}"]`) : null;
+  if (card) {
+    card.scrollIntoView({ block: "start" });
+    (card.querySelector('[data-connection-node]') || card).focus({ preventScroll: true });
+  } else focusHeading($("#v-map"));
 }
 function captureDetailContext() {
   return {
@@ -945,7 +643,6 @@ function captureDetailContext() {
     threads: { ...threadByName },
     agenda: state.view === "today" ? [...AGENDA] : agendaItems(),
     terms: TERMS, aliases: ALIAS, termRe: TERM_RE,
-    sim: state.sim ? { ...state.sim } : null,
     weeks: new Map(X.weekly ? [[X.weekly.id, X.weekly]] : []),
   };
 }
@@ -1044,28 +741,32 @@ function syncSheetHistory() {
 }
 
 // ---------- 画面の切り替え ----------
-const RENDER = { today: renderToday, news: renderNews, map: renderMap, experts: renderExperts, learn: renderLearn };
+const RENDER = { today: renderToday, news: renderNews, map: renderMap, experts: renderExperts };
+function viewFromHash() {
+  const view = (location.hash || "#today").slice(1);
+  if (view === "learn") {
+    const { kzSheet, kzDepth, ...base } = history.state || {};
+    history.replaceState(base, "", "#today");
+    return "today";
+  }
+  return RENDER[view] ? view : "today";
+}
 function route() {
-  const v = (location.hash || "#today").slice(1);
-  const next = RENDER[v] ? v : "today";
+  const next = viewFromHash();
   if (next !== state.view) state.viewScroll[state.view] = window.scrollY;
   state.view = next;
   $$(".view").forEach(el => el.classList.toggle("on", el.id === "v-" + state.view));
   $$(".nav a").forEach(a => { if (a.dataset.v === state.view) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
   RENDER[state.view]();
-  const target = state.mapScrollTarget;
-  state.mapScrollTarget = null;
   requestAnimationFrame(() => {
     if (state.view !== next) return;
-    if (next === "map" && target === "sim") $("#sim-sec")?.scrollIntoView({ block: "start" });
-    else window.scrollTo(0, next === "map" && target === "walk" ? 0 : state.viewScroll[next] || 0);
+    if (!(next === "map" && state.connectionTarget)) window.scrollTo(0, state.viewScroll[next] || 0);
     focusMapDestination();
   });
 }
 if ("scrollRestoration" in history) history.scrollRestoration = "manual";
 function syncNavigation() {
-  const v = (location.hash || "#today").slice(1);
-  const next = RENDER[v] ? v : "today";
+  const next = viewFromHash();
   if (next !== state.view) {
     hideTerm(false);
     if (sheetOpen) hideSheet(false);
@@ -1090,31 +791,25 @@ document.addEventListener("click", ev => {
   }
   const term = ev.target.closest("[data-term]");
   if (term) { ev.preventDefault(); ev.stopPropagation(); showTerm(term.dataset.term); return; }
-  const t = ev.target.closest("[data-node],[data-news],[data-sim],[data-newscat],[data-newsmode],[data-expert],[data-pick],[data-simdir],[data-q],[data-next-quiz],[data-today-map],[data-walk],[data-walkto],[data-trail],[data-mapmode],[data-thread],[data-weekly],[data-agenda],[data-agi],[data-reviews],[data-reviewfull],[data-theme],[data-guide],[data-picker],[data-hop],[data-glcat],[data-sources]");
+  const t = ev.target.closest("[data-node],[data-news],[data-newscat],[data-newsmode],[data-expert],[data-connection-cat],[data-connection-dir],[data-connection-node],[data-connection-to],[data-relation],[data-thread],[data-weekly],[data-agenda],[data-agi],[data-reviews],[data-reviewfull],[data-theme],[data-sources]");
   if (!t) return;
   const ds = t.dataset;
-  // history.back() は遅れて効くので、詳細から画面を移るときは閉じるだけにする
-  if (ds.sim) {
-    const [node, d] = ds.sim.split(":");
-    leaveSheetForMap();
-    runSim(node, d === "up" || d === "1" ? 1 : d === "down" || d === "-1" ? -1 : 0);
-  } else if (ds.walkto) { leaveSheetForMap(); walkTo(ds.walkto, true); }
-  else if (ds.walk) walkTo(ds.walk, state.mapMode !== "walk");
-  else if (ds.trail) { state.walk = ds.trail === "reset" ? state.walk.slice(0, 1) : state.walk.slice(0, +ds.trail + 1); renderMap(); }
-  else if (ds.mapmode) { state.mapMode = ds.mapmode; if (ds.mapmode === "walk" && !state.walk.length) state.walk = [state.simPick]; renderMap(); $(`#v-map .connect-tabs [data-mapmode="${state.mapMode}"]`)?.focus({ preventScroll: true }); }
-  else if (ds.picker !== undefined) openPicker();
-  else if (ds.pick) { leaveSheetForMap(); state.simPick = ds.pick; if (state.mapMode === "walk") walkTo(ds.pick, true); else runSim(ds.pick, state.simDir); }
-  else if (ds.simdir) { state.simDir = +ds.simdir; runSim(state.simPick, state.simDir); }
-  else if (ds.hop) openHop(ds.hop);
-  else if (ds.q !== undefined && ds.c !== undefined) answer(ds.q, +ds.c);
-  else if (ds.nextQuiz !== undefined) { state.gq = makeGraphQuiz(G); state.gqAnswered = null; const y = window.scrollY; renderLearn(); window.scrollTo(0, y); }
+  if (ds.connectionTo) goConnection(ds.connectionTo);
+  else if (ds.connectionCat) {
+    state.connectionCat = ds.connectionCat; renderMap();
+    $(`#v-map [data-connection-cat="${CSS.escape(ds.connectionCat)}"]`)?.focus({ preventScroll: true });
+  } else if (ds.connectionDir) {
+    const [id, direction] = ds.connectionDir.split(":");
+    if (!G.byId[id] || !["up", "down"].includes(direction)) return;
+    const y = window.scrollY; state.connectionDirections[id] = direction; renderMap();
+    $(`#v-map [data-connection-dir="${CSS.escape(ds.connectionDir)}"]`)?.focus({ preventScroll: true });
+    window.scrollTo(0, y);
+  } else if (ds.connectionNode) openNode(ds.connectionNode);
+  else if (ds.relation) openRelationship(ds.relation);
   else if (ds.newsmode) { state.newsMode = ds.newsmode; renderNews(); $(`#v-news [data-newsmode="${state.newsMode}"]`)?.focus({ preventScroll: true }); }
   else if (ds.sources !== undefined) openSources();
   else if (ds.newscat) { state.newsCat = ds.newscat; renderNews(); $(`#v-news [data-newscat="${state.newsCat}"]`)?.focus({ preventScroll: true }); }
   else if (ds.expert) { state.expert = ds.expert; renderExperts(); }
-  else if (ds.glcat) { state.glCat = ds.glcat; const y = window.scrollY; renderLearn(); window.scrollTo(0, y); }
-  else if (ds.todayMap !== undefined) { state.sim = null; paintMap(); renderSimResult(); }
-  else if (ds.guide !== undefined) { store.set("guideDone", true); renderToday(); }
   else if (ds.theme !== undefined) openTheme(+ds.theme);
   else if (ds.thread) openThread(ds.thread);
   else if (ds.weekly) openWeekly(ds.weekly);
@@ -1128,7 +823,7 @@ document.addEventListener("click", ev => {
 document.addEventListener("keydown", ev => {
   if (ev.key === "Tab") trapModalTab(ev);
   if (ev.key === "Escape") { if (activeModal()) ev.preventDefault(); if (!$("#termcard").hidden) hideTerm(); else closeSheet(); }
-  if ((ev.key === "Enter" || ev.key === " ") && ev.target.matches?.("[data-walk],[data-node],[data-term]")) { ev.preventDefault(); ev.target.dispatchEvent(new MouseEvent("click", { bubbles: true })); }
+  if ((ev.key === "Enter" || ev.key === " ") && ev.target.matches?.("[data-node],[data-term]")) { ev.preventDefault(); ev.target.dispatchEvent(new MouseEvent("click", { bubbles: true })); }
 });
 document.addEventListener('focusin', ev => {
   const modal = activeModal();
@@ -1142,24 +837,9 @@ window.addEventListener("hashchange", syncNavigation);
 
 // ---------- データの読み込みと、新しい内容・新しい版の確認 ----------
 const getJson = u => fetch(u, { cache: "no-cache" }).then(r => (r.ok ? r.json() : null)).catch(() => null);
-const quizIdentity = q => JSON.stringify([q.q, q.choices, q.answer, q.explain, q.nodes || []]);
 function setData(d) {
-  // 問題の番号ではなく内容で照合する。並び替えなら保持し、別問題なら未回答へ。
-  const answered = new Map();
-  for (const [i, q] of (D?.quiz || []).entries()) {
-    if (state.todayAnswers[i] === undefined) continue;
-    const key = quizIdentity(q);
-    if (!answered.has(key)) answered.set(key, []);
-    answered.get(key).push(state.todayAnswers[i]);
-  }
-  const nextAnswers = {};
-  for (const [i, q] of (d?.quiz || []).entries()) {
-    const answers = answered.get(quizIdentity(q));
-    if (answers?.length) nextAnswers[i] = answers.shift();
-  }
-  state.todayAnswers = nextAnswers;
   if (D && sheetOpen) pendingViewRefresh = true;
-  D = d || { brief: { themes: [] }, news: [], experts: [], moving: [], markets: {}, quiz: [] };
+  D = d || { brief: { themes: [] }, news: [], experts: [], moving: [], markets: {} };
   for (const k of Object.keys(newsById)) delete newsById[k];
   for (const k of Object.keys(expertById)) delete expertById[k];
   for (const n of D.news || []) newsById[n.id] = n;
@@ -1189,7 +869,7 @@ async function checkFresh() {
   lastCheck = Date.now();
   // ホーム画面のアプリは開きっぱなしで戻ってくるので、戻るたびに新しい内容があるかを見る
   const d = await getJson("data/latest.json");
-  if (d?.updated && D && d.updated !== D.updated) {
+  if (d?.updated && D && (d.updated !== D.updated || d.revision !== D.revision)) {
     await loadExtras();
     setData(d);
     if (!sheetOpen) RENDER[state.view]();

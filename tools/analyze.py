@@ -18,8 +18,9 @@ import sys
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
-from news_integrity import same_event, valid_news_tags, clean_news_text
+from news_integrity import same_event, valid_news_tags
 from scenario_integrity import normalize_case
+from news_details import news_detail_fields
 
 ROOT = Path(__file__).resolve().parent.parent
 RAW = ROOT / "_work" / "raw" / "collected.json"
@@ -42,7 +43,7 @@ SYSTEM = """あなたは経済・金融ニュースの解説者です。経済�
 - 見出しと要約に書かれていない事実を作らない。数字は与えられたものだけを使う。
 - 「起きたこと」と「この先の見通し」をはっきり分け、見通しは「〜かもしれない」「〜の可能性がある」と書く。
 - 特定の銘柄の売買をすすめない。
-- 識者の見方は、その人自身の発言・寄稿として読み取れるものだけを要約する。名前が出てくるだけの記事や、別人の記事は relevant を false にする。
+- 有識者の見方は、その人自身の発言・寄稿として読み取れるものだけを要約する。名前が出てくるだけの記事や、別人の記事は relevant を false にする。
 - 日本語で書く。一文は40字くらいまでに短く切る。むずかしい言葉は少なくし、使うときはかんたんな言い換えを添える。"""
 
 DIR = {"type": "string", "enum": ["up", "down"]}
@@ -87,13 +88,17 @@ def main_schema(nodes, cats):
             "outlook": arr(s(), 2, 3, "今後こうなるかもしれないこと（各70字以内）"),
             "watch": s("次に注目する予定・指標（60字以内）"),
             "news": arr(s(), desc="関係するニュースのID（n12 など）"),
-            "experts": arr(s(), desc="関係する識者の発信のID（e3 など）"),
+            "experts": arr(s(), desc="関係する有識者の発信のID（e3 など）"),
         }), 3, 5),
         "news": arr(obj({
             "id": s(), "tags": arr(tag, hi=3),
             "cat": {"type": "string", "enum": cats, "description": "分類を1つ（そのニュースのいちばん大事な面で選ぶ）"},
             "title_ja": s("英語の記事だけ短い日本語の見出し（40字以内）。主語・対象・国・輸出入の向きを変えない。原産国の製品と輸出先を取り違えない。日本語の記事は空文字"),
-            "plain": s("やさしい要点（60字以内）"), "next": s("この先どうつながるか（70字以内）"),
+            "plain": s("原資料から確認できる事実を2〜3文で（目安80〜180字）。資料が少なければ短くし、足りない事情を補わない"),
+            "context": s("背景・仕組み（80〜140字）。その記事を理解するのに必要な一般的な経済の仕組み。原資料にない会社固有の事情を断定しない"),
+            "impact": s("この先の影響（80〜140字）。条件を明示し、企業・家計・相場へのつながりを具体的に。見通しと断定を分ける"),
+            "watch": s("次に見ること（40〜80字）。何を確かめれば判断できるか。資料にない発表日を作らない"),
+            "next": s("影響の短い要点（70字以内）。impactと矛盾させない"),
             "level": {"type": "integer", "minimum": 1, "maximum": 3, "description": "重要度 3=大きい"},
         })),
         "experts": arr(obj({
@@ -105,10 +110,10 @@ def main_schema(nodes, cats):
             "crux": s("どこで見方が分かれるのか（80字以内）"),
             "sides": arr(obj({
                 "stance": {"type": "string", "enum": ["強気", "慎重"]},
-                "experts": arr(s(), 1, 4, "その見方の識者の発信のID（e3 など）"),
+                "experts": arr(s(), 1, 4, "その見方の有識者の発信のID（e3 など）"),
                 "view": s("その側の見方の要約（90字以内）"),
             }), 2, 2),
-        }), 0, 3, "識者の見方が分かれている点。はっきり分かれているものだけ（なければ空）"),
+        }), 0, 3, "有識者の見方が分かれている点。はっきり分かれているものだけ（なければ空）"),
         "scenarios": arr(obj({
             "event": s("予定の名前"), "date": s("YYYY-MM-DD（わからなければ空文字）"),
             "focus": s("何が焦点か（70字以内）"),
@@ -123,7 +128,7 @@ def main_schema(nodes, cats):
         "moving": arr(obj({"node": {"type": "string", "enum": nodes}, "dir": DIR,
                            "why": s("いまそう動いている理由（50字以内）")}), 3, 10),
         "quiz": arr(obj({"q": s(), "choices": arr(s(), 3, 3),
-                         "answer": {"type": "integer", "minimum": 0, "maximum": 2}, "explain": s()}), 3, 3),
+                         "answer": {"type": "integer", "minimum": 0, "maximum": 2}, "explain": s()}), 0, 0),
     })
 
 
@@ -216,7 +221,7 @@ def build_prompt(graph, raw, experts_cfg, threads):
     nodes = "\n".join(f"{n['id']}｜{n['name']}｜上がる＝{n['up']}／下がる＝{n['down']}｜対象：{n['desc']}" for n in graph["nodes"])
     edges = " ".join(f"{e['from']}>{e['to']}({'+' if e['sign'] > 0 else '-'})" for e in graph["edges"])
     news = "\n".join(
-        f"[n{i}] {'[英語] ' if x.get('lang') == 'en' else ''}{x['source']} {short_time(x['time'])}｜{x['title']}" + (f"｜{x['summary'][:90]}" if x["summary"] else "")
+        f"[n{i}] {'[英語] ' if x.get('lang') == 'en' else ''}{x['source']} {short_time(x['time'])}｜{x['title']}" + (f"｜{x['summary'][:500]}" if x["summary"] else "")
         for i, x in enumerate(raw["news"][:MAX_NEWS]))
     who = {e["id"]: e for e in experts_cfg}
     exps = "\n".join(
@@ -248,7 +253,7 @@ def build_prompt(graph, raw, experts_cfg, threads):
 ## ニュース（ID｜媒体 日時｜見出し｜要約）
 {news}
 
-## 識者の発信（ID｜名前（肩書き）｜種類｜媒体 日時｜題名｜要約）
+## 有識者の発信（ID｜名前（肩書き）｜種類｜媒体 日時｜題名｜要約）
 {exps}
 
 ## ニュースの分類（cat に使う id｜名前）
@@ -260,15 +265,16 @@ def build_prompt(graph, raw, experts_cfg, threads):
 ## 作るもの
 - headline: 今日の世の中の動きを一言で。
 - themes: 今日いちばん大事な動きを3〜5個、大事な順に並べる。経済への影響が大きい動きだけにする（情報流出・サイバー攻撃などの事件は、相場や業績を大きく動かしたときだけ）。chain は原因から影響へ、項目を順に並べる（なるべく上の基本の関係に沿う。沿わないつながりは chain_text で理由を書く）。chain の向きは今日実際に起きている向き（相場の数字とニュース）に合わせ、まだ起きていない仮の向きを使うときは chain_text に「もし〜なら」と書く。outlook は「〜かもしれない」で。thread は、上の『流れ』と同じ話題ならその名前をそのまま使い、新しい話題なら短い名前を付ける。つながり図の基本の関係でうまくつながらないときは、chain を2項目にとどめ、無理に項目を足さない。
-- news: 経済・金融・ビジネスに関係し、世の中の流れを知るために押さえておきたいものを30〜50本選び、重要な順に並べる。個人の好みやクリックされやすさでは選ばない。金融政策・為替・物価や景気・企業や産業・海外や政治の動きを広く見渡し、原資料に大事な動きがある分野を落とさない。一つの人気業界や銘柄だけで埋めない。新聞・通信社・経済誌・公的機関・海外の媒体を広く見渡し、同じ大事さなら一つの媒体ばかりにならないようにする。海外の媒体（[英語] を含む）は、日本の経済や世界の流れに関わる大事な動きを拾う。公的機関の発表は、政策や統計として大事なものだけにする。ただし原資料にない話題を分野の穴埋めのために作らない。スポーツ・事件・芸能などは入れない。同じ国・主体・発表対象・期間の出来事を伝える続報・見出し違いは、いちばん詳しい1本を優先する。別の国・企業・発表・期間は独立した記事として扱う。cat は下の分類から1つ選ぶ（例：日経平均の動き→market、日銀の決定→policy、企業の決算→industry、物価の統計→economy、海外の景気→global、政府の予算や選挙→politics、家計や住宅→life）。情報流出・サイバー攻撃・事件・選挙制度などは、経済への影響がはっきりしているときだけ入れ、level は1にする。level=3 は経済全体に広く影響する動きや重要な政策・統計、level=2 はその分野の流れを知るために押さえる動き、level=1 は補足。plain は見出しの繰り返しだけでなく、何が変わりなぜ押さえたいかを、原資料から分かる範囲の短い一文で書く。tags はそのニュースが動かす項目と向き（関係が薄ければ空でよい）。
-- news の同一判定: 1件には1本の元記事の情報だけを使い、同業他社の決算、別国の金融政策、同じ業界の別の変化を1件へまとめない。plain と next は選んだその記事についてだけ書き、別記事の事実を混ぜない。同じ出来事と確実に分かる記事を重ねて選びすぎず、別の重要な出来事は独立して選ぶ。最終的な統合はアプリ側が国・主体・指標・期間を照合して行う。
+- news: 経済・金融・ビジネスに関係し、世の中の流れを知るために押さえておきたいものを30〜50本選び、重要な順に並べる。個人の好みやクリックされやすさでは選ばない。金融政策・為替・物価や景気・企業や産業・海外や政治の動きを広く見渡し、原資料に大事な動きがある分野を落とさない。一つの人気業界や銘柄だけで埋めない。新聞・通信社・経済誌・公的機関・海外の媒体を広く見渡し、同じ大事さなら一つの媒体ばかりにならないようにする。海外の媒体（[英語] を含む）は、日本の経済や世界の流れに関わる大事な動きを拾う。公的機関の発表は、政策や統計として大事なものだけにする。ただし原資料にない話題を分野の穴埋めのために作らない。スポーツ・事件・芸能などは入れない。同じ国・主体・発表対象・期間の出来事を伝える続報・見出し違いは、いちばん詳しい1本を優先する。別の国・企業・発表・期間は独立した記事として扱う。cat は下の分類から1つ選ぶ（例：日経平均の動き→market、日銀の決定→policy、企業の決算→industry、物価の統計→economy、海外の景気→global、政府の予算や選挙→politics、家計や住宅→life）。情報流出・サイバー攻撃・事件・選挙制度などは、経済への影響がはっきりしているときだけ入れ、level は1にする。level=3 は経済全体に広く影響する動きや重要な政策・統計、level=2 はその分野の流れを知るために押さえる動き、level=1 は補足。plain は原資料の事実を2〜3文でやさしく説明する。見出ししかない記事は短くてもよいので、原因・事情・数字を推測で足さない。context にはそのニュースを読むための一般的な経済の仕組み、impact には条件付きの影響、watch には次に見る具体的なポイントを書く。4欄の同じ内容の繰り返しや、どの記事にも当てはまる定型文は避ける。context の一般論を、その企業・国で実際に起きた事情として書かない。元の記事に行かなくても要点と意味を理解できる内容にする。tags はそのニュースが動かす項目と向き（関係が薄ければ空でよい）。
+- news の参照: themes.newsで参照する記事は、必ずnewsにも同じIDで含め、plain/context/impact/watchをその記事の材料から書く。テーマの参照だけにしてニュース本文を省略しない。
+- news の同一判定: 1件には1本の元記事の情報だけを使い、同業他社の決算、別国の金融政策、同じ業界の別の変化を1件へまとめない。plain・context・impact・watch・next は選んだその記事についてだけ書き、別記事の事実を混ぜない。原資料にない数字・固有の会社名・国名・日付は足さない。同じ出来事と確実に分かる記事を重ねて選びすぎず、別の重要な出来事は独立して選ぶ。最終的な統合はアプリ側が国・主体・指標・期間を照合して行う。
 - news の項目札: 各項目の「対象」と上下の意味を、元の見出し・配信要約の国・指標・主体・変化と照合する。実際に書かれた対象の変化だけを tags にし、そこから推測した波及は next に分ける。「AI投資増を嫌気して株安」は投資の拡大で、株安を ai_semis の縮小に読み替えない。半導体企業の好決算・株価上昇・AIへの期待だけでは設備投資が増えた根拠にならない。import_prices は日本の円建て輸入物価で、米企業の原材料費では代用しない。中国の政治・軍事の出来事だけで china（中国経済）の回復・減速を決めない。「豪州の物価」を「米国の物価」、「海外の中央銀行」を「日銀」「FRB」で代用しない。複数の対象が逆に動く記事では、それぞれの方向を分ける。否定・据え置き・期待だけの変化を実績として付けず、根拠がない・曖昧・図に適切な項目がないときは tags を空にする。
-- experts: すべての識者の発信について、その人の見方として読めるかを判断する（relevant）。
-- debates: relevant な識者の発信のなかで、同じ話題について強気と慎重に見方が分かれているもの。無理に作らない。
+- experts: すべての有識者の発信について、その人の見方として読めるかを判断する（relevant）。
+- debates: relevant な有識者の発信のなかで、同じ話題について強気と慎重に見方が分かれているもの。無理に作らない。
 - scenarios: 上の予定のうち2週間以内のものそれぞれに、結果が2通りに分かれた場合の広がり。各caseのpathsには、上の基本の関係の向きと符号が合う因果経路を、1経路ずつ別配列で入れる。日銀の利上げから円高と長期金利上昇へ分かれるなら、日銀→円高 と 日銀→長期金利→住宅ローン の2配列にする。隣接する根拠のない項目や逆符号を矢印で結ばない。日銀・FRBが実際に据え置く条件だけdirをholdにし、holdは単独札にする。「利下げに前向き」「慎重な姿勢」など発言姿勢だけを政策金利の引き下げに置換せず、textで区別する。ニュースに日付つきで出てくる大きな予定（米雇用統計・米消費者物価など）があれば足してよい（日付がわからなければ date は空文字）。
 - moving: 今日のニュースから見て、いま動いている項目と向き。
-- quiz: 今日のニュースを使った3択クイズを3問。つながり（AならB）を考えさせる問題にする。
-- terms: あなたが書いた文章（what・chain_text・outlook・plain・next・view など）に出てくる難しい言葉で、上の用語集にないもの。会社名・人名は入れない。"""
+- quiz: クイズの画面は使わないため、空配列にする。
+- terms: あなたが書いた文章（what・chain_text・outlook・plain・context・impact・watch・next・view など）に出てくる難しい言葉で、上の用語集にないもの。会社名・人名は入れない。"""
 
 
 def find_claude():
@@ -397,8 +403,9 @@ def daily(graph, cfg, raw):
 
     def news_item(i, extra=None):
         x = raw["news"][i]
+        extra = extra or {}
         item = {"id": f"n{i}", "title": x["title"], "link": x["link"], "source": x["source"], "time": x["time"],
-                "group": x.get("group", ""), **(extra or {})}
+                "group": x.get("group", ""), **extra, **news_detail_fields(x, extra, facts_fallback=True)}
         if x.get("lang") == "en":
             item["lang"] = "en"
         return item
@@ -459,8 +466,9 @@ def daily(graph, cfg, raw):
                     rejected_same = True
             extra_ja = {"title_ja": n["title_ja"].strip()} if raw["news"][i].get("lang") == "en" and (n.get("title_ja") or "").strip() else {}
             # 統合範囲が誤っていた要約には、別会社等の事実も混ざりうるため採用しない。
-            news.append(news_item(i, {**extra_ja, "tags": tags, "cat": cat_of(n.get("cat"), tags, raw["news"][i]), "plain": "" if rejected_same else clean_news_text(raw["news"][i], n.get("plain", "")),
-                                      "next": "" if rejected_same else clean_news_text(raw["news"][i], n.get("next", "")), "level": n.get("level", 1), "related": related}))
+            details = news_detail_fields(raw["news"][i], {} if rejected_same else n)
+            news.append(news_item(i, {**extra_ja, **details, "tags": tags, "cat": cat_of(n.get("cat"), tags, raw["news"][i]),
+                                      "level": n.get("level", 1), "related": related}))
         for i, cat in restored.items():
             if i in used:
                 continue
@@ -544,7 +552,7 @@ def daily(graph, cfg, raw):
                 dt = sc.get("date", "")
                 scenarios.append({"event": sc.get("event", ""), "date": dt if re.match(r"^\d{4}-\d{2}-\d{2}$", dt or "") else "",
                                   "focus": sc.get("focus", ""), "cases": cases})
-        quiz = [q for q in ai.get("quiz", []) if len(q.get("choices", [])) == 3]
+        quiz = []  # 学ぶタブを外したため、旧AIキャッシュからもクイズを再投入しない。
         # 今日の用語：用語集にない言葉で、実際に文章に出てくるものだけ
         known = set(glossary_words())
         text = json.dumps([brief, news, experts, debates, scenarios], ensure_ascii=False)
@@ -598,7 +606,7 @@ def daily(graph, cfg, raw):
                 kept.append(t)
         kept.sort(key=lambda t: (t["entries"][-1]["date"], len(t["entries"])), reverse=True)
         save(THREADS, {"updated": data["updated"], "threads": kept}, pretty=True)
-    print(f"テーマ {len(brief['themes'])} / ニュース {len(news)} / 識者 {len(experts)} / 対立 {len(debates)} / シナリオ {len(scenarios)}"
+    print(f"テーマ {len(brief['themes'])} / ニュース {len(news)} / 有識者 {len(experts)} / 対立 {len(debates)} / シナリオ {len(scenarios)}"
           f" / 動き {len(moving)} / 相場と逆向き {conflicts} / クイズ {len(quiz)} / 今日の用語 {len(terms)}" + (f" / {meta}" if meta else "") + f" → {OUT}")
     return 0
 
