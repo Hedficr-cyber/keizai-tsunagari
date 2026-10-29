@@ -1,28 +1,23 @@
 {
- "updated": "2026-10-29T13:07:25+09:00",
- "collected": "2026-10-29T13:05:06+09:00",
+ "updated": "2026-10-29T15:44:12+09:00",
+ "collected": "2026-10-29T15:05:02+09:00",
  "ai": {
   "model": "sonnet",
-  "cost_usd": 0.5274772999999999,
-  "ms": 122969
+  "cost_usd": 0.2774882000000001,
+  "ms": 99197
  },
  "brief": {
-  "headline": "FRBは据え置き、AI決算で株は明暗",
+  "headline": "FRBは据え置き、利上げ観測残る。日銀会合を前に円は157円台",
   "themes": [
    {
-    "title": "FRB据え置きと12月の焦点",
-    "point": "据え置きでも利上げ観測は残る",
+    "title": "FRB据え置きと利上げ観測",
+    "point": "据え置きでも12月利上げが視野に",
     "thread": "日米の金融政策",
-    "what": "FRBは28日に政策金利を据え置いた。2人が利上げを主張して反対した。議長は物価が高すぎると述べ、年内利上げに含みを持たせた。米長期金利は一時5.05%台。",
+    "what": "FRBは28日まで開いた会合で政策金利を据え置いた。2人が利上げを主張して反対した。ウォーシュ議長は12月の利上げも視野に入れた。",
     "chain": [
-     {
-      "node": "us_cpi",
-      "dir": "up"
-     },
      {
       "node": "ust10",
       "dir": "up",
-      "known": false,
       "conflict": "米金利は実際には低下方向（1週間で 5.13→5.05%（−0.08pt））"
      },
      {
@@ -31,40 +26,35 @@
       "known": true
      }
     ],
-    "chain_text": "物価の高止まりが続くと、追加利上げが意識されて米金利が上がり、ドル高円安に傾きやすい。今回は利上げを急がない見方で円が一時買われた。",
+    "chain_text": "もしFRBが12月に利上げすれば、米長期金利が上がり、ドル円は円安に向かいやすい。ただ今回は据え置きで、円は一時157円台後半に買われた。",
     "outlook": [
-     "12月の利上げの有無は、物価や雇用の指標で決まるかもしれない。",
-     "利上げ観測が強まれば、米長期金利が上がり株の重しになるかもしれない。"
+     "12月会合で追加利上げに動くかもしれない",
+     "物価指標しだいで米長期金利が再び上がる可能性がある",
+     "日銀会合の結果で円相場が動くかもしれない"
     ],
     "watch": "10/30の日銀会合と総裁会見、12月のFOMC",
     "news": [
-     "n98",
-     "n266",
-     "n264",
-     "n76",
-     "n251",
-     "n195",
-     "n162"
+     "n161",
+     "n182",
+     "n148",
+     "n302",
+     "n147",
+     "n17",
+     "n246"
     ],
     "experts": [
-     "e7",
-     "e14"
+     "e17"
     ]
    },
    {
-    "title": "AI決算の明暗",
-    "point": "AI投資の稼ぐ力が問われている",
+    "title": "AI投資と相場の分かれ目",
+    "point": "AI投資への評価が企業ごとに割れた",
     "thread": "AI相場",
-    "what": "マイクロソフトとサムスンは大幅増益。アルファベットはAI投資の増加で25%減益となり株が下がった。日本ではアドバンテストの上方修正で半導体株が買われた。",
+    "what": "マイクロソフトは増益で株が上がった。アルファベットは減益で約10%下落した。日経平均は半導体株の買いで上昇した。",
     "chain": [
      {
       "node": "ai_semis",
       "dir": "up"
-     },
-     {
-      "node": "us_stocks",
-      "dir": "up",
-      "known": true
      },
      {
       "node": "nikkei",
@@ -72,114 +62,63 @@
       "known": true
      }
     ],
-    "chain_text": "AI投資が増えれば半導体や関連株が支えられ、日本株にも波及する。ただしアルファベットのように投資負担が嫌気され、株が下がる例もある。",
+    "chain_text": "AI関連の好決算が日本の半導体株への買いにつながり、日経平均を押し上げた。一方でAI投資の費用負担を嫌う売りも出ている。",
     "outlook": [
-     "AI投資が利益に結びつく企業と、そうでない企業で株価の差が広がるかもしれない。",
-     "巨額投資への疑いが強まれば、AI関連株が大きく揺れるかもしれない。"
+     "投資の回収が見えない企業は売られやすいかもしれない",
+     "半導体の好業績が続けば日本株を支える可能性がある"
     ],
-    "watch": "米ハイテク決算の続きと、日本の半導体関連の決算",
+    "watch": "米大手ハイテクの決算と半導体株の動き",
     "news": [
-     "n197",
-     "n198",
-     "n101",
-     "n129",
-     "n114",
-     "n216",
-     "n7",
-     "n211"
-    ],
-    "experts": [
-     "e2",
-     "e6",
-     "e8",
-     "e13"
-    ]
-   },
-   {
-    "title": "日本の金利と財政",
-    "point": "長期金利は低下も財政の目が続く",
-    "thread": "物価と金利",
-    "what": "日本の10年国債利回りは2.867%で、1か月前の3.082%より低い。欧米の投資家が日本国債を買い戻している。高市政権は積極財政を続ける方針。",
-    "chain": [
-     {
-      "node": "fiscal",
-      "dir": "up"
-     },
-     {
-      "node": "jgb10",
-      "dir": "up",
-      "known": true,
-      "conflict": "日本金利は実際には低下方向（1週間で 2.923→2.867%（−0.06pt））"
-     },
-     {
-      "node": "mortgage",
-      "dir": "up",
-      "known": true
-     }
-    ],
-    "chain_text": "財政支出が増えると国債の発行が増え、長期金利が上がりやすい。長期金利が上がると住宅ローン金利にも波及する。ただし今は金利が低下している。",
-    "outlook": [
-     "財政の拡大が意識されれば、長期金利が再び上がるかもしれない。",
-     "日銀が利上げすれば、住宅ローン金利にも波及するかもしれない。"
-    ],
-    "watch": "10/30の日銀会合と、10年国債の入札",
-    "news": [
-     "n204",
-     "n273",
-     "n303",
-     "n182"
-    ],
-    "experts": [
-     "e14",
-     "e15"
-    ]
-   },
-   {
-    "title": "原油高と地政学",
-    "point": "イラン戦争のコストが広がっている",
-    "thread": "原油と地政学",
-    "what": "イランとの戦争で燃料価格が高騰し、クルーズ船が運航を止めた。ナフサ高騰で中小メーカーが苦しんでいる。トランプ氏はロボットへの関税を見送った。",
-    "chain": [
-     {
-      "node": "geopolitics",
-      "dir": "up"
-     },
-     {
-      "node": "oil",
-      "dir": "up",
-      "known": true
-     },
-     {
-      "node": "import_prices",
-      "dir": "up",
-      "known": true
-     },
-     {
-      "node": "jp_cpi",
-      "dir": "up",
-      "known": true
-     }
-    ],
-    "chain_text": "地政学リスクで原油が上がると、輸入物価を通じて日本の物価を押し上げやすい。原料高は企業の利益と家計の負担にも響く。",
-    "outlook": [
-     "原料高が続けば、値上げがさらに広がるかもしれない。",
-     "関税の協議しだいで、企業のコスト見通しが変わるかもしれない。"
-    ],
-    "watch": "原油価格と関税協議の行方",
-    "news": [
-     "n87",
-     "n314",
-     "n133",
-     "n238",
-     "n9"
+     "n6",
+     "n248",
+     "n247",
+     "n199",
+     "n187",
+     "n175",
+     "n163"
     ],
     "experts": []
    },
    {
-    "title": "相次ぐサイバー攻撃",
-    "point": "消費や企業の信用への影響が焦点",
+    "title": "長期金利の一服",
+    "point": "日米とも長期金利は1週間前より低下",
+    "thread": "物価と金利",
+    "what": "日本の10年国債利回りは2.867%、米国は5.05%で、1週間前よりどちらも低下した。ドル円は157.96円。",
+    "chain": [
+     {
+      "node": "ust10",
+      "dir": "down"
+     },
+     {
+      "node": "jgb10",
+      "dir": "down",
+      "known": true
+     },
+     {
+      "node": "mortgage",
+      "dir": "down",
+      "known": true
+     }
+    ],
+    "chain_text": "米長期金利が下がると日本の長期金利も下がりやすい。固定型の住宅ローン金利にも影響しうる。",
+    "outlook": [
+     "米中間選挙後の政策しだいで金利が再び動くかもしれない",
+     "日銀の発言で長期金利が上下する可能性がある"
+    ],
+    "watch": "11/3の米中間選挙、日銀会合",
+    "news": [
+     "n38",
+     "n294",
+     "n214",
+     "n30"
+    ],
+    "experts": []
+   },
+   {
+    "title": "サイバー攻撃の経済影響",
+    "point": "相次ぐ攻撃が消費や信用に影を落とす",
     "thread": "サイバー攻撃",
-    "what": "GMOへの不正アクセスで社債のスプレッドが拡大した。政府内では消費への影響を案じる声が出ている。攻撃者の特定につながる情報も得られた。",
+    "what": "GMOへの不正アクセスで総務省が攻撃サイトの遮断を要請した。GMO社債の上乗せ金利も広がった。",
     "chain": [
      {
       "node": "consumption",
@@ -191,16 +130,16 @@
       "known": true
      }
     ],
-    "chain_text": "システム停止や情報流出が続くと、企業活動や消費が冷え、景気を押し下げる恐れがある。今のところ影響の大きさは未確定。",
+    "chain_text": "もし攻撃が続いてサービス停止が広がれば、消費が鈍り、GDPを押し下げる懸念が政府内にある。",
     "outlook": [
-     "被害が広がれば、企業の信用や景気への影響が大きくなるかもしれない。",
-     "対策費がかさんで、企業の利益を圧迫するかもしれない。"
+     "被害が広がれば消費への影響が出るかもしれない",
+     "企業の信用リスクとして意識される可能性がある"
     ],
-    "watch": "GMOの調査結果と政府の対応",
+    "watch": "政府の対応とGMOの調査結果",
     "news": [
-     "n34",
-     "n57",
-     "n39"
+     "n112",
+     "n130",
+     "n79"
     ],
     "experts": []
    }
@@ -208,49 +147,29 @@
  },
  "moving": [
   {
-   "node": "ai_semis",
+   "node": "fed",
    "dir": "up",
-   "why": "サムスンやアドバンテストが好調な業績を発表"
-  },
-  {
-   "node": "nikkei",
-   "dir": "up",
-   "why": "半導体株が支え、午前は小幅に続伸"
-  },
-  {
-   "node": "us_stocks",
-   "dir": "up",
-   "why": "NYダウは3日続伸。MSは好決算"
+   "why": "据え置きでも12月の利上げが視野に入った"
   },
   {
    "node": "ust10",
    "dir": "down",
-   "why": "28日の利回りは1週間前より低い5.05%"
+   "why": "1週間前の5.13%から5.05%へ低下"
   },
   {
    "node": "jgb10",
    "dir": "down",
-   "why": "日本の長期金利は2.867%と1週間前より低下"
+   "why": "1週間前の2.923%から2.867%へ低下"
   },
   {
-   "node": "usdjpy",
+   "node": "nikkei",
    "dir": "up",
-   "why": "157円台後半でもみ合い、1か月前より円安"
-  },
-  {
-   "node": "tariffs",
-   "dir": "down",
-   "why": "トランプ氏がロボットへの関税を見送り"
-  },
-  {
-   "node": "oil",
-   "dir": "up",
-   "why": "イラン戦争で燃料やナフサの高騰が続く"
+   "why": "半導体株の買いで日経平均が上昇"
   }
  ],
  "news": [
   {
-   "id": "n98",
+   "id": "n161",
    "title": "FRB 政策金利据え置き 12月会合で追加利上げ踏み切るかが焦点",
    "link": "https://news.web.nhk/newsweb/na/nd-20261029de67441",
    "source": "NHK",
@@ -258,55 +177,32 @@
    "group": "新聞・放送・通信",
    "tags": [],
    "cat": "policy",
-   "plain": "FRBが金利を据え置いた。12月に追加利上げするかが次の焦点。",
-   "next": "12月会合までの物価と雇用の指標しだいで、利上げの有無が決まるかもしれない。",
+   "plain": "FRBが政策金利を据え置き、12月の追加利上げが焦点になった。",
+   "next": "12月会合で利上げに動くかが円や金利の方向を左右するかもしれない。",
    "level": 3,
    "related": []
   },
   {
-   "id": "n266",
-   "title": "FRBが金利据え置き 議長「インフレ率高すぎる」、年内利上げに含み",
-   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE1YczhScm1VTzFEVTAtcm1XZFBhZl9NcUJxcHNiV2l0ZWppZFhocmFKQnVHNHNPYVNYUWNXM2FJWk1GTG5OTEotU2FsdkFlY0ZLRFhqbVJRYW9rYW1mS2Z0N3JQbXIwUWU1b0hENA?oc=5",
-   "source": "日本経済新聞",
-   "time": "2026-10-29T03:03:09+09:00",
+   "id": "n6",
+   "title": "日経平均は713円高、内外企業決算や米経済指標に関心",
+   "link": "https://news.google.com/rss/articles/CBMiS0FVX3lxTE44Z09QRFUtRkZocHhCR09Bd2tzZURpVklKSjhuSXEzNlNxQWlxQVkyWU1GU3psWFMxUHdJZ29vdVo2QzRKWS1rOXNIYw?oc=5",
+   "source": "47NEWS",
+   "time": "2026-10-29T14:52:13+09:00",
    "group": "新聞・放送・通信",
-   "tags": [],
-   "cat": "policy",
-   "plain": "議長は「インフレ率が高すぎる」と述べ、年内利上げに含みを持たせた。",
-   "next": "物価が下がらなければ、利上げが再び意識されるかもしれない。",
-   "level": 3,
-   "related": []
-  },
-  {
-   "id": "n264",
-   "title": "FRBが政策金利を据え置き、2会合ぶり　2人が利上げ主張し反対",
-   "link": "https://www.asahi.com/articles/ASVBX61RYVBXUHBI027M.html?ref=rss",
-   "source": "朝日新聞",
-   "time": "2026-10-29T03:13:56+09:00",
-   "group": "新聞・放送・通信",
-   "tags": [],
-   "cat": "policy",
-   "plain": "2人の委員が利上げを主張して反対票を投じ、据え置きは割れた。",
-   "next": "反対が増えれば、12月の利上げ観測がさらに強まるかもしれない。",
+   "tags": [
+    {
+     "node": "nikkei",
+     "dir": "up"
+    }
+   ],
+   "cat": "market",
+   "plain": "日経平均が713円高となった。",
+   "next": "企業決算や米経済指標しだいで動きが続くかもしれない。",
    "level": 2,
    "related": []
   },
   {
-   "id": "n76",
-   "title": "米利上げの予想回数「1.8回」に低下 2027年3月まで",
-   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE5ManBhLXhnYVJQRHhOUlc5WXdja3ZzMUtrbkdvWldaSVRPOTFfUFpleHVqRjg3dWtEN2tUVDJLc0s5SnJhMndXNGxYOS13LVNXTV9NbmJra1lGRUlyRDhMcnFiT2htcjQ4VnlqdA?oc=5",
-   "source": "日本経済新聞",
-   "time": "2026-10-29T11:15:02+09:00",
-   "group": "新聞・放送・通信",
-   "tags": [],
-   "cat": "rates",
-   "plain": "2027年3月までの米利上げ予想は1.8回に低下した。",
-   "next": "利上げペースが緩むとの見方が広がれば、長期金利の上昇が落ち着くかもしれない。",
-   "level": 2,
-   "related": []
-  },
-  {
-   "id": "n251",
+   "id": "n294",
    "title": "米長期金利、一時5.05%台 FOMC受け約1週間ぶり高水準",
    "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE1KbTM5bXh6ZDlSZ0o2X2dzdW56QkxnTEZhdjUyYzNfXzFJa3FaTWh6aDJyVnlzRml0MHFDZVFobzJlZC1ZNHp2aW9Lc0pQS20tVHRBWUF0SGVqbHpZY1pSQ0N6TVBaRjBUWV8xOQ?oc=5",
    "source": "日本経済新聞",
@@ -319,892 +215,299 @@
     }
    ],
    "cat": "rates",
-   "plain": "米長期金利が一時5.05%台になり、約1週間ぶりの高い水準をつけた。",
-   "next": "",
+   "plain": "米長期金利がFOMC後に一時5.05%台まで上がった。",
+   "next": "金利が高止まりすれば株や為替に影響するかもしれない。",
    "level": 2,
    "related": []
   },
   {
-   "id": "n195",
-   "title": "円相場 1ドル＝157円台後半に一時値上がり FRB議長会見を受け",
-   "link": "https://news.web.nhk/newsweb/na/nd-20261029de67462",
-   "source": "NHK",
-   "time": "2026-10-29T06:17:06+09:00",
-   "group": "新聞・放送・通信",
-   "tags": [
-    {
-     "node": "usdjpy",
-     "dir": "down"
-    }
-   ],
-   "cat": "fx",
-   "plain": "議長会見で利上げを急がないとの見方が出て、円が一時買われた。",
-   "next": "",
+   "id": "n199",
+   "title": "Google shares tumble 10% after $51bn AI outlay deepens cash burn",
+   "link": "https://www.ft.com/content/eb386156-5bf9-4edd-80f2-803fdee1e33d?syn-25a6b1a6=1",
+   "source": "Financial Times",
+   "time": "2026-10-29T08:27:01+09:00",
+   "group": "海外（英語）",
+   "title_ja": "グーグル株が10%下落",
+   "tags": [],
+   "cat": "industry",
+   "plain": "AI投資の費用増で現金の減りが深まり、株が急落した。",
+   "next": "AI投資の回収を問う見方が広がるかもしれない。",
    "level": 2,
-   "related": []
+   "related": [],
+   "lang": "en"
   },
   {
-   "id": "n162",
-   "title": "円は対ドルで157円台後半、FOMC据え置きでもみ合い－債券は上昇へ",
-   "link": "https://news.google.com/rss/articles/CBMijgFBVV95cUxPSTBaTkNoR0JQQnllN2FuRUxrMmMwNHZIQ0k2YUVtOWgxT2Y0ZW12akExcUM3Y0lNNG52N2lKQXdtb0xJaThvaTR2YV9BOEc1UFJ6cURyYWViTlFPLW9yaWJ0OXVwcENteV8zQzhGUjQ2LXZ0Q1gwOWRfTzM1czdqU1hHeW9OOEI5bzRzZkNn?oc=5",
+   "id": "n182",
+   "title": "FRBが金利据え置き決定－ウォーシュ議長は明言せずも追加利上げ示唆",
+   "link": "https://news.google.com/rss/articles/CBMijgFBVV95cUxQdmEzaG1KRnF0dUVxNmlTd1dyeXFwMG9GWkI2SW5OcHlTeXZwdDlyU2NacUc5RE5OY1RlbzJGTUNkUzdXdUtKUWpxNkJyTzdQNUppZXplZmU3eVV3XzFXQ2xXczQ5LTJMOTRMNk04WU1EV3BEWkxMd2NNNEk0cGoyVkZlTkR2NzVLTTQ1QkN3?oc=5",
    "source": "Bloomberg",
-   "time": "2026-10-29T07:43:09+09:00",
+   "time": "2026-10-29T09:52:00+09:00",
    "group": "新聞・放送・通信",
    "tags": [],
-   "cat": "fx",
-   "plain": "円は157円台後半でもみ合い、債券は上昇へと伝えた。",
+   "cat": "",
+   "plain": "",
    "next": "",
    "level": 1,
    "related": []
   },
   {
-   "id": "n197",
-   "title": "アルファベット7〜9月25%減益 検索広告鈍化、AI投資増を嫌気し株9%安",
-   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE50c1dSZTMtQkl6Ymh0dFRGdzBUMVJOZ2UzZHFFR2R5eDdDX19CbjlFSHQ4WXVud3dkQU1LbTZLNzhYM255N2w1VjhrNHBiR0JoX2ppVEt0UFdPdTlGNC1mT1dXSHBJQnBBOTJJSw?oc=5",
-   "source": "日本経済新聞",
-   "time": "2026-10-29T06:10:32+09:00",
+   "id": "n148",
+   "title": "FRB、金利据え置き　中間選挙を意識？　12月の利上げ観測強まる",
+   "link": "https://www.asahi.com/articles/ASVBY0FBCVBYUHBI00MM.html?ref=rss",
+   "source": "朝日新聞",
+   "time": "2026-10-29T11:17:30+09:00",
    "group": "新聞・放送・通信",
-   "tags": [
-    {
-     "node": "ai_semis",
-     "dir": "up"
-    }
-   ],
-   "cat": "industry",
-   "plain": "アルファベットは7〜9月が25%減益。AI投資の増加を嫌気し株が9%安。",
-   "next": "AI投資の回収に疑問が出ると、関連株が揺れやすくなるかもしれない。",
-   "level": 3,
+   "tags": [],
+   "cat": "",
+   "plain": "",
+   "next": "",
+   "level": 1,
    "related": []
   },
   {
-   "id": "n198",
+   "id": "n302",
+   "title": "FRBが政策金利を据え置き、2会合ぶり　2人が利上げ主張し反対",
+   "link": "https://www.asahi.com/articles/ASVBX61RYVBXUHBI027M.html?ref=rss",
+   "source": "朝日新聞",
+   "time": "2026-10-29T03:13:56+09:00",
+   "group": "新聞・放送・通信",
+   "tags": [],
+   "cat": "",
+   "plain": "",
+   "next": "",
+   "level": 1,
+   "related": []
+  },
+  {
+   "id": "n147",
+   "title": "FRB議長、12月利上げ視野 金融環境「なお引き締め余地」",
+   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTFBGUlZrUWV2UlZ1VmFiUGdQOTBYNDIzLUlqRGFza2MzdkJHNk15dlVrVjlLYjg0bTF6VUYxWWg1VWU4XzNNN3RtN3UzVWEwMTByNU55SnlNZkEyTEhpdW81SUpHdm1fZWRqVkItQw?oc=5",
+   "source": "日本経済新聞",
+   "time": "2026-10-29T11:18:13+09:00",
+   "group": "新聞・放送・通信",
+   "tags": [],
+   "cat": "",
+   "plain": "",
+   "next": "",
+   "level": 1,
+   "related": []
+  },
+  {
+   "id": "n17",
+   "title": "米短期債利回り低下、ＦＲＢ据え置きで利上げ観測見直し",
+   "link": "https://news.google.com/rss/articles/CBMihgFBVV95cUxNRHJ4M0tfRkRleWprc04tMjBtMnlvWDR6Q1RMc2VPZFRKWDVLTXZyWVhubkNKV0E0QUlWWU8xbGR4WlNlQi1sRjJLZVA2QnRMUU9xQjZNZEJYSTBwZTU5WmpPSTZVR0hBNG9qTktJVE1XY3Q5QTktVjBpSjdoTGgydVZKR3NDQQ?oc=5",
+   "source": "Reuters",
+   "time": "2026-10-29T14:32:00+09:00",
+   "group": "新聞・放送・通信",
+   "tags": [],
+   "cat": "",
+   "plain": "",
+   "next": "",
+   "level": 1,
+   "related": []
+  },
+  {
+   "id": "n246",
+   "title": "円相場 1ドル＝157円台後半に一時値上がり FRB議長会見を受け",
+   "link": "https://news.web.nhk/newsweb/na/nd-20261029de67462",
+   "source": "NHK",
+   "time": "2026-10-29T06:17:06+09:00",
+   "group": "新聞・放送・通信",
+   "tags": [],
+   "cat": "",
+   "plain": "",
+   "next": "",
+   "level": 1,
+   "related": []
+  },
+  {
+   "id": "n248",
    "title": "決算:Microsoft、7〜9月32%増益 AI向けクラウド事業が5割増収",
    "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE9iazBnSjF6cTZEWGg1VGZFY0prZVpOZFpiWUtRUl9HZDF5QUw0TjFDeHlmTVVkaFVmU0FZR3Q4VUVJQkxVcE1OMkMxLURhMFlFR1YyMzctOTB1YXk2UjM4OXZGSWtCb1JzYlRBcw?oc=5",
    "source": "日本経済新聞",
    "time": "2026-10-29T06:07:45+09:00",
    "group": "新聞・放送・通信",
    "tags": [],
-   "cat": "industry",
-   "plain": "マイクロソフトは7〜9月が32%増益。AI向けクラウドが5割増収。",
-   "next": "AI投資が稼ぎにつながる企業は、評価されやすいかもしれない。",
-   "level": 3,
+   "cat": "",
+   "plain": "",
+   "next": "",
+   "level": 1,
    "related": []
   },
   {
-   "id": "n101",
-   "title": "決算:サムスン半導体部門が営業利益15倍の12兆円 7〜9月、AI需要増",
-   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTFBPYkk0N0xDLUtxWFpJVThtanUyV04ySnFRT2c3WjJKazlBelJMbnpzTF9RU0t6TW9GcDJ0ZFdfa1pZaDJQLW44dXRaTWJrVmpVWjF3OEJ3dmtOcUpNN1RvQXR3akZvRkxvdW16WA?oc=5",
+   "id": "n247",
+   "title": "アルファベット7〜9月25%減益 検索広告鈍化、AI投資増を嫌気し株9%安",
+   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE50c1dSZTMtQkl6Ymh0dFRGdzBUMVJOZ2UzZHFFR2R5eDdDX19CbjlFSHQ4WXVud3dkQU1LbTZLNzhYM255N2w1VjhrNHBiR0JoX2ppVEt0UFdPdTlGNC1mT1dXSHBJQnBBOTJJSw?oc=5",
    "source": "日本経済新聞",
-   "time": "2026-10-29T10:36:35+09:00",
+   "time": "2026-10-29T06:10:32+09:00",
    "group": "新聞・放送・通信",
    "tags": [],
-   "cat": "industry",
-   "plain": "サムスンの半導体部門は営業益が約12兆円。AI需要で大幅に増えた。",
-   "next": "メモリ不足が続けば、半導体の価格や関連企業の業績を押し上げるかもしれない。",
-   "level": 3,
+   "cat": "",
+   "plain": "",
+   "next": "",
+   "level": 1,
    "related": []
   },
   {
-   "id": "n129",
+   "id": "n187",
    "title": "日経平均、続伸で始まる アドテスト上方修正でAI銘柄に買い",
    "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE83OGRGakJITFQyMC1QUDEzb2kzeURNSnVHX2FobFFhS1BWY1RqeUVsSWViVFVtRHljZjZCWkpFaXVRU2c3RU1MRnI3OTVPejhsZlBad2dFeG40VFZmaGVUSUlIa294QlF3U3VneA?oc=5",
    "source": "日本経済新聞",
    "time": "2026-10-29T09:11:40+09:00",
    "group": "新聞・放送・通信",
-   "tags": [
-    {
-     "node": "nikkei",
-     "dir": "up"
-    }
-   ],
-   "cat": "market",
-   "plain": "日経平均はアドバンテストの上方修正を受けAI銘柄に買いが入り続伸。",
-   "next": "米ハイテク株の動きしだいで、上値が重くなるかもしれない。",
-   "level": 2,
+   "tags": [],
+   "cat": "",
+   "plain": "",
+   "next": "",
+   "level": 1,
    "related": []
   },
   {
-   "id": "n131",
-   "title": "日経平均株価、続伸 午前終値は177円高の6万4131円",
-   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE9ueHVNbjMtZWJHYVl4NllSN2lFQWp4cnBxZHN4RW1JLUY2X2tIb3lORnNZR2N3SDBJc1pqYUhLV2YwbTRMQXJoTjZTNndncnBYczBRN3dnRmxYNl9wVFhsY1ZQSGJydndyMzdnRg?oc=5",
-   "source": "日本経済新聞",
-   "time": "2026-10-29T09:08:39+09:00",
-   "group": "新聞・放送・通信",
-   "tags": [
-    {
-     "node": "nikkei",
-     "dir": "up"
-    }
-   ],
-   "cat": "market",
-   "plain": "日経平均の午前終値は177円高の6万4131円だった。",
-   "next": "アルファベット株安の影響が、午後の売りにつながるかもしれない。",
-   "level": 2,
-   "related": []
-  },
-  {
-   "id": "n114",
+   "id": "n175",
    "title": "AI半導体市場「メガサイクル局面だ」　アドバンテスト好決算、CEOが語る「CPU」「光電融合」への期待とワクワク",
    "link": "https://www.itmedia.co.jp/business/articles/2610/29/news050.html",
    "source": "ITmedia ビジネス",
    "time": "2026-10-29T10:05:00+09:00",
    "group": "経済誌・ネットメディア",
    "tags": [],
-   "cat": "industry",
-   "plain": "アドバンテストは通期の売上高予想を1兆8630億円へ上方修正した。",
-   "next": "AI向けの半導体投資が続けば、検査装置の需要も伸びるかもしれない。",
-   "level": 2,
-   "related": []
-  },
-  {
-   "id": "n216",
-   "title": "NYダウ、3日続伸し97ドル高 AI関連や金融株に買い",
-   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE8tVkktLWtHVmZ1UVlCN2pTTHR6M01idkFLQXd2RTgzVG1oeGg5eHcwNmtsS1BUYUZHR1pHcnFqbTFfdU0wcFYtQWQtTTktcnphNk9yOHdSdEN3U3lzaEtfTWNfaVdRQ3BlN2pnMg?oc=5",
-   "source": "日本経済新聞",
-   "time": "2026-10-29T05:42:17+09:00",
-   "group": "新聞・放送・通信",
-   "tags": [
-    {
-     "node": "us_stocks",
-     "dir": "up"
-    }
-   ],
-   "cat": "market",
-   "plain": "NYダウは3日続伸し97ドル高。AI関連と金融株に買いが入った。",
-   "next": "決算の明暗で、個別株の動きは大きくなるかもしれない。",
-   "level": 2,
-   "related": []
-  },
-  {
-   "id": "n133",
-   "title": "トランプ氏、輸入ロボットに安保リスク認定 関税は見送り",
-   "link": "https://news.google.com/rss/articles/CBMihwFBVV95cUxPajdRVERLbzdJaVFxWGFQR3lqUkROY0xwcktfWUFydWdFZl82d0NBQXF2WEJDb3ZmOTJ0dWZvN1B6T0UxZzF2ZWxVNFA2RXM0bXNpQ2hZUFoydUh0T3o4QzJRdVh4MzBYSXlOblZhN0tvd2ExaEtFaE1ncDZhTkFkLWtYeXVHVTg?oc=5",
-   "source": "Reuters",
-   "time": "2026-10-29T09:05:00+09:00",
-   "group": "新聞・放送・通信",
-   "tags": [
-    {
-     "node": "tariffs",
-     "dir": "down"
-    }
-   ],
-   "cat": "global",
-   "plain": "トランプ氏は輸入ロボットを安保リスクと認めたが、関税は見送った。",
-   "next": "貿易相手国との協議しだいで、関税が決まる可能性がある。",
-   "level": 2,
-   "related": []
-  },
-  {
-   "id": "n80",
-   "title": "世界の債券発行6.61兆ドルで過去最高、AIインフラ投資がけん引",
-   "link": "https://news.google.com/rss/articles/CBMijgFBVV95cUxQbGlGY3dOR2t6OHdvRUdVT2V4VWNDQkU1Y0Fjd09BVHV4OUtVU3JQd1MwcGdqZjVpbUJ5a1U1aWFDb2lhd2JuQWRaSDZuSUhFN0tZdFV4bDVVNmRVaEJ1TnVqWmE0V3V6c0UtX2dESGxmQmMwZ1gtMm1tTzNldWlfbXNCQVBKbURmTGRJN3BR?oc=5",
-   "source": "Bloomberg",
-   "time": "2026-10-29T11:10:00+09:00",
-   "group": "新聞・放送・通信",
-   "tags": [],
-   "cat": "market",
-   "plain": "世界の債券発行が6.61兆ドルで過去最高。AIインフラ投資が主因。",
-   "next": "資金調達が増えると、金利や社債の需給に影響するかもしれない。",
-   "level": 2,
-   "related": []
-  },
-  {
-   "id": "n204",
-   "title": "日本国債買いに再び傾く欧米投資家、国内勢の需要回復と高利回り魅力",
-   "link": "https://news.google.com/rss/articles/CBMiigFBVV95cUxNUk1NSlpKQ09TS2d5bEt2Q3FOY3NFQ3J6SDlyNzZaM1RDMjhjaHp2THhIa2pTTjFrckw2ZGc5Z0RERkQ0N2FPbUhPbHptUmRNMEgtRG1pdGJzd0l1THNOOFJ6OEpiai1LbzNRSUg2UUNROG9qdFlzYzlqaU5PdTYyWnM5Z1JKOGhjZlE?oc=5",
-   "source": "Bloomberg.com",
-   "time": "2026-10-29T06:00:00+09:00",
-   "group": "新聞・放送・通信",
-   "tags": [
-    {
-     "node": "jgb10",
-     "dir": "down"
-    }
-   ],
-   "cat": "rates",
-   "plain": "欧米の投資家が、高い利回りを理由に日本国債を再び買い始めた。",
-   "next": "買いが続けば、日本の長期金利の上昇が抑えられるかもしれない。",
-   "level": 2,
-   "related": []
-  },
-  {
-   "id": "n182",
-   "title": "日本企業の信用リスクが4年ぶりの大幅上昇、記録的な社債発行に逆風",
-   "link": "https://news.google.com/rss/articles/CBMid0FVX3lxTE83TE0wLWRpSXh1RlhmUkNCV0l2RWtJcUF0QTRzdk9qYV9hMzB2RHVpd084S2V1S0RvU3g5ei1Wd0tkUlZHQlNDM3JSSzJnaVhaVzRvYW5zcXplbDd6RXhCVy1NeXpyQzRtc3NDaDZxcXVnYTdzNzhn?oc=5",
-   "source": "Bloomberg",
-   "time": "2026-10-29T07:00:59+09:00",
-   "group": "新聞・放送・通信",
-   "tags": [],
-   "cat": "market",
-   "plain": "日本企業の信用リスクが4年ぶりの大幅上昇。記録的な社債発行に逆風。",
-   "next": "信用不安が広がると、企業の資金調達コストが上がるかもしれない。",
-   "level": 2,
-   "related": []
-  },
-  {
-   "id": "n183",
-   "title": "米国債の「1兆ドルショック」が日本で醸成中",
-   "link": "https://news.google.com/rss/articles/CBMiWkFVX3lxTE1ZdGlhTHQ0eFpQanBpcnRNRTRabV95YTNRZXltZS1VdWxmZ2R5Z2pjZXBYdTYyUTBSVG54UzZpdl9QWFhwX0o4ODBQbDRzUEl2aHlEYjVSVE50UQ?oc=5",
-   "source": "Forbes JAPAN",
-   "time": "2026-10-29T07:00:00+09:00",
-   "group": "ニュースのまとめ",
-   "tags": [
-    {
-     "node": "ust10",
-     "dir": "up"
-    }
-   ],
-   "cat": "rates",
-   "plain": "米国債の「1兆ドルショック」が日本で意識されているという解説。",
-   "next": "米国債の需給が悪化すれば、日本の金利にも影響するかもしれない。",
+   "cat": "",
+   "plain": "",
+   "next": "",
    "level": 1,
    "related": []
   },
   {
-   "id": "n273",
-   "title": "高市政権「狭義のリフレ」否定 積極財政は継続、需要も刺激",
-   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTFBtTzNOdnd5a1llNENVRzBNcVhvaF9acnJGN1ZNWDNKMVkxRGV4ZUN2Y3Qwd0RtQ2ZpUzAzNEZfWS15SmVVZENWZWJZMzhuSXBCalRMUEluaUNvOFNjM3d2cG5Kd1E2TVNnYzRISg?oc=5",
+   "id": "n163",
+   "title": "決算:サムスン半導体部門が営業利益15倍の12兆円 7〜9月、AI需要増",
+   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTFBPYkk0N0xDLUtxWFpJVThtanUyV04ySnFRT2c3WjJKazlBelJMbnpzTF9RU0t6TW9GcDJ0ZFdfa1pZaDJQLW44dXRaTWJrVmpVWjF3OEJ3dmtOcUpNN1RvQXR3akZvRkxvdW16WA?oc=5",
    "source": "日本経済新聞",
-   "time": "2026-10-29T02:00:00+09:00",
+   "time": "2026-10-29T10:36:35+09:00",
    "group": "新聞・放送・通信",
-   "tags": [
-    {
-     "node": "fiscal",
-     "dir": "up"
-    }
-   ],
-   "cat": "politics",
-   "plain": "高市政権は「狭義のリフレ」を否定しつつ、積極財政は続ける方針。",
-   "next": "財政支出が増えれば、長期金利の上昇圧力になるかもしれない。",
-   "level": 2,
+   "tags": [],
+   "cat": "",
+   "plain": "",
+   "next": "",
+   "level": 1,
    "related": []
   },
   {
-   "id": "n303",
-   "title": "消費減税で客足減る？　外食業界の不安に政府「支援策は今後具体化」",
-   "link": "https://www.asahi.com/articles/ASVBX3HZ2VBXULFA01XM.html?ref=rss",
-   "source": "朝日新聞",
-   "time": "2026-10-28T20:24:48+09:00",
-   "group": "新聞・放送・通信",
-   "tags": [
-    {
-     "node": "consumption",
-     "dir": "up"
-    }
-   ],
-   "cat": "politics",
-   "plain": "消費減税で外食の客足が減る不安があり、政府は支援策を今後具体化する。",
-   "next": "減税の設計しだいで、個人消費への効果が変わるかもしれない。",
-   "level": 2,
+   "id": "n38",
+   "title": "なぜ｢長期金利上昇｣はいったん一服したのか…AI半導体株との連動､米中間選挙後は〈油断禁物〉",
+   "link": "https://toyokeizai.net/articles/-/962868?utm_source=rss&utm_medium=http&utm_campaign=link_back",
+   "source": "東洋経済オンライン",
+   "time": "2026-10-29T14:00:00+09:00",
+   "group": "経済誌・ネットメディア",
+   "tags": [],
+   "cat": "",
+   "plain": "",
+   "next": "",
+   "level": 1,
    "related": []
   },
   {
-   "id": "n34",
+   "id": "n214",
+   "title": "円は対ドルで157円台後半、FOMC据え置きでもみ合い－債券は上昇へ",
+   "link": "https://news.google.com/rss/articles/CBMijgFBVV95cUxPSTBaTkNoR0JQQnllN2FuRUxrMmMwNHZIQ0k2YUVtOWgxT2Y0ZW12akExcUM3Y0lNNG52N2lKQXdtb0xJaThvaTR2YV9BOEc1UFJ6cURyYWViTlFPLW9yaWJ0OXVwcENteV8zQzhGUjQ2LXZ0Q1gwOWRfTzM1czdqU1hHeW9OOEI5bzRzZkNn?oc=5",
+   "source": "Bloomberg",
+   "time": "2026-10-29T07:43:09+09:00",
+   "group": "新聞・放送・通信",
+   "tags": [],
+   "cat": "",
+   "plain": "",
+   "next": "",
+   "level": 1,
+   "related": []
+  },
+  {
+   "id": "n30",
+   "title": "アングル：ＦＲＢが景気判断を「力強い」に上げ、米国債の見通し不透明に",
+   "link": "https://news.google.com/rss/articles/CBMihgFBVV95cUxPWFIyUWRtRzV4NnpMSkhlSjVrOXNUT3JSVlZtR3EtcDVLUjd4ZlBUenJZWGpPcEJuZ2lPc21fT0VRM1Rfck13X2Nja0d5ajNfSXBmcHpvYUM4T3ZfX25TdlJ5M1dieVU1SG5ORTFhb1RPNnFZNS0zOTZDQVNpSm96UmRXMzRTZw?oc=5",
+   "source": "Reuters",
+   "time": "2026-10-29T14:08:00+09:00",
+   "group": "新聞・放送・通信",
+   "tags": [],
+   "cat": "",
+   "plain": "",
+   "next": "",
+   "level": 1,
+   "related": []
+  },
+  {
+   "id": "n112",
    "title": "マクロスコープ：相次ぐサイバー攻撃、政府内に消費影響案じる声 ＧＤＰ押し下げも",
    "link": "https://news.google.com/rss/articles/CBMihgFBVV95cUxNR1drQ2wwaE1zRFBGVXBMQ3lLb1FPSFV4MlYyU01TTWJqZlRva2U0UGpkbVNwMmVHZmdSeFExMHN1ZWQtMFJ4TUw0ZWpTck1QNUdycERnRUFXN0tvNVQyODhvWGQ0REp2VGRLMnAyTEpSOUZKNUpZbWRtZXNTSEhxOWg1bXN2UQ?oc=5",
    "source": "Reuters",
    "time": "2026-10-29T12:02:00+09:00",
    "group": "新聞・放送・通信",
-   "tags": [
-    {
-     "node": "consumption",
-     "dir": "down"
-    },
-    {
-     "node": "jp_economy",
-     "dir": "down"
-    }
-   ],
-   "cat": "economy",
-   "plain": "相次ぐサイバー攻撃で、政府内に消費への影響を案じる声。GDPを押し下げる恐れ。",
-   "next": "システム停止が長引けば、消費や景気に響くかもしれない。",
-   "level": 2,
+   "tags": [],
+   "cat": "",
+   "plain": "",
+   "next": "",
+   "level": 1,
    "related": []
   },
   {
-   "id": "n57",
+   "id": "n130",
    "title": "GMO社債、スプレッド拡大が止まらず－サイバー攻撃で信用リスク警戒",
    "link": "https://news.google.com/rss/articles/CBMid0FVX3lxTE1ib1NxSEFON0trM2laS2piRTRISDNjZVQ1U0lqODJQbEdKRlIteUp0TmY4QmJTZ1VnY3QyQllzMlJOdmVwQ3RTTkVmN1NIZ0JPWDFtX1BkLWx2dFpvcm9Dd0NpWDU3YTF2VWExTDdIUXNvNjZ1RWFZ?oc=5",
    "source": "Bloomberg",
    "time": "2026-10-29T11:43:00+09:00",
    "group": "新聞・放送・通信",
    "tags": [],
-   "cat": "market",
-   "plain": "GMOの社債は、サイバー攻撃で信用リスクが警戒され上乗せ金利の拡大が続く。",
-   "next": "被害の全容がわかるまで、社債の売られやすさが続くかもしれない。",
-   "level": 1,
-   "related": []
-  },
-  {
-   "id": "n39",
-   "title": "GMO社長“攻撃者特定につながる情報入手 警察などに提出する”",
-   "link": "https://news.google.com/rss/articles/CBMiX0FVX3lxTE53WWlZSldnbG55eXdjUWlCSWczYzlHYjdPRGhVTlBpSmM2WEhROUFlZ2ZxTzdxUDM5aDZmNktla2FJM2M5Sm8zMkJ2U1ZHLVgzcEgzVGxxSjNuTHIxTXhj?oc=5",
-   "source": "NHKニュース",
-   "time": "2026-10-29T11:58:41+09:00",
-   "group": "ニュースのまとめ",
-   "tags": [],
-   "cat": "industry",
-   "plain": "GMO社長が、攻撃者特定につながる情報を入手し警察に提出すると述べた。",
-   "next": "被害の拡大が止まるかが、企業の信用を左右するかもしれない。",
-   "level": 1,
-   "related": []
-  },
-  {
-   "id": "n59",
-   "title": "NZ中銀総裁「12月利上げの公算大きい」と示唆－インフレ率はなお高い",
-   "link": "https://news.google.com/rss/articles/CBMijgFBVV95cUxOTW1hWFBHTmswZWpQNWJ1T0VickZwQzZuWXJ5UXB2aGZPOEdRQnNTVWNSUzFKa0RFZlpIUFNaTjVtbllDdVlvTjRHLVZUdHMyREhhdzBGN0tJa3ByV01qMDlQNmhfTGhLNTNKMnhicl9RS2ZkU19NS2RZdS1hOVFPRjFCOEYtM3o1a2tFWXR3?oc=5",
-   "source": "Bloomberg",
-   "time": "2026-10-29T11:33:00+09:00",
-   "group": "新聞・放送・通信",
-   "tags": [],
-   "cat": "policy",
-   "plain": "NZ中銀総裁が、インフレ率がなお高いとして12月の利上げ公算が大きいと示唆。",
-   "next": "各国で物価対策の利上げが続くかもしれない。",
-   "level": 1,
-   "related": []
-  },
-  {
-   "id": "n117",
-   "title": "英予算案、銀行追加課税倍増 時限措置で法人税含め31％に",
-   "link": "https://news.google.com/rss/articles/CBMihgFBVV95cUxNWVZ3WlRCRXZ4dHU4OFBXWVJjTVJWMFhfWXBqZXpUMy1QWTMydng3REk0VlppNnY3cVpLaXVWT093LV9KMWJ0XzdFdGNjam1Sb2dqODlLTFFud01FbTlrMTJkV3RXQWdpOGRnLWxYc0VHNzQyaTkzRFhjdE5lOFhUWmIzem12Zw?oc=5",
-   "source": "Reuters",
-   "time": "2026-10-29T09:56:00+09:00",
-   "group": "新聞・放送・通信",
-   "tags": [],
-   "cat": "politics",
-   "plain": "英予算案で銀行への追加課税が倍増し、法人税込みで31%になる。",
-   "next": "財政のやりくりから銀行への課税が広がるかもしれない。",
-   "level": 1,
-   "related": []
-  },
-  {
-   "id": "n123",
-   "title": "イタリア、銀行・エネルギー企業など増税へ 27年予算案",
-   "link": "https://news.google.com/rss/articles/CBMifkFVX3lxTE9HOVN4V2NPR2dsVU1GdnNDQ0ZRX0RITks4ZWxkRmt3RWdNLXhqRzdTdVlYeURRZ19mTnp3UnI5ckFobWZEMmYtSUM1RmNrT2JSdng2S1F5cVJOQUZTR2RGWHZiNE93cTk1Q1RZVmxBcHpVaUU3WVZOdjJleTI3dw?oc=5",
-   "source": "Reuters",
-   "time": "2026-10-29T09:37:00+09:00",
-   "group": "新聞・放送・通信",
-   "tags": [],
-   "cat": "politics",
-   "plain": "イタリアは2027年予算案で銀行やエネルギー企業を増税する。",
-   "next": "欧州の銀行の収益に重しになるかもしれない。",
-   "level": 1,
-   "related": []
-  },
-  {
-   "id": "n87",
-   "title": "ナフサ高騰で「崖っぷち」　アメリカ中間選挙、社長「不安は大きい」",
-   "link": "https://www.asahi.com/articles/ASVBV23CHVBVUTIL00SM.html?ref=rss",
-   "source": "朝日新聞",
-   "time": "2026-10-29T11:00:00+09:00",
-   "group": "新聞・放送・通信",
-   "tags": [],
-   "cat": "industry",
-   "plain": "ナフサの高騰で中小メーカーが「崖っぷち」と訴えている。",
-   "next": "原料高が続くと、製品価格への転嫁が進むかもしれない。",
-   "level": 2,
-   "related": []
-  },
-  {
-   "id": "n314",
-   "title": "世界周航を続けるクルーズ船が運航停止に、「住民」を下船させる対応　イラン戦争で燃料費高騰",
-   "link": "https://www.cnn.co.jp/travel/35254109.html?ref=rss",
-   "source": "CNN.co.jp",
-   "time": "2026-10-28T19:15:00+09:00",
-   "group": "海外（日本語）",
-   "tags": [
-    {
-     "node": "oil",
-     "dir": "up"
-    },
-    {
-     "node": "geopolitics",
-     "dir": "up"
-    }
-   ],
-   "cat": "global",
-   "plain": "イラン戦争による燃料高で、世界一周クルーズ船が運航を停止した。",
-   "next": "戦争が長引けば、燃料高が各産業のコストを押し上げるかもしれない。",
-   "level": 2,
-   "related": []
-  },
-  {
-   "id": "n60",
-   "title": "デンソー、4─9月期純利益8.8%減 通期予想は据え置き",
-   "link": "https://news.google.com/rss/articles/CBMie0FVX3lxTFBOUjZXMUd5X2VJTjB2aWM3MG4ySzJmVlEwUWRsb1RnLWNGelYtaDk2dElmNC0yTWNlbXlRcDRaWGM4UlVYbXNFSUFlY2lFSzVOM09rUUdfbW1JczJiVVFkcHVPU3N2SERCOWZrVmFUbzRreWwxZml6MWRCZw?oc=5",
-   "source": "Reuters",
-   "time": "2026-10-29T11:32:00+09:00",
-   "group": "新聞・放送・通信",
-   "tags": [],
-   "cat": "industry",
-   "plain": "デンソーの4〜9月期は純利益が8.8%減。通期予想は据え置いた。",
-   "next": "自動車部品の業績は、為替や関税の動きに左右されるかもしれない。",
-   "level": 2,
-   "related": []
-  },
-  {
-   "id": "n309",
-   "title": "日立、2年連続最高益の見通し　27年3月期　AI需要追い風",
-   "link": "https://www.asahi.com/articles/ASVBX3GD2VBXULFA00BM.html?ref=rss",
-   "source": "朝日新聞",
-   "time": "2026-10-28T19:48:21+09:00",
-   "group": "新聞・放送・通信",
-   "tags": [],
-   "cat": "industry",
-   "plain": "日立は2年連続で最高益の見通し。AI需要が追い風になった。",
-   "next": "好決算でも、織り込み済みで株が売られる場面があるかもしれない。",
-   "level": 2,
-   "related": []
-  },
-  {
-   "id": "n75",
-   "title": "NEC株価一時10%安 27年3月通期を上方修正、材料出尽くし",
-   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTFBvSVM2UmNMT3NlV0RsNU1qWC1HaUFxVnkteEQ1UlBReWE4Q3V6bnVNcHRiX2VxZ0p3WlIzN3V6NDhqNW1TNzhHR3VhQmtTN0VjUU93QXZyX3BycWNtc1A5b0I4Tno5eTlpOVB3cw?oc=5",
-   "source": "日本経済新聞",
-   "time": "2026-10-29T11:15:31+09:00",
-   "group": "新聞・放送・通信",
-   "tags": [],
-   "cat": "industry",
-   "plain": "NECは通期を上方修正したが、材料出尽くしで株価が一時10%安となった。",
-   "next": "好業績でも期待が先行していると、株は伸びにくいかもしれない。",
-   "level": 1,
-   "related": []
-  },
-  {
-   "id": "n118",
-   "title": "ルネサス、26年12月期は大幅増収へ 営業利益率33％超に上昇見通し",
-   "link": "https://news.google.com/rss/articles/CBMifkFVX3lxTE1HRkZxQ0thTmlqaEVvd2RDSEZjWGtRWnd5SDFyV2RmNGdRY0ZFQUxySzFSdWhRZDlGTVZvTWtnc1V0RV9QenR4QUtwME9WOVNFbjlDWEF3QTdBVGRuSmNndTZMOFViRkt1ajc3QXJWbFdSV3c0azh3QkNXYlFyQQ?oc=5",
-   "source": "Reuters",
-   "time": "2026-10-29T09:54:00+09:00",
-   "group": "新聞・放送・通信",
-   "tags": [],
-   "cat": "industry",
-   "plain": "ルネサスは2026年12月期に大幅増収へ。営業利益率が33%超に上昇する見通し。",
-   "next": "車載や産業向け半導体の回復が続くかもしれない。",
-   "level": 1,
-   "related": []
-  },
-  {
-   "id": "n211",
-   "title": "AIブームの光と影、PCもスマホもいきなり売れなくなった本当の原因メモリを吸い尽くすAIデータセンターという「ブラックホール」",
-   "link": "https://jbpress.ismedia.jp/articles/-/97730?utm_source=ldr&utm_medium=feed&utm_campaign=link&utm_content=link",
-   "source": "JBpress",
-   "time": "2026-10-29T06:00:00+09:00",
-   "group": "経済誌・ネットメディア",
-   "tags": [],
-   "cat": "industry",
-   "plain": "AIがメモリを吸い込み、PCやスマホが売れにくくなっているという解説。",
-   "next": "メモリ高が続くと、端末の価格が上がるかもしれない。",
-   "level": 2,
-   "related": []
-  },
-  {
-   "id": "n206",
-   "title": "スマホの値段は平均8万円超え　AIブームが招いた「異次元」の高騰",
-   "link": "https://www.asahi.com/articles/ASVBV21HBVBVULFA00ZM.html?ref=rss",
-   "source": "朝日新聞",
-   "time": "2026-10-29T06:00:00+09:00",
-   "group": "新聞・放送・通信",
-   "tags": [],
-   "cat": "life",
-   "plain": "AIブームで部品が高騰し、スマホの平均価格は8万円を超えた。",
-   "next": "端末の値上がりが、家計の負担を重くするかもしれない。",
-   "level": 2,
-   "related": []
-  },
-  {
-   "id": "n7",
-   "title": "サービスナウ株急落、売上高見通しは予想並み－AIへの懸念再燃",
-   "link": "https://news.google.com/rss/articles/CBMijgFBVV95cUxNTGxUemNUVlBRZnk5dTdMbGtkbTFwSlJ2Slh5a1ZvQ1FZSHBzeVJOb3JROTRvOTZlY0JNOENkX3ltQ3VFMGs4Q2tEZnZqdW9xOFpfNk1kbGtYWFdKb3RQQWhGTHluT19vbEliUm04YnVmNmVqcmNKTF9HV0g3c3dnb3VtZlVqaURyb01XVjdB?oc=5",
-   "source": "Bloomberg",
-   "time": "2026-10-29T12:39:00+09:00",
-   "group": "新聞・放送・通信",
-   "tags": [],
-   "cat": "industry",
-   "plain": "サービスナウ株が急落。売上高見通しは予想並みで、AIへの懸念が再燃した。",
-   "next": "ソフト企業はAIに仕事を奪われる懸念で揺れるかもしれない。",
-   "level": 1,
-   "related": []
-  },
-  {
-   "id": "n122",
-   "title": "フェデックス、通期見通し引き上げ－年末商戦控え配送需要堅調",
-   "link": "https://news.google.com/rss/articles/CBMijgFBVV95cUxQYkUwc0ZyY2J0cThSQnd0NHZjUHdFTE92SmZvT2xlbXBFdWJVaHU4eU5DZGFkR1VZa1pxTnVQd1FMVE1sb25KYUlkTk5fbFMwUE9xOUVEVFRKTHhOVU1fcHdEZVBjQktxQV9RakxYek4zamhFTlJGdEkxcEFtSWt4MXhaSWtScW5OU2FKazFR?oc=5",
-   "source": "Bloomberg",
-   "time": "2026-10-29T09:41:00+09:00",
-   "group": "新聞・放送・通信",
-   "tags": [],
-   "cat": "industry",
-   "plain": "フェデックスは通期見通しを引き上げた。年末商戦を前に配送需要が堅調。",
+   "cat": "",
+   "plain": "",
    "next": "",
    "level": 1,
    "related": []
   },
   {
-   "id": "n134",
-   "title": "フォード、第3四半期コア利益は微増 通期原材料コスト見通し引き上げ",
-   "link": "https://news.google.com/rss/articles/CBMifkFVX3lxTE5nSlBjTUl4R3lfWHVRT2o2RkRxdDhqQkJSUExzTUxFYWRKSlRHSFpCX2N5XzlWd0pTdUdwUlA5VTVISmtVcDBkakpJcDlwbnc2Nzhwdm9sbkJuZHI5RWlBQzY0aFh2d0k5S0dxcUlNRWNqVTJJTmRjUzRKdUkyQQ?oc=5",
-   "source": "Reuters",
-   "time": "2026-10-29T09:02:00+09:00",
-   "group": "新聞・放送・通信",
-   "tags": [],
-   "cat": "industry",
-   "plain": "フォードの第3四半期コア利益は微増。通期の原材料コスト見通しを引き上げた。",
-   "next": "原材料高が車の価格に反映されるかもしれない。",
-   "level": 1,
-   "related": []
-  },
-  {
-   "id": "n238",
-   "title": "サイゼリヤ、鶏肉休止の誤算 原料高と注文集中で上場来初の本格値上げ",
-   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE1PSFRXQ0cxNWZ6SEdOOVl5dzI1eFdWRGotTENOUEZORTlHSF83c09iUjR3a2t1LVoyU21jeGhkTG51MkhFLS00Zm9vWFVTOGJfSmhOS0hfTERWTXVkVUJjWTN3eFoxZUFKdU82SA?oc=5",
+   "id": "n79",
+   "title": "GMO攻撃者側サイト、総務省が強制遮断要請 通信各社に",
+   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTFB2b0dHWE9kTjlNYW5SMEk5N0w1RFNFLUN2ZEtMMWdaeGoxd1ZIOEF0R05IVHhmbFZSd3ZfaXVaNVJZeG5UbDV1Tk8yaVo2VDQwUWVRWjIxRS02V25kWk9ndzlpZlNyc2IxblBtLQ?oc=5",
    "source": "日本経済新聞",
-   "time": "2026-10-29T05:00:00+09:00",
-   "group": "ニュースのまとめ",
-   "tags": [
-    {
-     "node": "jp_cpi",
-     "dir": "up"
-    }
-   ],
-   "cat": "industry",
-   "plain": "サイゼリヤが原料高と注文集中を受け、上場後初の本格値上げを実施した。",
-   "next": "外食の値上げが広がれば、物価の押し上げ要因になるかもしれない。",
-   "level": 2,
-   "related": []
-  },
-  {
-   "id": "n9",
-   "title": "ユニクロ、靴下100円値上げを11日で撤回－顧客反発で一転、ANAも",
-   "link": "https://news.google.com/rss/articles/CBMijgFBVV95cUxOZlhIZm1PMm1EcW5paEotaGU1a2FqRVk0ZUhlTDR1eGR4YzVqMl9jX21SVFgxVGhzcTRwWU1NV1hhVEI2cElBX1FXaWlJMDdGeG12dzhPSmUzRG5wazhtem5nTEppTS1LQWhDc0FkRkdUZ204ZUp5aFFLcklqWEl2VTlZNGtWWlI0VWFDd2ZB?oc=5",
-   "source": "Bloomberg",
-   "time": "2026-10-29T12:37:00+09:00",
+   "time": "2026-10-29T12:47:10+09:00",
    "group": "新聞・放送・通信",
    "tags": [],
-   "cat": "industry",
-   "plain": "ユニクロは靴下の100円値上げを11日で撤回した。顧客の反発を受けた。",
-   "next": "消費者が値上げに敏感で、企業は転嫁に慎重になるかもしれない。",
-   "level": 2,
-   "related": []
-  },
-  {
-   "id": "n237",
-   "title": "ニデック上場維持に不透明感…監査法人が追加調査要求、有価証券報告「適正意見」月内に取れず",
-   "link": "https://news.google.com/rss/articles/CBMiZEFVX3lxTE5BQjZNa2xzaGdpeUE3STdCZ2d1R3UwMFZURkJXQVpwM2FJMktKekVfYndyY1NYLVFvU0dORDZSZkhwUi1xdFVuOC1VYWdLT2dvMVc5YXBpYXl5V1c4OVZpanZITmY?oc=5",
-   "source": "読売新聞",
-   "time": "2026-10-29T05:00:00+09:00",
-   "group": "ニュースのまとめ",
-   "tags": [],
-   "cat": "industry",
-   "plain": "ニデックは監査法人の適正意見が月内に得られず、上場維持に不透明感が出ている。",
-   "next": "上場維持の判断は、市場の信頼や株主に影響するかもしれない。",
-   "level": 1,
-   "related": []
-  },
-  {
-   "id": "n21",
-   "title": "Hello Kitty maker cuts ties with Japanese spy drama after China backlash",
-   "link": "https://www.bbc.co.uk/news/articles/cry4x177jlnyo?at_medium=RSS&at_campaign=rss",
-   "source": "BBC Business",
-   "time": "2026-10-29T12:16:19+09:00",
-   "group": "海外（英語）",
-   "title_ja": "Hello Kitty社、中国の反発で日本ドラマと提携解消",
-   "tags": [],
-   "cat": "global",
-   "plain": "サンリオが日本のドラマとの商品展開を、中国での批判を受け取りやめた。",
-   "next": "日中関係しだいで、日本企業の中国事業に影響が出るかもしれない。",
-   "level": 1,
-   "related": [],
-   "lang": "en"
-  },
-  {
-   "id": "n82",
-   "title": "中国共産党、軍制服組元トップらを党籍剝奪へ 5中全会きょう閉幕",
-   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTFAwSld2WnozRUVQVWE1RmlUWmMxMm1ZcHA0OFR3US0yOVpGX3dFcG9hTDRwVE1jTHdDYU1fdHBBZVFyTmFSVTNUZXJ0cE5YWWNPb2c0aC1HRm5BVWZOQ1lMX0lwdnFocXg2U2twTQ?oc=5",
-   "source": "日本経済新聞",
-   "time": "2026-10-29T11:00:00+09:00",
-   "group": "新聞・放送・通信",
-   "tags": [],
-   "cat": "global",
-   "plain": "中国共産党が軍の元トップらを党籍剥奪へ。5中全会が閉幕する。",
-   "next": "中国の政策運営の方向が、今後の発表で見えてくるかもしれない。",
-   "level": 1,
-   "related": []
-  },
-  {
-   "id": "n205",
-   "title": "トヨタ車の長すぎる納期待ち、解消の兆し－海外工場活用やHV生産安定",
-   "link": "https://news.google.com/rss/articles/CBMijgFBVV95cUxPd25qM0pZYkZmZXA5TVgwQXdkM2Y1dm40aHB1ZXVPRWl5OWI3aUFNMUdyeXJhemhwMEFlbFlCcEMwcVBMYUhxOUZubEFTRmVib2NDeXVpQk9pYnBjRHJXTDNxYU9HSEoyMVdKTi1OTS1NQVJwWm5xczhub2k0NHBzMk0yOEZIYWdPMjVwT0RB?oc=5",
-   "source": "Bloomberg.com",
-   "time": "2026-10-29T06:00:00+09:00",
-   "group": "新聞・放送・通信",
-   "tags": [
-    {
-     "node": "exporters",
-     "dir": "up"
-    }
-   ],
-   "cat": "industry",
-   "plain": "トヨタ車の納期待ちが、海外工場の活用やHV生産の安定で解消の兆し。",
-   "next": "納車が進めば、販売や利益の押し上げにつながるかもしれない。",
+   "cat": "",
+   "plain": "",
+   "next": "",
    "level": 1,
    "related": []
   }
  ],
  "experts": [
   {
-   "id": "e2",
-   "expert": "goto",
-   "name": "後藤達也",
-   "role": "経済ジャーナリスト（元日経記者）",
-   "kind": "投稿",
-   "title": "【コアメンバー】 AI投資「3つの時計」のズレ",
-   "link": "https://note.com/goto_finance/n/n38f3571e5d23",
-   "source": "後藤達也",
-   "time": "2026-10-23T08:50:18+09:00",
-   "view": "Metaは設備投資が営業CFを上回りFCFが赤字。AI投資の強さと財務負担にズレがあると指摘。",
-   "stance": "慎重",
-   "tags": [
-    {
-     "node": "ai_semis",
-     "dir": "up"
-    },
-    {
-     "node": "us_stocks",
-     "dir": "down"
-    }
-   ]
-  },
-  {
-   "id": "e3",
-   "expert": "goto",
-   "name": "後藤達也",
-   "role": "経済ジャーナリスト（元日経記者）",
-   "kind": "投稿",
-   "title": "【朝メモ】 NASDAQ 2.6%安 Meta株急落",
-   "link": "https://note.com/goto_finance/n/nfd329a2f84f9",
-   "source": "後藤達也",
-   "time": "2026-10-23T05:49:43+09:00",
-   "view": "Meta株の急落でNASDAQが2.6%安になったと伝えた。",
-   "stance": "慎重",
-   "tags": [
-    {
-     "node": "us_stocks",
-     "dir": "down"
-    }
-   ]
-  },
-  {
-   "id": "e4",
-   "expert": "goto",
-   "name": "後藤達也",
-   "role": "経済ジャーナリスト（元日経記者）",
-   "kind": "投稿",
-   "title": "【コアメンバー】 後藤の運用資産 「債券＞株式」に",
-   "link": "https://note.com/goto_finance/n/nf84965b9b4a4",
-   "source": "後藤達也",
-   "time": "2026-10-22T21:07:56+09:00",
-   "view": "自らの運用資産を株式から債券へ大きめにシフトしたと明かした。",
-   "stance": "慎重",
-   "tags": [
-    {
-     "node": "us_stocks",
-     "dir": "down"
-    }
-   ]
-  },
-  {
-   "id": "e6",
-   "expert": "karakama",
-   "name": "唐鎌大輔",
-   "role": "エコノミスト（みずほ銀行）",
-   "kind": "記事",
-   "title": "コラム：ＩＭＦが指摘する「薄氷のＡＩ相場」、日本も逆資産効果に備える時か＝唐鎌大輔氏",
-   "link": "https://news.google.com/rss/articles/CBMijgFBVV95cUxOZ1d4cWxIbWlkU0FITUtnXzZTelFiZ2lqRmNxYy1XVk1Sbnl5R1lKUVItWlBtTGNyVU03ZzE5bUNPc25KR2xyRHlHQjc5cU90Mmk3WVZhamlMOWFPZFpsS3JldUpxTGhmeS1BQU5weUhSN1gzNUl2dGZ0QVN3NS1kZDVuWHYwU0k5cXRKcG1R?oc=5",
-   "source": "Reuters",
-   "time": "2026-10-27T14:36:59+09:00",
-   "view": "IMFが指摘する薄氷のAI相場に、日本も逆資産効果へ備える時だと論じた。",
-   "stance": "慎重",
-   "tags": [
-    {
-     "node": "ai_semis",
-     "dir": "down"
-    },
-    {
-     "node": "nikkei",
-     "dir": "down"
-    }
-   ]
-  },
-  {
-   "id": "e7",
-   "expert": "karakama",
-   "name": "唐鎌大輔",
-   "role": "エコノミスト（みずほ銀行）",
-   "kind": "記事",
-   "title": "【今の円高は“敵失”でしかない】フランス危機をIMFは予言していた／ルペンシナリオの危うさ／ポスト・ラガルド人事を占う／エコノミスト唐鎌大輔が解説【エコラボ】",
-   "link": "https://news.google.com/rss/articles/CBMidEFVX3lxTE9xbmkzTXpEbl9ZQmVZS01sQ3RoeFNTSm85UEV6ZGgtTlpxeWhRQU0wZFd0bkRqeGVjdzc4QXFBekUzRVVZY0lQRnBwbzhjcXFxT0VVT2Q3VU93QkJUN1hCQkI0ZHI0SzlZS1EtRWl6UGdNSUZQ?oc=5",
-   "source": "TBS NEWS DIG",
-   "time": "2026-10-23T18:46:00+09:00",
-   "view": "今の円高は他国の失点によるもので、円の実力ではないとの見方。",
-   "stance": "慎重",
-   "tags": [
-    {
-     "node": "usdjpy",
-     "dir": "down"
-    }
-   ]
-  },
-  {
-   "id": "e8",
-   "expert": "karakama",
-   "name": "唐鎌大輔",
-   "role": "エコノミスト（みずほ銀行）",
-   "kind": "記事",
-   "title": "AI相場はいつまで持つのか、AI相場を支える巨額投資にIMFが警鐘、日本の株式市場と家計にも迫る「逆資産効果」 【唐鎌大輔の為替から見る日本】国際金融安定報告が示した三重のレバレッジと、韓国・台湾に次ぐ日本株の高い感応度(1/6)",
-   "link": "https://news.google.com/rss/articles/CBMiVkFVX3lxTFBTeUNUX0RTaU82WmZXalRjRGhEOVhjVms2SHZyektNWTN3V3o5M0hyRUxtOGE0aXI3ZjRRVFIzZUlUWGo3VFpGYnZEMzhNYTR5Qkh0bnlB?oc=5",
-   "source": "JBpress",
-   "time": "2026-10-23T10:00:00+09:00",
-   "view": "AI巨額投資にIMFが警鐘。日本株は感応度が高く、家計にも逆資産効果が及ぶ恐れ。",
-   "stance": "慎重",
-   "tags": [
-    {
-     "node": "ai_semis",
-     "dir": "down"
-    },
-    {
-     "node": "nikkei",
-     "dir": "down"
-    }
-   ]
-  },
-  {
-   "id": "e13",
-   "expert": "kumano",
-   "name": "熊野英生",
-   "role": "エコノミスト（ABC経済研究所 代表）",
-   "kind": "記事",
-   "title": "【宮崎政懇延岡例会】来年もＡＩ景気拡大 熊野さん（エコノミスト）指摘",
-   "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTFBvdTZwbFdLR2FMdVRWUnFjcm5CRG56bTA2cTM2Qk10YXJmc2hDaDRCeGZnZm9PY3F2Wkt5Wk9zNGxQdVJiaEZXbUdIUnEzZXJPVWxkRjVoRktqWjBlcjRiU0YxUkxVb1V4cW4zeGVNdw?oc=5",
-   "source": "宮崎日日新聞",
-   "time": "2026-10-28T06:00:00+09:00",
-   "view": "来年もAI景気の拡大が続くと指摘した。",
-   "stance": "強気",
-   "tags": [
-    {
-     "node": "ai_semis",
-     "dir": "up"
-    },
-    {
-     "node": "jp_economy",
-     "dir": "up"
-    }
-   ]
-  },
-  {
-   "id": "e14",
-   "expert": "kumano",
-   "name": "熊野英生",
-   "role": "エコノミスト（ABC経済研究所 代表）",
-   "kind": "記事",
-   "title": "【長期金利３％台へ急伸】借金負担増で国民につけ 財政の信認高め事態打開を ＡＢＣ経済研究所代表エコノミスト 熊野英生",
-   "link": "https://news.google.com/rss/articles/CBMiUkFVX3lxTE5BOGYzdjJSUWJzV2lmZGh3LUJ3QVc2Y0E1SWJaXzljUVlTUmpUUHM5WXZLMTM3RXAyV09VSnp2MVNGV2pPdE5lS0hnXzJHU1ZMemc?oc=5",
-   "source": "山陽新聞",
-   "time": "2026-10-24T16:00:00+09:00",
-   "view": "長期金利が3%台へ急伸し、借金の負担が国民につく。財政の信認を高めるべきと訴えた。",
-   "stance": "慎重",
-   "tags": [
-    {
-     "node": "jgb10",
-     "dir": "up"
-    },
-    {
-     "node": "fiscal",
-     "dir": "up"
-    }
-   ]
-  },
-  {
-   "id": "e15",
-   "expert": "kiuchi",
-   "name": "木内登英",
-   "role": "エコノミスト（野村総合研究所・元日銀審議委員）",
-   "kind": "記事",
-   "title": "【第２次高市改造内閣】財務相留任に大きな意味 市場は首相のスタンス凝視 野村総合研究所エグゼクティブ・エコノミスト 木内登英氏",
-   "link": "https://news.google.com/rss/articles/CBMiUkFVX3lxTFBUckxyV21vUlpjMWUxY2RGRDJRWmJpOHhpLWhOX0paWmlMemxCY2hfdkVXZFZvMVlTclJvSzVOelFsU2JEb1hOeHNwaXpUSE9RMUE?oc=5",
-   "source": "山陽新聞",
-   "time": "2026-10-24T16:00:00+09:00",
-   "view": "財務相の留任には大きな意味があり、市場は首相のスタンスを注視している。",
-   "stance": "中立",
-   "tags": [
-    {
-     "node": "fiscal",
-     "dir": "up"
-    }
-   ]
-  },
-  {
-   "id": "e16",
-   "expert": "kono",
-   "name": "河野龍太郎",
-   "role": "エコノミスト",
-   "kind": "記事",
-   "title": "米国神話の終焉：ドル建てステーブルコインはドル覇権体制の強化か延命か 河野龍太郎",
-   "link": "https://news.google.com/rss/articles/CBMif0FVX3lxTE5qLUwwcUNkazg2VXBJTVA4dTNhZTY0bHk2bHlyOTBNTnRTbDhpZi1fMzlhVzU2UU9MNVpTRlprSTA2WmxXTHNZQjZGenZXc2ZCQWVpVjdfQTJwbkJ4cHNOQjZ4N2JFdEtnYTlLMTl2U3dFTjdyWk5sc0lCVmw2TTA?oc=5",
-   "source": "週刊エコノミスト Online",
-   "time": "2026-10-26T05:02:24+09:00",
-   "view": "ドル建てステーブルコインがドル覇権を強めるのか延命にとどまるのかを論じた。",
+   "id": "e17",
+   "expert": "nli",
+   "name": "ニッセイ基礎研究所",
+   "role": "シンクタンク（研究員のレポート）",
+   "kind": "レポート",
+   "title": "米ＦＯＭＣ（26年10月）－市場予想通り、政策金利据え置き。クック理事が予想外に反対票を投じた",
+   "link": "https://www.nli-research.co.jp/topics_detail1/id=87214?site=nli",
+   "source": "ニッセイ基礎研究所",
+   "time": "2026-10-29T15:09:06+09:00",
+   "view": "FOMCは市場予想通り据え置き。クック理事が予想外に反対票を投じた。",
    "stance": "中立",
    "tags": []
   }
  ],
- "debates": [
-  {
-   "topic": "AI相場はこの先も続くか",
-   "crux": "巨額のAI投資を、景気を支える力と見るか、バブルのもろさと見るか。",
-   "sides": [
-    {
-     "stance": "強気",
-     "experts": [
-      "e13"
-     ],
-     "view": "AIを軸にした景気の拡大は来年も続くという見方。"
-    },
-    {
-     "stance": "慎重",
-     "experts": [
-      "e6",
-      "e8"
-     ],
-     "view": "IMFが警告するAI相場は薄氷。崩れれば日本にも逆資産効果が及ぶ。"
-    }
-   ]
-  }
- ],
+ "debates": [],
  "scenarios": [
   {
    "event": "日銀の金融政策決定会合",
    "date": "2026-10-30",
-   "focus": "利上げの有無と、総裁会見での次の一手への示唆。",
+   "focus": "利上げの有無と総裁会見での今後の姿勢",
    "cases": [
     {
-     "label": "利上げを決める",
+     "label": "利上げに動く",
      "paths": [
       [
-       {
-        "node": "boj",
-        "dir": "up"
-       },
        {
         "node": "usdjpy",
         "dir": "down"
        }
       ],
       [
-       {
-        "node": "boj",
-        "dir": "up"
-       },
        {
         "node": "jgb10",
         "dir": "up"
@@ -1213,19 +516,9 @@
         "node": "mortgage",
         "dir": "up"
        }
-      ],
-      [
-       {
-        "node": "boj",
-        "dir": "up"
-       },
-       {
-        "node": "banks",
-        "dir": "up"
-       }
       ]
      ],
-     "text": "円高方向に動き、長期金利や住宅ローン金利が上がるかもしれない。銀行の収益には追い風になりうる。"
+     "text": "円高方向に動き、長期金利や住宅ローン金利が上がるかもしれない。"
     },
     {
      "label": "据え置く",
@@ -1237,7 +530,7 @@
        }
       ]
      ],
-     "text": "据え置きなら、円相場は157円台で小さく動くかもしれない。会見で次の利上げ時期をどう示すかが焦点になる。"
+     "text": "据え置きなら市場は総裁会見の言葉を見て、円相場が動くかもしれない。"
     }
    ]
   }
@@ -1745,69 +1038,44 @@
  },
  "quiz": [
   {
-   "q": "FRBが利上げを急がないと見られたとき、ドル円は一時どう動いた？",
+   "q": "米長期金利が下がると、日本の長期金利は一般にどうなりやすい？",
    "choices": [
-    "円安に動いた",
-    "円高に動いた",
-    "まったく動かなかった"
-   ],
-   "answer": 1,
-   "explain": "利上げ観測が弱まるとドルが売られ、円が買われて円高になりやすいです。"
-  },
-  {
-   "q": "アルファベットの株が下がった主な理由は？",
-   "choices": [
-    "AI投資の増加を嫌気した",
-    "配当が増えた",
-    "円高が進んだ"
+    "下がりやすい",
+    "上がりやすい",
+    "無関係"
    ],
    "answer": 0,
-   "explain": "7〜9月は25%減益で、AI投資の増加が嫌気されました。"
+   "explain": "米の長期金利は世界の金利の基準で、日本の長期金利も同じ向きに動きやすい。"
   },
   {
-   "q": "日銀が利上げをすると、基本の関係でドル円はどうなりやすい？",
+   "q": "アルファベット株が下がった主な理由は？",
    "choices": [
-    "円安になりやすい",
-    "円高になりやすい",
-    "関係しない"
+    "利上げ",
+    "AI投資の費用増と減益",
+    "円高"
    ],
    "answer": 1,
-   "explain": "日米の金利差が縮むとの見方から、円が買われて円高になりやすいです。"
+   "explain": "AI投資の増加と減益が嫌気された。"
+  },
+  {
+   "q": "日銀が利上げすると円相場はどうなりやすい？",
+   "choices": [
+    "円安",
+    "円高",
+    "変わらない"
+   ],
+   "answer": 1,
+   "explain": "日米の金利差が縮まり、円が買われやすい。"
   }
  ],
- "terms": [
-  {
-   "term": "ナフサ",
-   "explain": "原油から作る石油製品で、プラスチックなどの原料になる。"
-  },
-  {
-   "term": "材料出尽くし",
-   "explain": "良い知らせが事前に株価へ織り込まれ、発表後に売られること。"
-  },
-  {
-   "term": "反対票",
-   "explain": "会議で決定案に反対して投じる票。"
-  },
-  {
-   "term": "信用リスク",
-   "explain": "貸したお金や社債が、返してもらえなくなる危険。"
-  },
-  {
-   "term": "スプレッド",
-   "explain": "社債の利回りが国債の利回りよりどれだけ高いかの差。"
-  },
-  {
-   "term": "メモリ",
-   "explain": "データを一時的に覚えておく半導体部品。"
-  }
- ],
+ "terms": [],
  "sources": [
   {
    "name": "日本経済新聞",
    "group": "新聞・放送・通信",
    "lang": "ja",
    "collected": 45,
-   "shown": 12,
+   "shown": 7,
    "related": 0
   },
   {
@@ -1815,7 +1083,7 @@
    "group": "ニュースのまとめ",
    "lang": "ja",
    "collected": 30,
-   "shown": 4,
+   "shown": 0,
    "related": 0
   },
   {
@@ -1831,7 +1099,7 @@
    "group": "経済誌・ネットメディア",
    "lang": "ja",
    "collected": 15,
-   "shown": 0,
+   "shown": 1,
    "related": 0
   },
   {
@@ -1863,7 +1131,7 @@
    "group": "新聞・放送・通信",
    "lang": "ja",
    "collected": 25,
-   "shown": 7,
+   "shown": 3,
    "related": 0
   },
   {
@@ -1871,7 +1139,7 @@
    "group": "新聞・放送・通信",
    "lang": "ja",
    "collected": 25,
-   "shown": 10,
+   "shown": 3,
    "related": 0
   },
   {
@@ -1879,7 +1147,7 @@
    "group": "新聞・放送・通信",
    "lang": "ja",
    "collected": 20,
-   "shown": 5,
+   "shown": 2,
    "related": 0
   },
   {
@@ -1895,7 +1163,7 @@
    "group": "新聞・放送・通信",
    "lang": "ja",
    "collected": 20,
-   "shown": 0,
+   "shown": 1,
    "related": 0
   },
   {
@@ -1911,7 +1179,7 @@
    "group": "経済誌・ネットメディア",
    "lang": "ja",
    "collected": 10,
-   "shown": 1,
+   "shown": 0,
    "related": 0
   },
   {
@@ -1934,7 +1202,7 @@
    "name": "内閣府",
    "group": "公的機関",
    "lang": "ja",
-   "collected": 1,
+   "collected": 5,
    "shown": 0,
    "related": 0
   },
@@ -1942,7 +1210,7 @@
    "name": "BBCニュース日本語",
    "group": "海外（日本語）",
    "lang": "ja",
-   "collected": 8,
+   "collected": 12,
    "shown": 0,
    "related": 0
   },
@@ -1951,14 +1219,14 @@
    "group": "海外（日本語）",
    "lang": "ja",
    "collected": 12,
-   "shown": 1,
+   "shown": 0,
    "related": 0
   },
   {
    "name": "CNBC",
    "group": "海外（英語）",
    "lang": "en",
-   "collected": 12,
+   "collected": 10,
    "shown": 0,
    "related": 0
   },
@@ -1967,7 +1235,7 @@
    "group": "海外（英語）",
    "lang": "en",
    "collected": 15,
-   "shown": 1,
+   "shown": 0,
    "related": 0
   },
   {
@@ -1983,7 +1251,7 @@
    "group": "海外（英語）",
    "lang": "en",
    "collected": 10,
-   "shown": 0,
+   "shown": 1,
    "related": 0
   }
  ]
