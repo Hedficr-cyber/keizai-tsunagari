@@ -19,6 +19,7 @@ from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 from news_integrity import same_event, valid_news_tags
+from news_connections import news_connection_tags
 from scenario_integrity import normalize_case
 from news_details import news_detail_fields
 
@@ -404,6 +405,8 @@ def daily(graph, cfg, raw):
     def news_item(i, extra=None):
         x = raw["news"][i]
         extra = extra or {}
+        # AIが札を省いた記事や復元した記事にも、元材料に明示された導線は残す。
+        extra = {**extra, "tags": news_connection_tags(x, extra.get("tags", []), graph)}
         item = {"id": f"n{i}", "title": x["title"], "link": x["link"], "source": x["source"], "time": x["time"],
                 "group": x.get("group", ""), **extra, **news_detail_fields(x, extra, facts_fallback=True)}
         if x.get("lang") == "en":
@@ -450,7 +453,7 @@ def daily(graph, cfg, raw):
             if i is None or i in used or placeholder_news(n) or not economic_candidate(raw["news"][i]):
                 continue
             used.add(i)
-            tags = valid_news_tags(raw["news"][i], ok_tags(n.get("tags")), graph)
+            tags = news_connection_tags(raw["news"][i], ok_tags(n.get("tags")), graph)
             # 同じ出来事の別の記事は、代表の1本の中に「関連記事」として入れる
             related = []
             rejected_same = False

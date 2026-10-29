@@ -390,7 +390,12 @@
    "impact": "他のハイテク株にも警戒が広がる可能性がある。",
    "watch": "各社の設備投資と利益の関係",
    "next": "AI投資の採算への懸念が強まる",
-   "tags": [],
+   "tags": [
+    {
+     "node": "ai_semis",
+     "dir": "up"
+    }
+   ],
    "cat": "market",
    "level": 3,
    "related": []
@@ -427,12 +432,7 @@
    "impact": "半導体関連の売りにつながる可能性がある。",
    "watch": "米市場の寄り付き後の動き",
    "next": "半導体関連の売りにつながる可能性がある。",
-   "tags": [
-    {
-     "node": "us_stocks",
-     "dir": "down"
-    }
-   ],
+   "tags": [],
    "cat": "global",
    "level": 2,
    "related": [],
@@ -561,6 +561,10 @@
     {
      "node": "oil",
      "dir": "up"
+    },
+    {
+     "node": "gold",
+     "dir": "up"
     }
    ],
    "cat": "global",
@@ -642,12 +646,7 @@
    "impact": "物価高が続けば消費が弱まる可能性がある。",
    "watch": "来月の指数と消費統計",
    "next": "心理悪化が消費の重しに",
-   "tags": [
-    {
-     "node": "consumption",
-     "dir": "down"
-    }
-   ],
+   "tags": [],
    "cat": "economy",
    "level": 2,
    "related": []
@@ -715,12 +714,7 @@
    "impact": "統合で経費を削る効果が出るかもしれない。",
    "watch": "統合の詳細と効果",
    "next": "地銀の再編が進む",
-   "tags": [
-    {
-     "node": "banks",
-     "dir": "up"
-    }
-   ],
+   "tags": [],
    "cat": "industry",
    "level": 2,
    "related": []
@@ -1949,5 +1943,6 @@
    "shown": 3,
    "related": 0
   }
- ]
+ ],
+ "revision": "v0.7.2-connections-5f7879935e90"
 }

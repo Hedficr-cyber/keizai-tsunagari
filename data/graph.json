@@ -163,7 +163,7 @@
     { "from": "oil", "to": "import_prices", "sign": 1, "strength": 3, "lag": "すぐ", "why": "日本はエネルギーのほとんどを輸入しているため、原油の値段がそのまま響く。" },
     { "from": "oil", "to": "trade_balance", "sign": -1, "strength": 2, "lag": "数か月", "why": "同じ量でも輸入代金が膨らみ、貿易赤字が広がる。" },
     { "from": "oil", "to": "us_cpi", "sign": 1, "strength": 2, "lag": "数か月", "why": "ガソリン代などを通じて、アメリカの物価も押し上げる。" },
-    { "from": "trade_balance", "to": "usdjpy", "sign": -1, "strength": 1, "lag": "1年以上", "why": "赤字が続くと、輸入代金のために円を売ってドルを買う動きが増え、円安の圧力になる。" },
+    { "from": "trade_balance", "to": "usdjpy", "sign": -1, "strength": 1, "lag": "1年以上", "why": "貿易収支が改善すると、輸入代金による円売りの圧力が和らぎ、円高の向きに働くことがある。" },
     { "from": "import_prices", "to": "jp_cpi", "sign": 1, "strength": 3, "lag": "数か月", "why": "仕入れの値段の上昇が、ガソリン・電気代・食品の値上げとして店頭に届く。" },
     { "from": "import_prices", "to": "construction", "sign": 1, "strength": 1, "lag": "数か月", "why": "輸入する資材やエネルギーの値上がりが、建てる費用を押し上げる。" },
     { "from": "jp_cpi", "to": "household", "sign": 1, "strength": 3, "lag": "すぐ", "why": "同じ暮らしをするのに多くのお金がかかるようになる。" },

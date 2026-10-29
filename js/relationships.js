@@ -71,11 +71,6 @@ const DOWN_REASON = {
   "nikkei>consumption": "株や投資信託の値下がりで資産が減ると、お金を使う余裕や気持ちが弱まりやすい。",
 };
 
-const UP_REASON = {
-  // 元の説明が「貿易赤字」の場合を記しているため、改善方向の説明を分ける。
-  "trade_balance>usdjpy": "貿易収支が改善すると、輸入代金による円売りの圧力が和らぎ、円高の向きに働くことがある。",
-};
-
 function nodesOf(graph) { return graph.byId || Object.fromEntries(graph.nodes.map(node => [node.id, node])); }
 function num(direction) { return direction === "down" || direction === -1 ? -1 : 1; }
 function word(node, direction) { return num(direction) > 0 ? node.up : node.down; }
@@ -103,7 +98,7 @@ function conditionSentence(node, direction) {
 export function relationshipReason(graph, edge, direction = "up") {
   if (!edge) return "";
   const key = `${edge.from}>${edge.to}`;
-  if (num(direction) > 0) return UP_REASON[key] || edge.why || "";
+  if (num(direction) > 0) return edge.why || "";
   if (DOWN_REASON[key]) return DOWN_REASON[key];
   // 未知の辺に、上昇時の文章を下降時の理由としてそのまま出さない。
   const byId = nodesOf(graph), a = byId[edge.from], b = byId[edge.to];

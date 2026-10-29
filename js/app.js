@@ -1,5 +1,5 @@
 import { makeGraph, dirWord, dirNum, dirClass } from "./graph.js";
-import { renderRelationships, relationshipDetail } from "./relationships.js";
+import { renderRelationships, relationshipDetail, relationshipReason } from "./relationships.js";
 import { VERSION } from "./versions.js";
 import { initNavigation } from "./navigation.js";
 
@@ -10,6 +10,7 @@ const safeUrl = u => (/^https:\/\//.test(u || "") ? u : "");
 let G = null;
 let D = null;
 let GLOSSARY = null;
+let loadStatus = "loading";
 // 日をまたぐデータ：流れ・答え合わせ・週のまとめ
 let X = { threads: [], reviews: [], weeks: [], weekly: null };
 const newsById = {};
@@ -446,8 +447,8 @@ function openNode(id, context = detailContext()) {
       <p class="muted small">${esc(last.d)} 時点（前の営業日の値）・${esc(m.source)}</p></div>`;
   }
   const mv = (context.data.moving || []).find(x => x.node === id);
-  const outs = G.out[id].map(e => `<button class="link-row" data-relation="${esc(id)}:${esc(e.to)}:up"><div class="hd"><span class="small muted">${esc(n.up)}すると</span>${chip(e.to, e.sign, { span: true })}</div><p class="why">${esc(e.why)}</p></button>`).join("");
-  const ins = G.inn[id].map(e => `<button class="link-row" data-relation="${esc(e.from)}:${esc(id)}:up"><div class="hd">${chip(e.from, 1, { span: true })}<span class="small muted">→ ${esc(n.short)}は${esc(dirWord(n, e.sign))}</span></div><p class="why">${esc(e.why)}</p></button>`).join("");
+  const outs = G.out[id].map(e => `<button class="link-row" data-relation="${esc(id)}:${esc(e.to)}:up"><div class="hd"><span class="small muted">${esc(n.up)}すると</span>${chip(e.to, e.sign, { span: true })}</div><p class="why">${esc(relationshipReason(G, e))}</p></button>`).join("");
+  const ins = G.inn[id].map(e => `<button class="link-row" data-relation="${esc(e.from)}:${esc(id)}:up"><div class="hd">${chip(e.from, 1, { span: true })}<span class="small muted">→ ${esc(n.short)}は${esc(dirWord(n, e.sign))}</span></div><p class="why">${esc(relationshipReason(G, e))}</p></button>`).join("");
   const news = (context.data.news || []).filter(x => (x.tags || []).some(t => t.node === id)).slice(0, 4);
   openSheet(`
     <p class="cat">${esc(G.catName[n.cat])}</p>
@@ -745,7 +746,7 @@ function syncSheetHistory() {
 const RENDER = { today: renderToday, news: renderNews, map: renderMap, experts: renderExperts };
 const navigation = initNavigation({
   nav: $(".nav"), main: $("main"), getView: () => state.view,
-  canNavigate: () => !!D && !activeModal(),
+  canNavigate: () => loadStatus === "ready" && !activeModal(),
   navigate: view => {
     if (!RENDER[view] || view === state.view || activeModal()) return;
     history.pushState({}, "", `#${view}`);
@@ -768,7 +769,10 @@ function route() {
   state.view = next;
   $$(".view").forEach(el => el.classList.toggle("on", el.id === "v-" + state.view));
   $$(".nav a").forEach(a => { if (a.dataset.v === state.view) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
-  RENDER[state.view]();
+  if (loadStatus === "ready") RENDER[state.view]();
+  else $("#v-" + state.view).innerHTML = loadStatus === "loading"
+    ? '<div class="load-state" data-load-status="loading" role="status">読み込み中…</div>'
+    : '<div class="load-state" data-load-status="error" role="status"><p>読み込めませんでした</p><button class="btn" data-load-retry>再読み込み</button></div>';
   navigation.sync(state.view);
   requestAnimationFrame(() => {
     if (state.view !== next) return;
@@ -789,6 +793,11 @@ function syncNavigation() {
 }
 
 document.addEventListener("click", ev => {
+  if (ev.target.closest("[data-load-retry]")) {
+    ev.preventDefault();
+    if (loadStatus !== "loading") load();
+    return;
+  }
   activationTarget = ev.target.closest('button,a[href],[tabindex]');
   queueMicrotask(() => { activationTarget = null; });
   // 用語の説明が出ているときは、外をタップしたら閉じるだけにする
@@ -902,13 +911,22 @@ $("#update-btn").addEventListener("click", async () => {
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkFresh(); });
 
 async function load() {
-  const [g, d, gloss] = await Promise.all([fetch("data/graph.json").then(r => r.json()), getJson("data/latest.json"), getJson("data/glossary.json"), loadExtras()]);
-  G = makeGraph(g);
-  GLOSSARY = gloss;
-  setData(d);
-  lastCheck = Date.now();
+  loadStatus = "loading";
   route();
-  setTimeout(() => { lastCheck = 0; checkFresh(); }, 4000);
+  try {
+    const [g, d, gloss] = await Promise.all([getJson("data/graph.json"), getJson("data/latest.json"), getJson("data/glossary.json"), loadExtras()]);
+    if (!g?.nodes?.length || !Array.isArray(g.edges) || !Array.isArray(d?.news)) throw new Error("missing data");
+    G = makeGraph(g);
+    GLOSSARY = gloss;
+    setData(d);
+    loadStatus = "ready";
+    lastCheck = Date.now();
+    route();
+    setTimeout(() => { lastCheck = 0; checkFresh(); }, 4000);
+  } catch {
+    loadStatus = "error";
+    route();
+  }
 }
 load();
 if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {});
