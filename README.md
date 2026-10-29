@@ -41,9 +41,10 @@
 
 ## 自動更新
 
-- Mac の launchd（`~/Library/LaunchAgents/jp.hedficr.keizai-tsunagari.update.plist`）が、毎日 7:00・12:00・18:00 に `tools/auto_update.py` を動かす。Mac が眠っていた時刻の分は、起きたときに1回まとめて動く。更新している間は `caffeinate -i -s` で Mac を眠らせない（電源につないでいれば最後まで動く。バッテリーでフタを閉じていると、次に起きたときに続きが動く）。
+- Mac の launchd（`~/Library/LaunchAgents/jp.hedficr.keizai-tsunagari.update.plist`）が、毎時5分に `tools/auto_update.py` を動かす。Mac が眠っていた時刻の分は、起きたときに1回まとめて動く。
+- 毎回ニュースは集める（10秒ほど・利用枠は使わない）。Claude に読み解かせるのは、前回の読み解きから3時間たったとき、または2時間以上たって新しい見出しが80本以上たまったときだけ（夜中の0〜6時は6時間あける）。目安は `tools/auto_update.py` の先頭。今すぐ読み解かせたいときは `KEIZAI_FORCE=1` を付けて動かす。更新している間は `caffeinate -i -s` で Mac を眠らせない（電源につないでいれば最後まで動く。バッテリーでフタを閉じていると、次に起きたときに続きが動く）。
 - 動かす場所は `~/Library/Application Support/keizai-app/repo`（GitHub の写し。毎回 GitHub の最新にそろえるので、手で直さない）。記録は `~/Library/Logs/keizai-app/update.log`。
-- 流れ：最新のコードにそろえる → 集める → 読み解く → `data/` だけをコミットして push → GitHub Pages が1分ほどで反映。
+- 流れ：最新のコードにそろえる → 集める → 読み解くかを決める → 読み解く → `data/` だけをコミットして push → GitHub Pages が1分ほどで反映。
 - 読み解きに失敗した回は、公開中の版をそのまま残す。
 - 止めるとき：`launchctl bootout gui/$(id -u)/jp.hedficr.keizai-tsunagari.update`。今すぐ1回動かすとき：`launchctl kickstart gui/$(id -u)/jp.hedficr.keizai-tsunagari.update`。
 
