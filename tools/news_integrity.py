@@ -343,6 +343,119 @@ _POLICY_ACTION = {
 }
 
 
+# 株価・売上・投資は別の量。これら3項目は一般語の一致だけでは残さず、
+# 項目そのものと、その量の変化が明示された区間だけを根拠にする。
+_AI_INVESTMENT = (
+    r"(?:(?:生成)?ai|人工知能|半導体|データセンター)"
+    r"(?:向け|関連|分野|の|への|に|・|インフラ|設備|開発|研究|用|と|及び|および|\s){0,12}"
+    r"(?:設備投資|投資(?!家|信託)|設備支出|支出|工場建設)"
+    r"|\b(?:ai|artificial intelligence|semiconductor|chip|data cent(?:er|re)s?)"
+    r"(?:[ -]+(?:infrastructure|capital|related|sector))*[ -]+(?:investment|spending|capex)\b"
+    r"|\b(?:investment|spending|capex)[ -]+(?:in|on|for)[ -]+(?:ai|semiconductors?|chips?|data cent(?:er|re)s?)\b"
+)
+_IMPORT_INDICATOR = r"輸入物価(?:指数)?|輸入価格|輸入コスト|\bimport (?:prices?|costs?)\b"
+_JAPAN_IMPORT_INDICATOR = (
+    r"(?:日本|本邦)(?:の|における)?(?:\d{1,2}月)?(?:円建て)?(?:輸入物価(?:指数)?|輸入価格|輸入コスト)"
+    r"|円建て(?:の)?(?:輸入物価(?:指数)?|輸入価格|輸入コスト)"
+    r"|(?:輸入物価(?:指数)?|輸入価格|輸入コスト)[(（](?:日本|円建て)[)）]"
+    r"|\bjapan(?:'s|ese)?\s+(?:yen[ -]based\s+)?import (?:prices?|costs?)\b"
+)
+_CHINA_ECONOMY = (
+    r"中国(?:の)?(?:経済|景気|gdp|国内総生産|成長率|個人消費|工業生産|小売売上|製造業pmi)"
+    r"|中国[、,\s]+(?:gdp|国内総生産|成長率|工業生産|小売売上|製造業pmi)"
+    r"|\b(?:china(?:'s)?|chinese)[ -]+(?:economy|economic growth|gdp|growth|industrial production|retail sales|manufacturing pmi)\b"
+)
+_SEMANTIC_ANCHORS = {
+    "ai_semis": _AI_INVESTMENT,
+    "import_prices": _IMPORT_INDICATOR,
+    "china": _CHINA_ECONOMY,
+}
+_DIRECTION_WORDS = {
+    "up": r"増(?:加|額|大|強|や|え)?|拡大|拡充|引き上げ|引上げ|上方修正|上昇|積み増|倍増|回復|持ち直|改善|加速|\b(?:ris(?:e|es|ing)|rose|grew|grow(?:s|ing)?|increas(?:e|es|ed|ing)|expand(?:s|ed|ing)?|higher|recover(?:s|ed|ing)?|accelerat(?:e|es|ed|ing))\b",
+    "down": r"減(?:少|額|ら|り|る)?|削減|縮小|抑制|引き下げ|引下げ|下方修正|下落|低下|落ち込|悪化|減速|鈍化|弱含|\b(?:fall(?:s|ing)?|fell|drop(?:s|ped|ping)?|declin(?:e|es|ed|ing)|decreas(?:e|es|ed|ing)|shrink(?:s|ing)?|shrank|lower|slow(?:s|ed|ing)?|contract(?:s|ed|ing)?)\b",
+}
+_OTHER_METRIC = (
+    r"株価|関連株|株[がはをも]|株\s*\d|株高|株安|増収|減収|増益|減益|利益|純益|売上|収益|回収率|回収|利回り|受注|生産|需要|人員|採用|雇用|増加率|伸び率"
+    r"|\b(?:stock|shares?|profit|revenue|earnings|returns?|orders?|demand|production)\b"
+)
+_UNCERTAIN_CHANGE = (
+    r"見送|撤回|否定|しない|せず|していない|しておらず|さない|さず|増えず|減らず|なかった|ない|ぬ|ずに|見通し|見込み|予想|予測|観測|期待|可能性|懸念|なら|場合|したら"
+    r"|\b(?:not|never|no|deny|denies|denied|may|might|could|would|should|expect(?:s|ed|ing)?|forecast|if)\b"
+)
+
+
+def _metric_directions(text, anchor_pattern, *, china=False):
+    """同じ節の指標と増減を結ぶ。別の指標へ移った先の増減を拾わない。"""
+    directions = set()
+    # 明示的に区切られた文・対比の外側から、方向を借りない。
+    for clause in re.split(r"[。！？!?;；\n、,]|一方|対して|だが|しかし|whereas|\bbut\b", text):
+        anchors = list(re.finditer(anchor_pattern, clause))
+        for i, anchor in enumerate(anchors):
+            end = anchors[i + 1].start() if i + 1 < len(anchors) else len(clause)
+            tail = clause[anchor.end():min(end, anchor.end() + 42)]
+            other = re.search(_OTHER_METRIC, tail)
+            if other:
+                tail = tail[:other.start()]
+            # GDPの増加と成長率の鈍化は違う。明示的な回復/減速の表現を優先する。
+            patterns = _DIRECTION_WORDS
+            if china and re.search(r"回復|持ち直|改善|加速|悪化|減速|鈍化|弱含|\b(?:recover\w*|accelerat\w*|slow\w*)\b", tail):
+                patterns = {
+                    "up": r"回復|持ち直|改善|加速|\b(?:recover\w*|accelerat\w*)\b",
+                    "down": r"悪化|減速|鈍化|弱含|\bslow\w*\b",
+                }
+            for direction, pattern in patterns.items():
+                for change in re.finditer(pattern, tail):
+                    # 「投資縮小を否定」「増やさない」「増加を予想」等は断定しない。
+                    context = tail[max(0, change.start() - 12):change.end() + 20]
+                    if not re.search(_UNCERTAIN_CHANGE, context):
+                        directions.add(direction)
+            # 英語では動詞が指標の前に来る。目的語の直前の動詞だけを扱う。
+            prefix = clause[max(0, anchor.start() - 30):anchor.start()]
+            for direction, pattern in (
+                ("up", r"\b(?:increase[sd]?|raise[sd]?|boost(?:s|ed)?|expand(?:s|ed)?)"),
+                ("down", r"\b(?:cuts?|reduc(?:e|es|ed)|slash(?:es|ed)?)"),
+            ):
+                match = re.search(pattern + r"(?:\s+(?:its|the|planned|annual|capital))*\s*$", prefix)
+                if match and not re.search(_UNCERTAIN_CHANGE, prefix):
+                    directions.add(direction)
+    return directions
+
+
+def _semantic_direction(article, node_id):
+    """対象指標の明示的な方向1つだけを返す。不明/矛盾/根拠不足はNone。"""
+    # titleの末尾とsummaryの先頭をつないで、架空の主語述語を作らない。
+    parts = [_norm(article.get(k)) for k in ("title", "summary", "description") if article.get(k)]
+    directions = set()
+    for text in parts:
+        anchor_pattern = _SEMANTIC_ANCHORS[node_id]
+        if node_id == "china":
+            # 「中国、GDPが…」は一つの指標名。国名だけを別の節にしない。
+            text = re.sub(r"中国[、,]\s*(?=gdp|国内総生産|成長率|工業生産|小売売上|製造業pmi)", "中国", text)
+        if node_id == "import_prices":
+            countries = _countries(text)
+            direct_jp = bool(re.search(_JAPAN_IMPORT_INDICATOR, text))
+            # 日本の指標への代用を防ぐ。国省略の日本語「輸入物価」は扱うが、
+            # 一企業の「原材料」や出所不明の英語import pricesだけでは認めない。
+            if not direct_jp and (countries - {"jp"} or not re.search(r"輸入物価", text)):
+                continue
+            if countries - {"jp"}:
+                anchor_pattern = _JAPAN_IMPORT_INDICATOR
+        directions.update(_metric_directions(text, anchor_pattern, china=node_id == "china"))
+        if node_id == "china":
+            # 「GDPは増加、成長率は鈍化」の後半は同じ経済の別の量。
+            # 水準の増加だけを回復へ変換せず、相反する方向なら札を外す。
+            rate_scope = (
+                r"(?:中国(?:の)?(?:gdp|国内総生産)|\bchina(?:'s)?\s+gdp)"
+                r"[^。！？!?;；]{0,32}?[、,]\s*(?:成長率|伸び(?:率)?|growth(?: rate)?|pace of growth)"
+                r"[^。！？!?;；、,]{0,24}?"
+            )
+            if re.search(rate_scope + r"(?:減速|鈍化|低下|\bslow\w*\b)", text):
+                directions.add("down")
+            if re.search(rate_scope + r"(?:加速|上昇|\baccelerat\w*\b)", text):
+                directions.add("up")
+    return next(iter(directions)) if len(directions) == 1 else None
+
+
 def _policy_change_confirmed(article, node_id, direction):
     """思惑・姿勢・据え置きを、実際の政策金利変更に変換しない。
 
@@ -377,11 +490,12 @@ def _policy_change_confirmed(article, node_id, direction):
 
 
 def valid_news_tags(article, tags, graph):
-    """元記事の語句と国の整合を確認できるタグを返す（入力は変更しない）。
+    """元記事の語句・国・対象指標を確認できるタグを返す（入力は変更しない）。
 
     外国の統計に似た米国・日本のノードを代用しない。国内外両方への影響が
     元記事に明示される場合は、両方のタグを認める。国が省略された記事や
-    語句の因果的な意味まで完全には検証できない。
+    AI投資・日本の輸入物価・中国経済は、対象と方向が明示された場合だけ
+    返す。逆向きの入力はその明示的な方向へ直す。文章の意味の万能な検証ではない。
     """
     nodes = graph.get("nodes", []) if isinstance(graph, dict) else []
     by_id = {n["id"]: n for n in nodes if isinstance(n, dict) and n.get("id")}
@@ -409,6 +523,14 @@ def valid_news_tags(article, tags, graph):
                 continue
         if node_id in _POLICY_BANK and not _policy_change_confirmed(article, node_id, direction):
             continue
+        if node_id in _SEMANTIC_ANCHORS:
+            confirmed = _semantic_direction(article, node_id)
+            if confirmed is None:
+                continue
+            tag = dict(tag)
+            if direction is not None:
+                direction = (1 if confirmed == "up" else -1) if isinstance(direction, int) else confirmed
+                tag["dir"] = direction
         key = (node_id, direction)
         if key not in seen:
             seen.add(key)

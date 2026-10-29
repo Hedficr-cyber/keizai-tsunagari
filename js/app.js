@@ -41,6 +41,7 @@ let TERMS = {}; // 用語 → { t, e, n, c, ai }
 let ALIAS = {}; // 文中の言い方 → 用語
 let TERM_RE = null;
 let termContext = null;
+let termReturnFocus = null;
 function setTerms(glossary, aiTerms) {
   TERMS = {};
   ALIAS = {};
@@ -75,6 +76,7 @@ function gl(text, seen, context = null) {
 function showTerm(key, context = detailContext()) {
   const t = context.terms[key];
   if (!t) return;
+  termReturnFocus = captureFocus(sheetOpen ? $("#sheet") : $("#v-" + state.view));
   termContext = context;
   $("#tc-term").textContent = t.t;
   $("#tc-tag").textContent = t.ai ? "AI の説明" : t.c || "";
@@ -83,9 +85,18 @@ function showTerm(key, context = detailContext()) {
   if (t.n && G.byId[t.n]) { nb.hidden = false; nb.dataset.to = t.n; nb.textContent = `「${G.byId[t.n].short}」のつながりを見る`; } else nb.hidden = true;
   const card = $("#termcard");
   card.hidden = false;
+  syncModalState();
+  $("#tc-close").focus({ preventScroll: true });
   requestAnimationFrame(() => card.classList.add("on"));
 }
-function hideTerm() { const c = $("#termcard"); c.classList.remove("on"); c.hidden = true; termContext = null; }
+function hideTerm(restoreFocus = true) {
+  const c = $("#termcard");
+  const wasOpen = !c.hidden;
+  c.classList.remove("on"); c.hidden = true; termContext = null;
+  syncModalState();
+  if (wasOpen && restoreFocus) restoreFocusRef(termReturnFocus);
+  termReturnFocus = null;
+}
 
 // ---------- 小さな部品 ----------
 const ARROW = { up: "↑", down: "↓", mix: "⇅" };
@@ -593,6 +604,7 @@ function walkTo(id, fresh = false) {
   const y = window.scrollY;
   renderMap();
   window.scrollTo(0, Math.max(0, Math.min(y, $("#v-map .seg")?.getBoundingClientRect().top + window.scrollY - 70)));
+  focusMapDestination();
 }
 function paintMap() {
   const svg = $("#map");
@@ -717,7 +729,7 @@ function runSim(node, dir) {
   state.mapMode = "try";
   if (state.view !== "map") { state.mapScrollTarget = "sim"; location.hash = "#map"; return; }
   renderMap();
-  requestAnimationFrame(() => $("#sim-sec")?.scrollIntoView({ block: "start" }));
+  requestAnimationFrame(() => { $("#sim-sec")?.scrollIntoView({ block: "start" }); focusMapDestination(); });
 }
 
 // ---------- 識者 ----------
@@ -850,8 +862,80 @@ let sheetSession = null;
 let sheetDepth = 0;
 let sheetSequence = 0;
 let pendingViewRefresh = false;
+let activationTarget = null;
+let focusMapAfterSheet = false;
 const sheetSessions = new Map();
 const sheetContexts = new Map();
+const sheetReturnFocus = new Map();
+const FOCUSABLE = 'a[href],button:not(:disabled),input:not(:disabled),select:not(:disabled),textarea:not(:disabled),summary,[tabindex]:not([tabindex="-1"])';
+function usableFocus(el) {
+  if (!(el?.isConnected && el.getClientRects().length && !el.closest('[hidden],[inert]') && !el.disabled)) return false;
+  // 閉じたdetailsの中は、ブラウザによって矩形だけが残るため別に除く。
+  for (let details = el.closest('details:not([open])'); details; details = details.parentElement?.closest('details:not([open])')) {
+    if (![...details.children].find(child => child.tagName === 'SUMMARY')?.contains(el)) return false;
+  }
+  return getComputedStyle(el).visibility !== 'hidden';
+}
+// 本文を描き直した場合も、同じ操作対象を探す。別記事へ入れ替わった要素には戻さない。
+function focusIdentity(el) {
+  const headline = el.matches('[data-news]') ? el.querySelector('.t,.hd b') : el.matches('[data-theme]') ? el.querySelector('h3') : null;
+  return (headline || el).textContent.trim();
+}
+function captureFocus(root) {
+  const el = root?.contains(activationTarget) ? activationTarget : document.activeElement;
+  if (!root?.contains(el) || el === root || !el.matches(FOCUSABLE)) return null;
+  const path = [];
+  for (let at = el; at !== root; at = at.parentElement) path.unshift([...at.parentElement.children].indexOf(at));
+  const key = el.id ? ['id', el.id] : [...el.attributes].find(a => a.name.startsWith('data-'));
+  return { root, el, path, key: key ? [key[0] || key.name, key[1] ?? key.value] : null, tag: el.tagName, text: focusIdentity(el) };
+}
+function restoreFocusRef(ref) {
+  if (!ref) return false;
+  let el = ref.el;
+  if (!usableFocus(el)) {
+    el = ref.key ? $$(`[${CSS.escape(ref.key[0])}="${CSS.escape(ref.key[1])}"]`, ref.root).find(e => e.tagName === ref.tag && focusIdentity(e) === ref.text) : null;
+    if (!el && ref.key?.[0] === 'data-news') el = $$('[data-news]', ref.root).find(e => e.tagName === ref.tag && focusIdentity(e) === ref.text);
+    if (!el) {
+      let candidate = ref.root;
+      for (const index of ref.path) candidate = candidate?.children[index];
+      if (candidate?.tagName === ref.tag && focusIdentity(candidate) === ref.text) el = candidate;
+    }
+  }
+  if (!usableFocus(el)) return false;
+  el.focus({ preventScroll: true });
+  return document.activeElement === el;
+}
+function focusHeading(root) {
+  const el = root?.querySelector('h1,h2') || root;
+  if (!el) return;
+  if (!el.hasAttribute('tabindex')) el.tabIndex = -1;
+  el.focus({ preventScroll: true });
+}
+function activeModal() { return !$("#termcard").hidden ? $("#termcard") : sheetOpen ? $("#sheet") : null; }
+function syncModalState() {
+  const termOpen = !$("#termcard").hidden;
+  $$('.top,main,.nav,#update').forEach(el => { el.inert = sheetOpen || termOpen; });
+  const sheet = $("#sheet");
+  sheet.inert = !sheetOpen || termOpen;
+  sheet.setAttribute('aria-hidden', String(!sheetOpen || termOpen));
+  sheet.setAttribute('aria-modal', String(sheetOpen && !termOpen));
+}
+function trapModalTab(ev) {
+  const modal = activeModal();
+  if (!modal) return;
+  const items = $$(FOCUSABLE, modal).filter(usableFocus);
+  const active = document.activeElement;
+  if (!items.length) { ev.preventDefault(); focusHeading(modal); }
+  else if (!modal.contains(active) || active === modal || (ev.shiftKey && active === items[0]) || (!ev.shiftKey && active === items.at(-1))) {
+    ev.preventDefault();
+    (ev.shiftKey ? items.at(-1) : items[0]).focus({ preventScroll: true });
+  }
+}
+function focusMapDestination() {
+  if (!focusMapAfterSheet || state.view !== 'map') return;
+  focusMapAfterSheet = false;
+  focusHeading(state.mapMode === 'try' ? $("#sim-sec") : $("#v-map"));
+}
 function captureDetailContext() {
   return {
     data: D,
@@ -873,7 +957,7 @@ function rememberSheet() {
   if (!sheetOpen) return;
   const frames = sheetSessions.get(sheetSession);
   if (!frames?.[sheetDepth - 1]) return;
-  frames[sheetDepth - 1] = { html: $("#sheet-body").innerHTML, scroll: $("#sheet").scrollTop };
+  frames[sheetDepth - 1] = { html: $("#sheet-body").innerHTML, scroll: $("#sheet").scrollTop, focus: captureFocus($("#sheet")) || frames[sheetDepth - 1].focus };
 }
 function showSheetFrame(session, depth) {
   const frame = sheetSessions.get(session)?.[depth - 1];
@@ -886,6 +970,8 @@ function showSheetFrame(session, depth) {
   $("#sheet").classList.add("on");
   $("#scrim").classList.add("on");
   document.body.style.overflow = "hidden";
+  syncModalState();
+  if (!restoreFocusRef(frame.focus)) focusHeading($("#sheet-body"));
   $("#sheet").scrollTop = frame.scroll;
   requestAnimationFrame(() => {
     if (sheetOpen && sheetSession === session && sheetDepth === depth) $("#sheet").scrollTop = frame.scroll;
@@ -900,6 +986,7 @@ function openSheet(html, context = detailContext()) {
     sheetDepth = 0;
     sheetSessions.set(sheetSession, []);
     sheetContexts.set(sheetSession, context);
+    sheetReturnFocus.set(sheetSession, { view: state.view, focus: captureFocus($("#v-" + state.view)) });
   }
   const frames = sheetSessions.get(sheetSession).slice(0, sheetDepth);
   frames.push({ html, scroll: 0 });
@@ -908,17 +995,23 @@ function openSheet(html, context = detailContext()) {
   history.pushState({ ...history.state, kzSheet: sheetSession, kzDepth: sheetDepth }, "");
   showSheetFrame(sheetSession, sheetDepth);
 }
-function hideSheet() {
+function hideSheet(restoreFocus = true) {
   rememberSheet();
+  hideTerm(false);
   sheetOpen = false;
   $("#sheet").classList.remove("on");
   $("#scrim").classList.remove("on");
   document.body.style.overflow = "";
+  syncModalState();
   if (pendingViewRefresh) {
     const y = window.scrollY;
     pendingViewRefresh = false;
     RENDER[state.view]();
     requestAnimationFrame(() => window.scrollTo(0, y));
+  }
+  if (restoreFocus) {
+    const origin = sheetReturnFocus.get(sheetSession);
+    if (origin?.view === state.view && !restoreFocusRef(origin.focus)) focusHeading($("#v-" + state.view));
   }
 }
 function closeSheet() {
@@ -932,7 +1025,8 @@ function backSheet() {
 }
 function leaveSheetForMap() {
   if (!sheetOpen) return;
-  hideSheet();
+  focusMapAfterSheet = true;
+  hideSheet(false);
   // 同じ画面の項目選択ではhashが変わらない。閉じた詳細を現在の履歴に残さない。
   if (state.view === "map") {
     const { kzSheet, kzDepth, ...base } = history.state || {};
@@ -965,21 +1059,24 @@ function route() {
     if (state.view !== next) return;
     if (next === "map" && target === "sim") $("#sim-sec")?.scrollIntoView({ block: "start" });
     else window.scrollTo(0, next === "map" && target === "walk" ? 0 : state.viewScroll[next] || 0);
+    focusMapDestination();
   });
 }
 if ("scrollRestoration" in history) history.scrollRestoration = "manual";
 function syncNavigation() {
-  hideTerm();
   const v = (location.hash || "#today").slice(1);
   const next = RENDER[v] ? v : "today";
   if (next !== state.view) {
-    if (sheetOpen) hideSheet();
+    hideTerm(false);
+    if (sheetOpen) hideSheet(false);
     route();
   }
   syncSheetHistory();
 }
 
 document.addEventListener("click", ev => {
+  activationTarget = ev.target.closest('button,a[href],[tabindex]');
+  queueMicrotask(() => { activationTarget = null; });
   // 用語の説明が出ているときは、外をタップしたら閉じるだけにする
   const card = $("#termcard");
   if (!card.hidden) {
@@ -1029,8 +1126,13 @@ document.addEventListener("click", ev => {
   else if (ds.node) openNode(ds.node);
 }, true);
 document.addEventListener("keydown", ev => {
-  if (ev.key === "Escape") { if (!$("#termcard").hidden) hideTerm(); else closeSheet(); }
+  if (ev.key === "Tab") trapModalTab(ev);
+  if (ev.key === "Escape") { if (activeModal()) ev.preventDefault(); if (!$("#termcard").hidden) hideTerm(); else closeSheet(); }
   if ((ev.key === "Enter" || ev.key === " ") && ev.target.matches?.("[data-walk],[data-node],[data-term]")) { ev.preventDefault(); ev.target.dispatchEvent(new MouseEvent("click", { bubbles: true })); }
+});
+document.addEventListener('focusin', ev => {
+  const modal = activeModal();
+  if (modal && !modal.contains(ev.target)) ($$(FOCUSABLE, modal).find(usableFocus) || modal).focus({ preventScroll: true });
 });
 $("#scrim").addEventListener("click", closeSheet);
 $("#sheet-close").addEventListener("click", closeSheet);
