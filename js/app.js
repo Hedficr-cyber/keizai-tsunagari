@@ -32,12 +32,15 @@ const state = {
   gqAnswered: null,
   todayAnswers: {},
   glCat: null,
+  viewScroll: {},
+  mapScrollTarget: null,
 };
 
 // ---------- 用語をタップで説明 ----------
 let TERMS = {}; // 用語 → { t, e, n, c, ai }
 let ALIAS = {}; // 文中の言い方 → 用語
 let TERM_RE = null;
+let termContext = null;
 function setTerms(glossary, aiTerms) {
   TERMS = {};
   ALIAS = {};
@@ -53,13 +56,15 @@ function setTerms(glossary, aiTerms) {
   TERM_RE = keys.length ? new RegExp(keys.join("|"), "g") : null;
 }
 // 文章の中の用語に点線を付ける。seen を渡すと、同じ画面では最初の1回だけにする
-function gl(text, seen) {
+function gl(text, seen, context = null) {
   const s = String(text ?? "");
-  if (!TERM_RE || !s) return esc(s);
+  const re = context ? context.termRe : TERM_RE;
+  const aliases = context ? context.aliases : ALIAS;
+  if (!re || !s) return esc(s);
   let out = "", last = 0, m;
-  TERM_RE.lastIndex = 0;
-  while ((m = TERM_RE.exec(s))) {
-    const key = ALIAS[m[0]];
+  re.lastIndex = 0;
+  while ((m = re.exec(s))) {
+    const key = aliases[m[0]];
     out += esc(s.slice(last, m.index));
     if (seen?.has(key)) out += esc(m[0]);
     else { seen?.add(key); out += `<span class="term" data-term="${esc(key)}" role="button" tabindex="0">${esc(m[0])}</span>`; }
@@ -67,9 +72,10 @@ function gl(text, seen) {
   }
   return out + esc(s.slice(last));
 }
-function showTerm(key) {
-  const t = TERMS[key];
+function showTerm(key, context = detailContext()) {
+  const t = context.terms[key];
   if (!t) return;
+  termContext = context;
   $("#tc-term").textContent = t.t;
   $("#tc-tag").textContent = t.ai ? "AI の説明" : t.c || "";
   $("#tc-exp").textContent = t.e;
@@ -79,16 +85,17 @@ function showTerm(key) {
   card.hidden = false;
   requestAnimationFrame(() => card.classList.add("on"));
 }
-function hideTerm() { const c = $("#termcard"); c.classList.remove("on"); c.hidden = true; }
+function hideTerm() { const c = $("#termcard"); c.classList.remove("on"); c.hidden = true; termContext = null; }
 
 // ---------- 小さな部品 ----------
 const ARROW = { up: "↑", down: "↓", mix: "⇅" };
 function chip(nodeId, dir, opts = {}) {
   const n = G.byId[nodeId];
   if (!n) return "";
-  const d = dir === undefined || dir === null ? null : dirNum(dir);
+  const held = dir === "hold" && ["boj", "fed"].includes(nodeId);
+  const d = held || dir === undefined || dir === null ? null : dirNum(dir);
   const cls = d === null ? "" : dirClass(d);
-  const word = d === null ? "" : `<span>${esc(dirWord(n, d))}</span><span class="ar">${ARROW[cls]}</span>`;
+  const word = held ? `<span>据え置き</span>` : d === null ? "" : `<span>${esc(dirWord(n, d))}</span><span class="ar">${ARROW[cls]}</span>`;
   const label = opts.full ? n.name : n.short;
   // ボタンの中に置くときは span にする（ボタンの入れ子はブラウザが崩す）
   const tagName = opts.span ? "span" : "button";
@@ -96,7 +103,32 @@ function chip(nodeId, dir, opts = {}) {
   const target = opts.span ? "" : ` data-node="${esc(n.id)}"`;
   return `<${tagName} class="tag ${cls} ${opts.conf ? "conf" : ""}"${target}><span class="nm">${esc(label)}</span>${word}</${tagName}>`;
 }
-const chainHtml = (chain, span = false) => (chain || []).map((c, k) => (k ? `<span class="arrow ${c.known === false ? "new" : ""}">→</span>` : "") + chip(c.node, c.dir, { span, conf: !!c.conflict })).join("");
+const chainHtml = (chain, span = false) => (chain || []).map((c, k) => {
+  const previous = chain[k - 1];
+  const fromDir = previous && dirNum(previous.dir), toDir = dirNum(c.dir);
+  const linked = previous && [1, -1].includes(fromDir) && [1, -1].includes(toDir)
+    && G.out[previous.node]?.some(e => e.to === c.node && fromDir * e.sign === toDir);
+  return (k ? linked ? `<span class="arrow">→</span>` : `<span class="chain-break" aria-hidden="true"></span>` : "")
+    + chip(c.node, c.dir, { span, conf: !!c.conflict });
+}).join("");
+// シナリオは独立した因果経路ごとに描く。旧データも、不明な隣接を矢印で結ばない。
+function scenarioPathsHtml(c) {
+  const paths = [];
+  for (const source of c.paths || (c.chain ? [c.chain] : [])) {
+    let path = [];
+    for (const tag of source) {
+      if (!G.byId[tag.node] || !["up", "down", "hold"].includes(tag.dir)) continue;
+      if (tag.dir === "hold" && !["boj", "fed"].includes(tag.node)) continue;
+      const previous = path[path.length - 1];
+      const connected = previous && ["up", "down"].includes(previous.dir) && ["up", "down"].includes(tag.dir)
+        && G.out[previous.node].some(e => e.to === tag.node && dirNum(previous.dir) * e.sign === dirNum(tag.dir));
+      if (previous && !connected) { paths.push(path); path = []; }
+      path.push(tag);
+    }
+    if (path.length) paths.push(path);
+  }
+  return `<div class="case-paths">${paths.map(path => `<div class="chain">${chainHtml(path)}</div>`).join("")}</div>`;
+}
 function fmtTime(iso, withDate = true) {
   if (!iso) return "";
   const d = new Date(iso);
@@ -157,14 +189,14 @@ function lv(n) { return `<span class="lv" aria-label="重要度${n}">${[1, 2, 3]
 const foot = () => `<p class="foot">${esc(VERSION)}</p>`;
 const VERDICT = { 当たり: "hit", 一部当たり: "part", 外れ: "miss", まだわからない: "wait" };
 const HINT = "";
-const relList = ids => ids.map(id => newsById[id]).filter(Boolean).slice(0, 4)
+const relList = (ids, context = null) => ids.map(id => (context?.news || newsById)[id]).filter(Boolean).slice(0, 4)
   .map(n => `<button data-news="${esc(n.id)}">${esc(newsTitle(n))}<span class="src">${esc(n.source)}・${esc(ago(n.time))}</span></button>`).join("");
 
 // ---------- 今日 ----------
 // 一覧では要点だけを見せ、くわしい中身はタップで開く
 function renderToday() {
   const b = D.brief || { themes: [] };
-  const upd = D.updated ? new Date(D.updated) : null;
+  const upd = D.collected || D.updated ? new Date(D.collected || D.updated) : null;
   const moving = (D.moving || []).slice(0, 8).map(m => chip(m.node, m.dir)).join("");
   const wk = X.weekly;
   const showWeek = wk && (Date.now() - new Date(wk.made)) < 4 * 86400000;
@@ -190,40 +222,40 @@ function themeRow(t, i) {
     <div class="chain">${chainHtml(t.chain, true)}</div>
   </button>`;
 }
-function openTheme(i) {
-  const t = D.brief?.themes?.[i];
+function openTheme(i, context = detailContext()) {
+  const t = context.data.brief?.themes?.[i];
   if (!t) return;
   const S = new Set();
-  const th = threadByName[t.thread];
+  const th = context.threads[t.thread];
   // 点線は画面の上から最初の1回だけ付けるので、表示の順に組み立てる（識者の見方は下で作る）
-  const voices = () => (t.experts || []).map(id => expertById[id]).filter(Boolean).slice(0, 2)
-    .map(e => `<div class="voice"><div class="who">${esc(e.name)}<span class="muted" style="font-weight:500">｜${esc(e.role)}</span></div>${gl(e.view, S)}</div>`).join("");
-  const hasVoices = (t.experts || []).some(id => expertById[id]);
-  const rel = relList(t.news || []);
+  const voices = () => (t.experts || []).map(id => context.experts[id]).filter(Boolean).slice(0, 2)
+    .map(e => `<div class="voice"><div class="who">${esc(e.name)}<span class="muted" style="font-weight:500">｜${esc(e.role)}</span></div>${gl(e.view, S, context)}</div>`).join("");
+  const hasVoices = (t.experts || []).some(id => context.experts[id]);
+  const rel = relList(t.news || [], context);
   const conf = (t.chain || []).filter(c => c.conflict).map(c => `<p class="conf-note">※ ${esc(c.conflict)}</p>`).join("");
   const first = (t.chain || [])[0];
   openSheet(`
     ${th && th.entries.length > 1 ? `<p class="cat">流れ「${esc(th.name)}」${th.entries.length}日目</p>` : ""}
     <h2>${esc(t.title)}</h2>
-    <div class="q-sec"><div class="q-h">何が起きた？</div><p>${gl(t.what, S)}</p></div>
-    <div class="q-sec"><div class="q-h">どうつながる？</div><div class="chain">${chainHtml(t.chain)}</div><p>${gl(t.chain_text, S)}</p>${conf}</div>
-    <div class="q-sec"><div class="q-h">この先どうなるかも</div><ul class="outlook">${(t.outlook || []).map(o => `<li>${gl(o, S)}</li>`).join("")}</ul></div>
-    ${t.watch ? `<div class="q-sec"><div class="q-h">次に見るもの</div><p>${gl(t.watch, S)}</p></div>` : ""}
+    <div class="q-sec"><div class="q-h">何が起きた？</div><p>${gl(t.what, S, context)}</p></div>
+    <div class="q-sec"><div class="q-h">どうつながる？</div><div class="chain">${chainHtml(t.chain)}</div><p>${gl(t.chain_text, S, context)}</p>${conf}</div>
+    <div class="q-sec"><div class="q-h">この先どうなるかも</div><ul class="outlook">${(t.outlook || []).map(o => `<li>${gl(o, S, context)}</li>`).join("")}</ul></div>
+    ${t.watch ? `<div class="q-sec"><div class="q-h">次に見るもの</div><p>${gl(t.watch, S, context)}</p></div>` : ""}
     ${hasVoices ? `<div class="q-sec"><div class="q-h">識者はどう見ている？</div>${voices()}</div>` : ""}
     ${rel ? `<div class="q-sec"><div class="q-h">元のニュース</div><div class="rel">${rel}</div></div>` : ""}
     <div class="row-btns">${first ? `<button class="btn" data-sim="${esc(first.node)}:${esc(first.dir)}">広がる影響を図で見る</button>` : ""}${th && th.entries.length > 1 ? `<button class="btn ghost" data-thread="${esc(th.name)}">これまでの流れ</button>` : ""}</div>
-    ${HINT}`);
+    ${HINT}`, context);
 }
 
 // ---------- 予定とシナリオ ----------
 let AGENDA = [];
-function agendaItems() {
+function agendaItems(data = D) {
   const today = todayStr();
   // 結果が出たあとも、次の日までは残す（シナリオと照らせるように）
   const y = new Date(); y.setDate(y.getDate() - 1);
   const since = y.toLocaleDateString("sv");
-  const cal = (D.calendar || []).filter(e => e.date >= since);
-  const sc = [...(D.scenarios || [])];
+  const cal = (data.calendar || []).filter(e => e.date >= since);
+  const sc = [...(data.scenarios || [])];
   const items = cal.map(e => {
     // 同じ日の予定にシナリオを合わせる（名前の一部が重なるものを優先）
     const i = sc.findIndex(s => s.date === e.date && (s.event.includes(e.name.slice(0, 3)) || e.name.includes(s.event.slice(0, 3))));
@@ -247,8 +279,8 @@ function agendaRows(limit) {
     <div class="card ag-list">${AGENDA.slice(0, limit).map(agendaRow).join("")}
     ${AGENDA.length > limit ? `<button class="ag-all" data-agenda>予定をすべて見る（${AGENDA.length}）</button>` : ""}</div>`;
 }
-function openAgendaItem(i) {
-  const e = AGENDA[i];
+function openAgendaItem(i, context = detailContext()) {
+  const e = context.agenda[i];
   if (!e) return;
   const s = e.scenario;
   const S = new Set();
@@ -257,14 +289,14 @@ function openAgendaItem(i) {
     ${e.note ? `<p class="muted small">${esc(e.note)}</p>` : ""}
     ${(e.nodes || []).length ? `<div class="q-sec"><div class="q-h">動きそうなもの</div><div class="chips">${e.nodes.map(n => chip(n)).join("")}</div></div>` : ""}
     ${e.date && e.date < todayStr() ? `<p class="muted small">結果が出ました</p>` : ""}
-    ${s ? `<div class="q-sec"><div class="q-h">焦点</div><p>${gl(s.focus, S)}</p></div>
+    ${s ? `<div class="q-sec"><div class="q-h">焦点</div><p>${gl(s.focus, S, context)}</p></div>
       <div class="q-sec"><div class="q-h">結果しだいで、こう広がるかも</div>
-      <div class="cases">${s.cases.map((c, k) => `<div class="case c${k}"><div class="case-l">${esc(c.label)}</div><div class="chain">${chainHtml(c.chain)}</div><p>${gl(c.text, S)}</p></div>`).join("")}</div></div>` : ""}
-    ${HINT}`);
+      <div class="cases">${s.cases.map((c, k) => `<div class="case c${k}"><div class="case-l">${esc(c.label)}</div>${scenarioPathsHtml(c)}<p>${gl(c.text, S, context)}</p></div>`).join("")}</div></div>` : ""}
+    ${HINT}`, context);
 }
-function openAgenda() {
+function openAgenda(context = detailContext()) {
   openSheet(`<p class="cat">これからの予定</p><h2>予定</h2>
-    <div class="card ag-list" style="margin-top:14px">${AGENDA.map(agendaRow).join("")}</div>`);
+    <div class="card ag-list" style="margin-top:14px">${context.agenda.map(agendaRow).join("")}</div>`, context);
 }
 
 // ---------- ニュース ----------
@@ -348,27 +380,25 @@ function threadCard(t) {
     <p class="what">${esc(last.title)}</p>
   </button>`;
 }
-function openThread(name) {
-  const t = threadByName[name];
+function openThread(name, context = detailContext()) {
+  const t = context.threads[name];
   if (!t) return;
   const S = new Set();
   openSheet(`<p class="cat">流れ・${t.entries.length}日分</p><h2>${esc(t.name)}</h2>
     <div class="timeline">${[...t.entries].reverse().map(e => `<div class="tl">
       <div class="tl-date">${esc(md(e.date))}</div>
-      <div class="tl-body"><h3>${esc(e.title)}</h3><p>${gl(e.what, S)}</p>
+      <div class="tl-body"><h3>${esc(e.title)}</h3><p>${gl(e.what, S, context)}</p>
         <div class="chain" style="margin-top:8px">${chainHtml(e.chain)}</div></div></div>`).join("")}</div>
-    ${HINT}`);
+    ${HINT}`, context);
 }
 // 英語の記事は、AI が付けた日本語の見出しを出す（元の見出しは詳細に）
 const newsTitle = n => n.title_ja || n.title;
 // 集めている媒体（分け方ごとに、集めた本数と、AI が選んで載せた本数）
-function openSources() {
+function openSources(context = detailContext()) {
   const groups = new Map();
-  for (const x of D.sources || []) { if (!groups.has(x.group)) groups.set(x.group, []); groups.get(x.group).push(x); }
-  const total = (D.sources || []).reduce((a, x) => a + x.collected, 0);
+  for (const x of context.data.sources || []) { if (!groups.has(x.group)) groups.set(x.group, []); groups.get(x.group).push(x); }
   openSheet(`<p class="cat">ニュース</p><h2>集めている媒体</h2>
-    <p class="muted small" style="margin-top:6px">集めた${total}本から選んで載せています。</p>
-    ${[...groups].map(([g, list]) => `<div class="q-sec"><div class="q-h">${esc(g || "そのほか")}</div><div class="src-list">${list.map(x => `<div class="src-row"><span>${esc(x.name)}${x.lang === "en" ? `<small>英語</small>` : ""}</span><span class="muted small">集めた${x.collected}・載せた${x.shown}</span></div>`).join("")}</div></div>`).join("")}`);
+    ${[...groups].map(([g, list]) => `<div class="q-sec"><div class="q-h">${esc(g || "そのほか")}</div><div class="src-list">${list.map(x => `<div class="src-row"><span>${esc(x.name)}${x.lang === "en" ? `<small>英語</small>` : ""}</span><span class="muted small">収集${x.collected}・代表${x.shown}・関連${x.related || 0}</span></div>`).join("")}</div></div>`).join("")}`, context);
 }
 function newsRow(n, featured = false) {
   const category = G.cats.find(c => c.id === primaryNewsCat(n));
@@ -378,8 +408,8 @@ function newsRow(n, featured = false) {
     <span class="news-chevron" aria-hidden="true">›</span>
   </button>`;
 }
-function openNews(id) {
-  const n = newsById[id];
+function openNews(id, context = detailContext()) {
+  const n = context.news[id];
   if (!n) return;
   const S = new Set();
   const t0 = (n.tags || []).find(t => G.byId[t.node] && [1, -1].includes(dirNum(t.dir)));
@@ -393,29 +423,33 @@ function openNews(id) {
   const url = safeUrl(n.link);
   openSheet(`
     <p class="cat">${esc(n.source)}・${esc(fmtTime(n.time))}</p>
-    <h2>${gl(newsTitle(n), S)}</h2>
+    <h2>${gl(newsTitle(n), S, context)}</h2>
     ${n.title_ja ? `<p class="muted small" lang="en">元の見出し（英語）：${esc(n.title)}</p>` : ""}
-    ${n.plain ? `<div class="q-sec"><div class="q-h">ひとことで</div><p>${gl(n.plain, S)}</p></div>` : ""}
-    ${n.next ? `<div class="q-sec"><div class="q-h">この先</div><p>${gl(n.next, S)}</p></div>` : ""}
+    ${n.plain ? `<div class="q-sec"><div class="q-h">ひとことで</div><p>${gl(n.plain, S, context)}</p></div>` : ""}
+    ${n.next ? `<div class="q-sec"><div class="q-h">この先</div><p>${gl(n.next, S, context)}</p></div>` : ""}
     ${url ? `<a class="outbtn" href="${esc(url)}" target="_blank" rel="noopener noreferrer">元の記事を読む</a>` : ""}
     ${(n.related || []).length ? `<details class="fold"><summary>同じ出来事の別の記事（${n.related.length}）</summary><div class="rel">${n.related.map(r => safeUrl(r.link) ? `<a href="${esc(safeUrl(r.link))}" target="_blank" rel="noopener noreferrer">${esc(r.title)}<span class="src">${esc(r.source)}・${esc(ago(r.time))}</span></a>` : "").join("")}</div></details>` : ""}
     ${(n.tags || []).length || ripple ? `<details class="fold news-connections"><summary>このニュースは何につながる？</summary>
       ${(n.tags || []).length ? `<div class="q-sec"><div class="q-h">関係するもの</div><div class="chips">${n.tags.map(t => chip(t.node, t.dir, { full: true })).join("")}</div></div>` : ""}
       ${ripple}</details>` : ""}
-    ${HINT}`);
+    ${HINT}`, context);
 }
 function hopRow(v, r) {
   const n = G.byId[v];
   const from = [...new Set(r.via.map(a => G.byId[a.from].short))].join("・");
-  return `<button class="link-row" data-node="${esc(v)}"><div class="hd">${chip(v, r.dir, { span: true })}<span class="from muted small">← ${esc(from)}</span></div><p class="why">${esc(r.dir === 0 ? "逆向きの力がぶつかる（綱引き）" : r.via[0].edge.why)}</p></button>`;
+  const via = r.via[0];
+  const f = G.byId[via.from];
+  const why = r.dir === 0 ? "逆向きの力がぶつかる（綱引き）"
+    : res0(via) < 0 ? `${f.short}が${dirWord(f, res0(via))}すると、${n.short}は${dirWord(n, via.dir)}方向。` : via.edge.why;
+  return `<button class="link-row" data-node="${esc(v)}"><div class="hd">${chip(v, r.dir, { span: true })}<span class="from muted small">← ${esc(from)}</span></div><p class="why">${esc(why)}</p></button>`;
 }
 
 // ---------- 項目の詳細 ----------
-function openNode(id) {
+function openNode(id, context = detailContext()) {
   const n = G.byId[id];
   if (!n) return;
   const S = new Set();
-  const m = n.market && D.markets?.[n.market];
+  const m = n.market && context.data.markets?.[n.market];
   let market = "";
   if (m?.series?.length) {
     const { last, diff } = marketChange(m);
@@ -426,22 +460,22 @@ function openNode(id) {
       ${spark(m.series, cls + "-t", true)}
       <p class="muted small">${esc(last.d)} 時点（前の営業日の値）・${esc(m.source)}</p></div>`;
   }
-  const mv = (D.moving || []).find(x => x.node === id);
+  const mv = (context.data.moving || []).find(x => x.node === id);
   const outs = G.out[id].map(e => `<button class="link-row" data-node="${esc(e.to)}"><div class="hd"><span class="small muted">${esc(n.up)}すると</span>${chip(e.to, e.sign, { span: true })}</div><p class="why">${esc(e.why)}</p></button>`).join("");
   const ins = G.inn[id].map(e => `<button class="link-row" data-node="${esc(e.from)}"><div class="hd">${chip(e.from, 1, { span: true })}<span class="small muted">→ ${esc(n.short)}は${esc(dirWord(n, e.sign))}</span></div><p class="why">${esc(e.why)}</p></button>`).join("");
-  const news = (D.news || []).filter(x => (x.tags || []).some(t => t.node === id)).slice(0, 4);
+  const news = (context.data.news || []).filter(x => (x.tags || []).some(t => t.node === id)).slice(0, 4);
   openSheet(`
     <p class="cat">${esc(G.catName[n.cat])}</p>
     <h2>${esc(n.name)}</h2>
-    <div class="q-sec"><div class="q-h">これは何？</div><p>${gl(n.desc, S)}</p></div>
-    <div class="q-sec"><div class="q-h">暮らしでは</div><p>${gl(n.life, S)}</p></div>
-    ${mv ? `<div class="q-sec"><div class="q-h">今日の動き</div><div class="hd" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">${chip(id, mv.dir, { full: true })}<span class="small">${gl(mv.why, S)}</span></div></div>` : ""}
+    <div class="q-sec"><div class="q-h">これは何？</div><p>${gl(n.desc, S, context)}</p></div>
+    <div class="q-sec"><div class="q-h">暮らしでは</div><p>${gl(n.life, S, context)}</p></div>
+    ${mv ? `<div class="q-sec"><div class="q-h">今日の動き</div><div class="hd" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">${chip(id, mv.dir, { full: true })}<span class="small">${gl(mv.why, S, context)}</span></div></div>` : ""}
     ${market}
     <div class="row-btns"><button class="btn" data-walkto="${esc(id)}">つながりを図でたどる</button><button class="btn up" data-sim="${esc(id)}:up">${esc(n.up)}したら？</button><button class="btn down" data-sim="${esc(id)}:down">${esc(n.down)}したら？</button></div>
     ${outs ? `<details class="fold"><summary>影響を与える先（${G.out[id].length}）</summary><div class="links">${outs}</div></details>` : ""}
     ${ins ? `<details class="fold"><summary>影響を受ける元（${G.inn[id].length}）</summary><div class="links">${ins}</div></details>` : ""}
     ${news.length ? `<div class="q-sec"><div class="q-h">関係する今日のニュース</div><div class="rel">${news.map(x => `<button data-news="${esc(x.id)}">${esc(newsTitle(x))}<span class="src">${esc(x.source)}・${esc(ago(x.time))}</span></button>`).join("")}</div></div>` : ""}
-    ${HINT}`);
+    ${HINT}`, context);
 }
 
 // ---------- つながり図 ----------
@@ -555,7 +589,7 @@ function walkTo(id, fresh = false) {
   if (fresh || !state.walk.length) state.walk = [id];
   else if (state.walk[state.walk.length - 1] !== id) state.walk = [...state.walk, id].slice(-8);
   state.mapMode = "walk";
-  if (state.view !== "map") { location.hash = "#map"; return; }
+  if (state.view !== "map") { state.mapScrollTarget = "walk"; location.hash = "#map"; return; }
   const y = window.scrollY;
   renderMap();
   window.scrollTo(0, Math.max(0, Math.min(y, $("#v-map .seg")?.getBoundingClientRect().top + window.scrollY - 70)));
@@ -648,15 +682,16 @@ function simHop(v, r) {
   const from = [...new Set(r.via.map(a => G.byId[a.from].short))].join("・");
   return `<button class="hop2" data-hop="${esc(v)}">${chip(v, r.dir, { span: true })}<span class="from">← ${esc(from)}</span></button>`;
 }
-function openHop(v) {
-  if (!state.sim) return openNode(v);
-  const { res } = simulate(G, state.sim.start, state.sim.dir);
+function openHop(v, context = detailContext()) {
+  const sim = context.sim;
+  if (!sim) return openNode(v, context);
+  const { res } = simulate(G, sim.start, sim.dir);
   const r = res[v], n = G.byId[v];
-  if (!r) return openNode(v);
+  if (!r) return openNode(v, context);
   const lines = r.via.slice(0, 3).map(a => {
     const f = G.byId[a.from], fd = res0(a);
     // 説明文は「上がる場合」で書いてあるので、下がる向きのときはそう添える
-    return `<div class="q-sec"><div class="q-h">${esc(f.short)}が${esc(dirWord(f, fd))} → ${esc(n.short)}は${esc(dirWord(n, a.dir))}</div><p>${gl(a.edge.why)}</p>${fd < 0 ? `<p class="muted small">（説明は${esc(f.up)}の場合。${esc(f.down)}のときは逆に働く）</p>` : ""}<p class="meta-line">時間の目安：${esc(a.edge.lag)}・関係の強さ：${esc(STRENGTH[a.edge.strength])}</p></div>`;
+    return `<div class="q-sec"><div class="q-h">${esc(f.short)}が${esc(dirWord(f, fd))} → ${esc(n.short)}は${esc(dirWord(n, a.dir))}</div><p>${gl(a.edge.why, null, context)}</p>${fd < 0 ? `<p class="muted small">（説明は${esc(f.up)}の場合。${esc(f.down)}のときは逆に働く）</p>` : ""}<p class="meta-line">時間の目安：${esc(a.edge.lag)}・関係の強さ：${esc(STRENGTH[a.edge.strength])}</p></div>`;
   }).join("");
   const path = [];
   let at = v;
@@ -669,8 +704,8 @@ function openHop(v) {
   }
   openSheet(`<p class="cat">なぜ、ここに影響する？</p><h2>${esc(n.name)}は${esc(dirWord(n, r.dir))}${r.dir === 0 ? "（逆向きの力がぶつかる）" : "方向"}</h2>
     <div class="q-sec"><div class="q-h">起点からの道すじ${r.dir === 0 ? "の一例" : ""}</div><div class="chain">${chainHtml(path)}</div></div>
-    <div class="q-sec"><div class="q-h">暮らしや仕事との関わり</div><p>${gl(impactLife(n))}</p></div>${lines}
-    <div class="row-btns"><button class="btn ghost" data-node="${esc(v)}">${esc(n.short)}の仕組みを読む</button></div>${HINT}`);
+    <div class="q-sec"><div class="q-h">暮らしや仕事との関わり</div><p>${gl(impactLife(n), null, context)}</p></div>${lines}
+    <div class="row-btns"><button class="btn ghost" data-node="${esc(v)}">${esc(n.short)}の仕組みを読む</button></div>${HINT}`, context);
 }
 // 経由した項目の向き（a.dir は到着先の向き、edge.sign で割り戻す）
 function res0(a) { return a.dir * a.edge.sign; }
@@ -680,7 +715,7 @@ function runSim(node, dir) {
   state.simPick = node;
   state.simDir = dir;
   state.mapMode = "try";
-  if (state.view !== "map") { location.hash = "#map"; return; }
+  if (state.view !== "map") { state.mapScrollTarget = "sim"; location.hash = "#map"; return; }
   renderMap();
   requestAnimationFrame(() => $("#sim-sec")?.scrollIntoView({ block: "start" }));
 }
@@ -727,12 +762,12 @@ function reviewHtml() {
     ${reviewCard(rv, 3)}
     <div class="row-btns" style="margin-top:-2px">${rv.items.length > 3 ? `<button class="btn ghost" data-reviewfull>残り${rv.items.length - 3}件も見る</button>` : ""}${X.reviews.length > 1 ? `<button class="btn ghost" data-reviews>これまでの答え合わせ</button>` : ""}</div>`;
 }
-function reviewCard(rv, limit = 99) {
+function reviewCard(rv, limit = 99, context = null) {
   const S = new Set();
   return `<article class="card review"><div class="no">${esc(md(rv.target))}の見通し → ${esc(md(rv.reviewed))}に確認</div>
-    <p class="rv-sum">${gl(rv.summary, S)}</p>
+    <p class="rv-sum">${gl(rv.summary, S, context)}</p>
     ${rv.items.slice(0, limit).map(i => `<div class="rv-item"><div class="rv-h"><span class="verdict v-${VERDICT[i.verdict] || "wait"}">${esc(i.verdict)}</span><span class="muted small">${esc(i.theme)}</span></div>
-      <p class="rv-o">「${gl(i.outlook, S)}」</p><p class="rv-a"><b>実際</b>${gl(i.actual, S)}</p><p class="rv-l"><b>学び</b>${gl(i.lesson, S)}</p></div>`).join("")}
+      <p class="rv-o">「${gl(i.outlook, S, context)}」</p><p class="rv-a"><b>実際</b>${gl(i.actual, S, context)}</p><p class="rv-l"><b>学び</b>${gl(i.lesson, S, context)}</p></div>`).join("")}
   </article>`;
 }
 function glossaryHtml() {
@@ -778,8 +813,11 @@ function quizCard(q, key, answered, kind) {
 function answer(key, c) {
   const sc = store.get("score", { right: 0, total: 0 });
   let q;
-  if (key === "g") { if (state.gqAnswered !== null) return; state.gqAnswered = c; q = state.gq; }
-  else { const i = +key.slice(1); if (state.todayAnswers[i] !== undefined) return; state.todayAnswers[i] = c; q = D.quiz[i]; }
+  if (key === "g") { if (state.gqAnswered !== null) return; q = state.gq; }
+  else { const i = +key.slice(1); if (state.todayAnswers[i] !== undefined) return; q = D.quiz?.[i]; }
+  if (!q || !Number.isInteger(c) || c < 0 || c >= q.choices.length) return;
+  if (key === "g") state.gqAnswered = c;
+  else state.todayAnswers[+key.slice(1)] = c;
   sc.total += 1; if (c === q.answer) sc.right += 1;
   store.set("score", sc);
   const y = window.scrollY;
@@ -788,53 +826,157 @@ function answer(key, c) {
 }
 
 // ---------- 週のまとめ ----------
-async function openWeekly(id) {
-  let w = X.weekly && X.weekly.id === id ? X.weekly : null;
+async function openWeekly(id, context = detailContext()) {
+  const origin = { view: state.view, session: sheetOpen ? sheetSession : null, depth: sheetOpen ? sheetDepth : 0 };
+  let w = context.weeks.get(id) || null;
   if (!w) w = await fetch(`data/weekly/${encodeURIComponent(id)}.json`, { cache: "no-cache" }).then(r => (r.ok ? r.json() : null)).catch(() => null);
   if (!w) return;
+  if (state.view !== origin.view || (sheetOpen ? sheetSession : null) !== origin.session || (sheetOpen ? sheetDepth : 0) !== origin.depth) return;
+  context.weeks.set(id, w);
   const S = new Set();
   openSheet(`<p class="cat">週のまとめ・${esc(md(w.from))}〜${esc(md(w.to))}</p><h2>${esc(w.title)}</h2>
-    <div class="q-sec"><div class="q-h">この1週間</div><p>${gl(w.summary, S)}</p></div>
+    <div class="q-sec"><div class="q-h">この1週間</div><p>${gl(w.summary, S, context)}</p></div>
     <div class="q-sec"><div class="q-h">大きな動き</div>
-    ${(w.moves || []).map(m => `<div class="wk-move"><h3>${esc(m.title)}</h3><div class="chain">${chainHtml(m.chain)}</div><p>${gl(m.text, S)}</p></div>`).join("")}</div>
-    ${w.markets ? `<div class="q-sec"><div class="q-h">相場の1週間</div><p>${gl(w.markets, S)}</p></div>` : ""}
-    ${(w.lessons || []).length ? `<div class="q-sec"><div class="q-h">今週わかったつながり</div><ul class="outlook">${w.lessons.map(l => `<li>${gl(l, S)}</li>`).join("")}</ul></div>` : ""}
-    ${(w.next_week || []).length ? `<div class="q-sec"><div class="q-h">来週の注目</div><div class="links">${w.next_week.map(n => `<div class="link-row"><div class="hd"><b>${n.date ? esc(md(n.date)) : "日付未定"}</b><span>${esc(n.event)}</span></div><p class="why">${gl(n.why, S)}</p></div>`).join("")}</div></div>` : ""}
-    ${HINT}`);
+    ${(w.moves || []).map(m => `<div class="wk-move"><h3>${esc(m.title)}</h3><div class="chain">${chainHtml(m.chain)}</div><p>${gl(m.text, S, context)}</p></div>`).join("")}</div>
+    ${w.markets ? `<div class="q-sec"><div class="q-h">相場の1週間</div><p>${gl(w.markets, S, context)}</p></div>` : ""}
+    ${(w.lessons || []).length ? `<div class="q-sec"><div class="q-h">今週わかったつながり</div><ul class="outlook">${w.lessons.map(l => `<li>${gl(l, S, context)}</li>`).join("")}</ul></div>` : ""}
+    ${(w.next_week || []).length ? `<div class="q-sec"><div class="q-h">来週の注目</div><div class="links">${w.next_week.map(n => `<div class="link-row"><div class="hd"><b>${n.date ? esc(md(n.date)) : "日付未定"}</b><span>${esc(n.event)}</span></div><p class="why">${gl(n.why, S, context)}</p></div>`).join("")}</div></div>` : ""}
+    ${HINT}`, context);
 }
 
 // ---------- 下から出る詳細 ----------
 let sheetOpen = false;
-function openSheet(html) {
+let sheetSession = null;
+let sheetDepth = 0;
+let sheetSequence = 0;
+let pendingViewRefresh = false;
+const sheetSessions = new Map();
+const sheetContexts = new Map();
+function captureDetailContext() {
+  return {
+    data: D,
+    extras: { ...X },
+    news: { ...newsById },
+    experts: { ...expertById },
+    threads: { ...threadByName },
+    agenda: state.view === "today" ? [...AGENDA] : agendaItems(),
+    terms: TERMS, aliases: ALIAS, termRe: TERM_RE,
+    sim: state.sim ? { ...state.sim } : null,
+    weeks: new Map(X.weekly ? [[X.weekly.id, X.weekly]] : []),
+  };
+}
+function detailContext() {
+  return sheetOpen ? sheetContexts.get(sheetSession) : captureDetailContext();
+}
+// 戻ったときには、本文だけでなく開閉した欄と読んでいた高さも戻す。
+function rememberSheet() {
+  if (!sheetOpen) return;
+  const frames = sheetSessions.get(sheetSession);
+  if (!frames?.[sheetDepth - 1]) return;
+  frames[sheetDepth - 1] = { html: $("#sheet-body").innerHTML, scroll: $("#sheet").scrollTop };
+}
+function showSheetFrame(session, depth) {
+  const frame = sheetSessions.get(session)?.[depth - 1];
+  if (!frame) return false;
+  sheetSession = session;
+  sheetDepth = depth;
+  sheetOpen = true;
+  $("#sheet-body").innerHTML = frame.html;
+  $("#sheet-back").hidden = depth <= 1;
+  $("#sheet").classList.add("on");
+  $("#scrim").classList.add("on");
+  document.body.style.overflow = "hidden";
+  $("#sheet").scrollTop = frame.scroll;
+  requestAnimationFrame(() => {
+    if (sheetOpen && sheetSession === session && sheetDepth === depth) $("#sheet").scrollTop = frame.scroll;
+  });
+  return true;
+}
+function openSheet(html, context = detailContext()) {
   hideTerm();
-  $("#sheet-body").innerHTML = html;
-  $("#sheet").scrollTop = 0;
+  rememberSheet();
   if (!sheetOpen) {
-    sheetOpen = true;
-    $("#sheet").classList.add("on");
-    $("#scrim").classList.add("on");
-    document.body.style.overflow = "hidden";
-    history.pushState({ sheet: 1 }, "");
+    sheetSession = `${Date.now()}-${++sheetSequence}`;
+    sheetDepth = 0;
+    sheetSessions.set(sheetSession, []);
+    sheetContexts.set(sheetSession, context);
   }
+  const frames = sheetSessions.get(sheetSession).slice(0, sheetDepth);
+  frames.push({ html, scroll: 0 });
+  sheetSessions.set(sheetSession, frames);
+  sheetDepth = frames.length;
+  history.pushState({ ...history.state, kzSheet: sheetSession, kzDepth: sheetDepth }, "");
+  showSheetFrame(sheetSession, sheetDepth);
 }
 function hideSheet() {
+  rememberSheet();
   sheetOpen = false;
   $("#sheet").classList.remove("on");
   $("#scrim").classList.remove("on");
   document.body.style.overflow = "";
+  if (pendingViewRefresh) {
+    const y = window.scrollY;
+    pendingViewRefresh = false;
+    RENDER[state.view]();
+    requestAnimationFrame(() => window.scrollTo(0, y));
+  }
 }
-function closeSheet() { if (sheetOpen) { if (history.state?.sheet) history.back(); else hideSheet(); } }
+function closeSheet() {
+  if (!sheetOpen) return;
+  const depth = history.state?.kzSheet === sheetSession ? sheetDepth : 0;
+  hideSheet();
+  if (depth) history.go(-depth);
+}
+function backSheet() {
+  if (sheetOpen && sheetDepth > 1) history.back();
+}
+function leaveSheetForMap() {
+  if (!sheetOpen) return;
+  hideSheet();
+  // 同じ画面の項目選択ではhashが変わらない。閉じた詳細を現在の履歴に残さない。
+  if (state.view === "map") {
+    const { kzSheet, kzDepth, ...base } = history.state || {};
+    history.replaceState(base, "");
+  }
+}
+function syncSheetHistory() {
+  const hs = history.state;
+  if (hs?.kzSheet && sheetSessions.get(hs.kzSheet)?.[hs.kzDepth - 1]) {
+    if (sheetOpen && sheetSession === hs.kzSheet && sheetDepth === hs.kzDepth) return;
+    rememberSheet();
+    hideTerm();
+    showSheetFrame(hs.kzSheet, hs.kzDepth);
+  } else if (sheetOpen) hideSheet();
+}
 
 // ---------- 画面の切り替え ----------
 const RENDER = { today: renderToday, news: renderNews, map: renderMap, experts: renderExperts, learn: renderLearn };
 function route() {
   const v = (location.hash || "#today").slice(1);
-  state.view = RENDER[v] ? v : "today";
+  const next = RENDER[v] ? v : "today";
+  if (next !== state.view) state.viewScroll[state.view] = window.scrollY;
+  state.view = next;
   $$(".view").forEach(el => el.classList.toggle("on", el.id === "v-" + state.view));
   $$(".nav a").forEach(a => { if (a.dataset.v === state.view) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
   RENDER[state.view]();
-  if (state.view === "map" && state.sim && state.mapMode === "try") requestAnimationFrame(() => $("#sim-sec")?.scrollIntoView({ block: "start" }));
-  else window.scrollTo(0, 0);
+  const target = state.mapScrollTarget;
+  state.mapScrollTarget = null;
+  requestAnimationFrame(() => {
+    if (state.view !== next) return;
+    if (next === "map" && target === "sim") $("#sim-sec")?.scrollIntoView({ block: "start" });
+    else window.scrollTo(0, next === "map" && target === "walk" ? 0 : state.viewScroll[next] || 0);
+  });
+}
+if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+function syncNavigation() {
+  hideTerm();
+  const v = (location.hash || "#today").slice(1);
+  const next = RENDER[v] ? v : "today";
+  if (next !== state.view) {
+    if (sheetOpen) hideSheet();
+    route();
+  }
+  syncSheetHistory();
 }
 
 document.addEventListener("click", ev => {
@@ -844,7 +986,7 @@ document.addEventListener("click", ev => {
     const inCard = ev.target.closest("#termcard");
     if (!inCard) { hideTerm(); if (!ev.target.closest("[data-term]")) { ev.preventDefault(); ev.stopPropagation(); return; } }
     else {
-      if (ev.target.closest("#tc-node")) { const to = $("#tc-node").dataset.to; hideTerm(); openNode(to); }
+      if (ev.target.closest("#tc-node")) { const to = $("#tc-node").dataset.to; const context = termContext; hideTerm(); openNode(to, context); }
       else if (ev.target.closest("#tc-close")) hideTerm();
       return;
     }
@@ -857,14 +999,14 @@ document.addEventListener("click", ev => {
   // history.back() は遅れて効くので、詳細から画面を移るときは閉じるだけにする
   if (ds.sim) {
     const [node, d] = ds.sim.split(":");
-    if (sheetOpen) hideSheet();
+    leaveSheetForMap();
     runSim(node, d === "up" || d === "1" ? 1 : d === "down" || d === "-1" ? -1 : 0);
-  } else if (ds.walkto) { if (sheetOpen) hideSheet(); walkTo(ds.walkto, true); }
+  } else if (ds.walkto) { leaveSheetForMap(); walkTo(ds.walkto, true); }
   else if (ds.walk) walkTo(ds.walk, state.mapMode !== "walk");
   else if (ds.trail) { state.walk = ds.trail === "reset" ? state.walk.slice(0, 1) : state.walk.slice(0, +ds.trail + 1); renderMap(); }
   else if (ds.mapmode) { state.mapMode = ds.mapmode; if (ds.mapmode === "walk" && !state.walk.length) state.walk = [state.simPick]; renderMap(); $(`#v-map .connect-tabs [data-mapmode="${state.mapMode}"]`)?.focus({ preventScroll: true }); }
   else if (ds.picker !== undefined) openPicker();
-  else if (ds.pick) { if (sheetOpen) hideSheet(); state.simPick = ds.pick; if (state.mapMode === "walk") walkTo(ds.pick, true); else runSim(ds.pick, state.simDir); }
+  else if (ds.pick) { leaveSheetForMap(); state.simPick = ds.pick; if (state.mapMode === "walk") walkTo(ds.pick, true); else runSim(ds.pick, state.simDir); }
   else if (ds.simdir) { state.simDir = +ds.simdir; runSim(state.simPick, state.simDir); }
   else if (ds.hop) openHop(ds.hop);
   else if (ds.q !== undefined && ds.c !== undefined) answer(ds.q, +ds.c);
@@ -881,8 +1023,8 @@ document.addEventListener("click", ev => {
   else if (ds.weekly) openWeekly(ds.weekly);
   else if (ds.agenda !== undefined) openAgenda();
   else if (ds.agi !== undefined) openAgendaItem(+ds.agi);
-  else if (ds.reviewfull !== undefined) openSheet(`<p class="cat">答え合わせ</p><h2>見通しの答え合わせ</h2>${reviewCard(X.reviews[0])}${HINT}`);
-  else if (ds.reviews !== undefined) openSheet(`<p class="cat">答え合わせ</p><h2>これまでの答え合わせ</h2>${X.reviews.map(r => reviewCard(r)).join("")}`);
+  else if (ds.reviewfull !== undefined) { const context = detailContext(); if (context.extras.reviews[0]) openSheet(`<p class="cat">答え合わせ</p><h2>見通しの答え合わせ</h2>${reviewCard(context.extras.reviews[0], 99, context)}${HINT}`, context); }
+  else if (ds.reviews !== undefined) { const context = detailContext(); openSheet(`<p class="cat">答え合わせ</p><h2>これまでの答え合わせ</h2>${context.extras.reviews.map(r => reviewCard(r, 99, context)).join("")}`, context); }
   else if (ds.news) openNews(ds.news);
   else if (ds.node) openNode(ds.node);
 }, true);
@@ -892,12 +1034,29 @@ document.addEventListener("keydown", ev => {
 });
 $("#scrim").addEventListener("click", closeSheet);
 $("#sheet-close").addEventListener("click", closeSheet);
-window.addEventListener("popstate", () => { if (sheetOpen) hideSheet(); });
-window.addEventListener("hashchange", () => { hideTerm(); if (sheetOpen) hideSheet(); route(); });
+$("#sheet-back").addEventListener("click", backSheet);
+window.addEventListener("popstate", syncNavigation);
+window.addEventListener("hashchange", syncNavigation);
 
 // ---------- データの読み込みと、新しい内容・新しい版の確認 ----------
 const getJson = u => fetch(u, { cache: "no-cache" }).then(r => (r.ok ? r.json() : null)).catch(() => null);
+const quizIdentity = q => JSON.stringify([q.q, q.choices, q.answer, q.explain, q.nodes || []]);
 function setData(d) {
+  // 問題の番号ではなく内容で照合する。並び替えなら保持し、別問題なら未回答へ。
+  const answered = new Map();
+  for (const [i, q] of (D?.quiz || []).entries()) {
+    if (state.todayAnswers[i] === undefined) continue;
+    const key = quizIdentity(q);
+    if (!answered.has(key)) answered.set(key, []);
+    answered.get(key).push(state.todayAnswers[i]);
+  }
+  const nextAnswers = {};
+  for (const [i, q] of (d?.quiz || []).entries()) {
+    const answers = answered.get(quizIdentity(q));
+    if (answers?.length) nextAnswers[i] = answers.shift();
+  }
+  state.todayAnswers = nextAnswers;
+  if (D && sheetOpen) pendingViewRefresh = true;
   D = d || { brief: { themes: [] }, news: [], experts: [], moving: [], markets: {}, quiz: [] };
   for (const k of Object.keys(newsById)) delete newsById[k];
   for (const k of Object.keys(expertById)) delete expertById[k];

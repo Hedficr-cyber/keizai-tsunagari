@@ -18,6 +18,9 @@ import sys
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
+from news_integrity import same_event, valid_news_tags, clean_news_text
+from scenario_integrity import normalize_case
+
 ROOT = Path(__file__).resolve().parent.parent
 RAW = ROOT / "_work" / "raw" / "collected.json"
 JST = timezone(timedelta(hours=9))
@@ -70,6 +73,8 @@ def tag_schema(nodes):
 
 def main_schema(nodes, cats):
     tag = tag_schema(nodes)
+    scenario_tag = obj({"node": {"type": "string", "enum": nodes},
+                        "dir": {"type": "string", "enum": ["up", "down", "hold"]}})
     return obj({
         "headline": s("今日の世の中の動きを一言で（40字以内）"),
         "themes": arr(obj({
@@ -87,8 +92,7 @@ def main_schema(nodes, cats):
         "news": arr(obj({
             "id": s(), "tags": arr(tag, hi=3),
             "cat": {"type": "string", "enum": cats, "description": "分類を1つ（そのニュースのいちばん大事な面で選ぶ）"},
-            "same": arr(s(), desc="同じ出来事を伝える別の記事のID（この1本にまとめたもの）"),
-            "title_ja": s("英語の記事（[英語]の印）のときだけ、内容がわかる短い日本語の見出し（40字以内）。日本語の記事は空文字"),
+            "title_ja": s("英語の記事だけ短い日本語の見出し（40字以内）。主語・対象・国・輸出入の向きを変えない。原産国の製品と輸出先を取り違えない。日本語の記事は空文字"),
             "plain": s("やさしい要点（60字以内）"), "next": s("この先どうつながるか（70字以内）"),
             "level": {"type": "integer", "minimum": 1, "maximum": 3, "description": "重要度 3=大きい"},
         })),
@@ -110,7 +114,7 @@ def main_schema(nodes, cats):
             "focus": s("何が焦点か（70字以内）"),
             "cases": arr(obj({
                 "label": s("場合の名前（例：予想より利下げに前向き）（25字以内）"),
-                "chain": arr(tag, 2, 5),
+                "paths": arr(arr(scenario_tag, 1, 5), 1, 4, "因果が成立する経路ごとに分ける。並列の影響は別配列。holdは日銀・FRBの据え置きのみ"),
                 "text": s("そうなったときの広がり（90字以内）"),
             }), 2, 2),
         }), 0, 5, "これからの予定ごとの2通りのシナリオ"),
@@ -256,10 +260,12 @@ def build_prompt(graph, raw, experts_cfg, threads):
 ## 作るもの
 - headline: 今日の世の中の動きを一言で。
 - themes: 今日いちばん大事な動きを3〜5個、大事な順に並べる。経済への影響が大きい動きだけにする（情報流出・サイバー攻撃などの事件は、相場や業績を大きく動かしたときだけ）。chain は原因から影響へ、項目を順に並べる（なるべく上の基本の関係に沿う。沿わないつながりは chain_text で理由を書く）。chain の向きは今日実際に起きている向き（相場の数字とニュース）に合わせ、まだ起きていない仮の向きを使うときは chain_text に「もし〜なら」と書く。outlook は「〜かもしれない」で。thread は、上の『流れ』と同じ話題ならその名前をそのまま使い、新しい話題なら短い名前を付ける。つながり図の基本の関係でうまくつながらないときは、chain を2項目にとどめ、無理に項目を足さない。
-- news: 経済・金融・ビジネスに関係し、世の中の流れを知るために押さえておきたいものを30〜50本選び、重要な順に並べる。個人の好みやクリックされやすさでは選ばない。金融政策・為替・物価や景気・企業や産業・海外や政治の動きを広く見渡し、原資料に大事な動きがある分野を落とさない。一つの人気業界や銘柄だけで埋めない。新聞・通信社・経済誌・公的機関・海外の媒体を広く見渡し、同じ大事さなら一つの媒体ばかりにならないようにする。海外の媒体（[英語] を含む）は、日本の経済や世界の流れに関わる大事な動きを拾う。公的機関の発表は、政策や統計として大事なものだけにする。ただし原資料にない話題を分野の穴埋めのために作らない。スポーツ・事件・芸能などは入れない。同じ出来事の続報・別の媒体・見出し違いは、いちばん詳しい1本だけを選び、残りの ID を same に入れる（別の意味を持つ変化だけ分ける）。cat は下の分類から1つ選ぶ（例：日経平均の動き→market、日銀の決定→policy、企業の決算→industry、物価の統計→economy、海外の景気→global、政府の予算や選挙→politics、家計や住宅→life）。情報流出・サイバー攻撃・事件・選挙制度などは、経済への影響がはっきりしているときだけ入れ、level は1にする。level=3 は経済全体に広く影響する動きや重要な政策・統計、level=2 はその分野の流れを知るために押さえる動き、level=1 は補足。plain は見出しの繰り返しだけでなく、何が変わりなぜ押さえたいかを、原資料から分かる範囲の短い一文で書く。tags はそのニュースが動かす項目と向き（関係が薄ければ空でよい）。
+- news: 経済・金融・ビジネスに関係し、世の中の流れを知るために押さえておきたいものを30〜50本選び、重要な順に並べる。個人の好みやクリックされやすさでは選ばない。金融政策・為替・物価や景気・企業や産業・海外や政治の動きを広く見渡し、原資料に大事な動きがある分野を落とさない。一つの人気業界や銘柄だけで埋めない。新聞・通信社・経済誌・公的機関・海外の媒体を広く見渡し、同じ大事さなら一つの媒体ばかりにならないようにする。海外の媒体（[英語] を含む）は、日本の経済や世界の流れに関わる大事な動きを拾う。公的機関の発表は、政策や統計として大事なものだけにする。ただし原資料にない話題を分野の穴埋めのために作らない。スポーツ・事件・芸能などは入れない。同じ国・主体・発表対象・期間の出来事を伝える続報・見出し違いは、いちばん詳しい1本を優先する。別の国・企業・発表・期間は独立した記事として扱う。cat は下の分類から1つ選ぶ（例：日経平均の動き→market、日銀の決定→policy、企業の決算→industry、物価の統計→economy、海外の景気→global、政府の予算や選挙→politics、家計や住宅→life）。情報流出・サイバー攻撃・事件・選挙制度などは、経済への影響がはっきりしているときだけ入れ、level は1にする。level=3 は経済全体に広く影響する動きや重要な政策・統計、level=2 はその分野の流れを知るために押さえる動き、level=1 は補足。plain は見出しの繰り返しだけでなく、何が変わりなぜ押さえたいかを、原資料から分かる範囲の短い一文で書く。tags はそのニュースが動かす項目と向き（関係が薄ければ空でよい）。
+- news の同一判定: 1件には1本の元記事の情報だけを使い、同業他社の決算、別国の金融政策、同じ業界の別の変化を1件へまとめない。plain と next は選んだその記事についてだけ書き、別記事の事実を混ぜない。同じ出来事と確実に分かる記事を重ねて選びすぎず、別の重要な出来事は独立して選ぶ。最終的な統合はアプリ側が国・主体・指標・期間を照合して行う。
+- news の項目札: 国・指標・主体を元のニュースと照合する。「豪州の物価」を「米国の物価」、「海外の中央銀行」を「日銀」「FRB」で代用しない。その項目への影響が見出しや要約にないなら付けない。図に適切な項目がないときは tags を空にする。
 - experts: すべての識者の発信について、その人の見方として読めるかを判断する（relevant）。
 - debates: relevant な識者の発信のなかで、同じ話題について強気と慎重に見方が分かれているもの。無理に作らない。
-- scenarios: 上の予定のうち2週間以内のものそれぞれに、結果が2通りに分かれた場合の広がり。ニュースに日付つきで出てくる大きな予定（米雇用統計・米消費者物価など）があれば足してよい（日付がわからなければ date は空文字）。
+- scenarios: 上の予定のうち2週間以内のものそれぞれに、結果が2通りに分かれた場合の広がり。各caseのpathsには、上の基本の関係の向きと符号が合う因果経路を、1経路ずつ別配列で入れる。日銀の利上げから円高と長期金利上昇へ分かれるなら、日銀→円高 と 日銀→長期金利→住宅ローン の2配列にする。隣接する根拠のない項目や逆符号を矢印で結ばない。日銀・FRBが実際に据え置く条件だけdirをholdにし、holdは単独札にする。「利下げに前向き」「慎重な姿勢」など発言姿勢だけを政策金利の引き下げに置換せず、textで区別する。ニュースに日付つきで出てくる大きな予定（米雇用統計・米消費者物価など）があれば足してよい（日付がわからなければ date は空文字）。
 - moving: 今日のニュースから見て、いま動いている項目と向き。
 - quiz: 今日のニュースを使った3択クイズを3問。つながり（AならB）を考えさせる問題にする。
 - terms: あなたが書いた文章（what・chain_text・outlook・plain・next・view など）に出てくる難しい言葉で、上の用語集にないもの。会社名・人名は入れない。"""
@@ -307,16 +313,23 @@ def run_claude(prompt, schema, name):
 
 def source_stats(cfg, raw, news):
     """媒体ごとの、集めた本数と載せた本数（画面の「集めている媒体」に出す）。"""
-    got, shown = {}, {}
+    got, shown, related = {}, {}, {}
     feed_of = {}
+    feed_by_link = {}
     for i, x in enumerate(raw["news"]):
         got[x["feed"]] = got.get(x["feed"], 0) + 1
         feed_of[f"n{i}"] = x["feed"]
+        feed_by_link[x["link"]] = x["feed"]
     for n in news:
         f = feed_of.get(n["id"])
         shown[f] = shown.get(f, 0) + 1
+        for link in {x.get("link") for x in n.get("related", [])}:
+            feed = feed_by_link.get(link)
+            if feed:
+                related[feed] = related.get(feed, 0) + 1
     return [{"name": s["name"], "group": s.get("group", ""), "lang": s.get("lang", "ja"),
-             "collected": got.get(s["id"], 0), "shown": shown.get(s["id"], 0)} for s in cfg["news"]]
+             "collected": got.get(s["id"], 0), "shown": shown.get(s["id"], 0),
+             "related": related.get(s["id"], 0)} for s in cfg["news"]]
 
 
 def bigrams(t):
@@ -324,12 +337,11 @@ def bigrams(t):
     return {t[i:i + 2] for i in range(len(t) - 1)}
 
 
-def merge_similar(news, limit=0.5):
-    """AI がまとめきれなかった、見出しがほぼ同じ記事を1本にまとめる（上にあるほうを残す）。"""
+def merge_similar(news):
+    """同じ主体・出来事と確認できた記事を1本にまとめる（上にあるほうを残す）。"""
     out, alias = [], {}
     for n in news:
-        b = bigrams(n["title"])
-        twin = next((o for o in out if b and len(b & bigrams(o["title"])) / len(b | bigrams(o["title"])) >= limit), None)
+        twin = next((o for o in out if same_event(o, n)), None)
         if twin:
             twin.setdefault("related", []).append({k: n[k] for k in ("title", "link", "source", "time")})
             twin["related"].extend(n.get("related", []))
@@ -342,6 +354,21 @@ def merge_similar(news, limit=0.5):
 def keyword_tags(title, graph):
     """AI を使わないときの簡易な項目付け（向きは付けない）。"""
     return [{"node": n["id"], "dir": None} for n in graph["nodes"] if any(k in title for k in n["kw"])][:3]
+
+
+def economic_candidate(article):
+    text = " ".join(str(article.get(k) or "") for k in ("title", "summary"))
+    business = re.search(r"経済|金融|株価|決算|売上|収益|投資|市場|予算|税制|減税|増税|補助金|物価|賃金|事業|雇用|契約|放映権|スポンサー|売買|買収", text)
+    if not business and re.search(r"バロンドール|代表選手|試合結果|本塁打|得点王|優勝決定|芸能|熱愛", text):
+        return False
+    if not business and re.search(r"比例定数|議員定数|選挙区の(?:区割り|定数)", text):
+        return False
+    return True
+
+
+def placeholder_news(item):
+    return any(re.fullmatch(r"\s*(?:ダミー|dummy|tbd|仮置き|テストデータ)[。.!]?\s*", str(item.get(k) or ""), re.I)
+               for k in ("plain", "next", "title_ja"))
 
 
 def daily(graph, cfg, raw):
@@ -383,15 +410,26 @@ def daily(graph, cfg, raw):
                 "title": x["title"], "link": x["link"], "source": x["source"], "time": x["time"], **(extra or {})}
 
     now = datetime.now(JST)
-    today = now.date().isoformat()
+    # 保存済み材料を日付をまたいで読み解き直しても、別日の記録を水増ししない。
+    try:
+        today = datetime.fromisoformat(raw["collected"]).astimezone(JST).date().isoformat()
+    except (KeyError, ValueError, TypeError):
+        today = now.date().isoformat()
     moves = market_moves(raw.get("markets", {}))
     debates, scenarios, conflicts = [], [], 0
     if ai:
         news, used, alias = [], set(), {}
+        restored = {}
         cat_ids = {c["id"] for c in graph["cats"]}
 
-        def cat_of(c, tags):
+        def cat_of(c, tags, article=None):
             # 分類は AI が選んだもの。ないときは、いちばん目の項目札の分類
+            if c == "policy" and article:
+                source = " ".join(str(article.get(k) or "") for k in ("title", "summary"))
+                monetary = re.search(r"日銀|日本銀行|FRB|FOMC|中銀|中央銀行|政策金利|利上げ|利下げ", source, re.I)
+                fiscal = re.search(r"補助金|補助|減税|増税|税制|予算|財政支出|給付金", source)
+                if fiscal and not monetary:
+                    return "politics"
             if c in cat_ids:
                 return c
             return next((by_id[t["node"]]["cat"] for t in tags if t["node"] in by_id), "")
@@ -402,21 +440,32 @@ def daily(graph, cfg, raw):
 
         for n in ai.get("news", []):
             i = ref("n", n.get("id"), len(raw["news"]))
-            if i is None or i in used:
+            if i is None or i in used or placeholder_news(n) or not economic_candidate(raw["news"][i]):
                 continue
             used.add(i)
-            tags = ok_tags(n.get("tags"))
+            tags = valid_news_tags(raw["news"][i], ok_tags(n.get("tags")), graph)
             # 同じ出来事の別の記事は、代表の1本の中に「関連記事」として入れる
             related = []
+            rejected_same = False
             for r in n.get("same", []):
                 j = ref("n", r, len(raw["news"]))
-                if j is not None and j not in used:
+                if j is not None and j not in used and j != i and same_event(raw["news"][i], raw["news"][j]):
                     used.add(j)
                     alias[f"n{j}"] = f"n{i}"
                     related.append(brief_item(j))
+                elif j is not None and j not in used and j != i and economic_candidate(raw["news"][j]):
+                    # 同じ出来事と確かめられない記事は、一覧から隠さず独立して残す。
+                    restored.setdefault(j, cat_of(n.get("cat"), []))
+                    rejected_same = True
             extra_ja = {"title_ja": n["title_ja"].strip()} if raw["news"][i].get("lang") == "en" and (n.get("title_ja") or "").strip() else {}
-            news.append(news_item(i, {**extra_ja, "tags": tags, "cat": cat_of(n.get("cat"), tags), "plain": n.get("plain", ""),
-                                      "next": n.get("next", ""), "level": n.get("level", 1), "related": related}))
+            # 統合範囲が誤っていた要約には、別会社等の事実も混ざりうるため採用しない。
+            news.append(news_item(i, {**extra_ja, "tags": tags, "cat": cat_of(n.get("cat"), tags, raw["news"][i]), "plain": "" if rejected_same else clean_news_text(raw["news"][i], n.get("plain", "")),
+                                      "next": "" if rejected_same else clean_news_text(raw["news"][i], n.get("next", "")), "level": n.get("level", 1), "related": related}))
+        for i, cat in restored.items():
+            if i in used:
+                continue
+            used.add(i)
+            news.append(news_item(i, {"tags": [], "cat": cat, "plain": "", "next": "", "level": 1, "related": []}))
         news, more = merge_similar(news)
         alias.update(more)
         experts = []
@@ -430,6 +479,14 @@ def daily(graph, cfg, raw):
         themes = []
         for t in ai.get("themes", []):
             chain = ok_tags(t.get("chain"))
+            refs = [ref("n", r, len(raw["news"])) for r in t.get("news", [])]
+            refs = [i for i in refs if i is not None and economic_candidate(raw["news"][i])]
+            # テーマでも、期待・姿勢だけを実際の政策金利の変更にしない。
+            evidence = {"title": "。".join(raw["news"][i]["title"] for i in refs),
+                        "summary": "。".join(raw["news"][i].get("summary", "") for i in refs)}
+            policies = valid_news_tags(evidence, [c for c in chain if c["node"] in ("boj", "fed")], graph)
+            allowed = {(c["node"], c.get("dir")) for c in policies}
+            chain = [c for c in chain if c["node"] not in ("boj", "fed") or (c["node"], c.get("dir")) in allowed]
             for a, b in zip(chain, chain[1:]):
                 b["known"] = (a["node"], b["node"]) in edge_set
             # 相場の数字（1週間）と逆向きの項目には、実際の動きを添える
@@ -439,7 +496,6 @@ def daily(graph, cfg, raw):
                     n = by_id[c["node"]]
                     c["conflict"] = f"{n['short']}は実際には{n['up'] if mv['dir'] == 'up' else n['down']}方向（{mv['text']}）"
                     conflicts += 1
-            refs = [ref("n", r, len(raw["news"])) for r in t.get("news", [])]
             for i in refs:
                 if i is not None and i not in used:
                     used.add(i)
@@ -451,6 +507,19 @@ def daily(graph, cfg, raw):
                 "news": list(dict.fromkeys(alias.get(f"n{i}", f"n{i}") for i in refs if i is not None)),
                 "experts": [f"e{i}" for i in (ref("e", r, len(raw["experts"])) for r in t.get("experts", [])) if i is not None and f"e{i}" in shown],
             })
+        # テーマから補った元記事も同じ出来事の確認を通し、重複を再投入しない。
+        news, theme_aliases = merge_similar(news)
+        alias.update(theme_aliases)
+        for theme in themes:
+            refs = []
+            for key in theme["news"]:
+                seen = set()
+                while key in alias and key not in seen:
+                    seen.add(key)
+                    key = alias[key]
+                if key not in refs:
+                    refs.append(key)
+            theme["news"] = refs
         brief = {"headline": ai.get("headline", ""), "themes": themes}
         moving = []
         for m in ai.get("moving", []):
@@ -470,7 +539,7 @@ def daily(graph, cfg, raw):
             if len(sides) == 2 and sides[0]["stance"] != sides[1]["stance"]:
                 debates.append({"topic": d.get("topic", ""), "crux": d.get("crux", ""), "sides": sides})
         for sc in ai.get("scenarios", []):
-            cases = [{"label": c.get("label", ""), "chain": ok_tags(c.get("chain")), "text": c.get("text", "")} for c in sc.get("cases", [])]
+            cases = [normalize_case(c, graph, sc.get("event", "")) for c in sc.get("cases", [])]
             if len(cases) == 2:
                 dt = sc.get("date", "")
                 scenarios.append({"event": sc.get("event", ""), "date": dt if re.match(r"^\d{4}-\d{2}-\d{2}$", dt or "") else "",
