@@ -9,7 +9,7 @@
 - UI：グレー／チャコール基調、Noto Sans JP、下のナビはガラス風。スマホのプルダウンは使わず、画面内のボタン（チップ）で選ぶ。ボタンの中にボタンを入れない（`chip(..., { span: true })`）。
 - 表示はすべて `esc()` を通し、外部リンクは https だけ（`safeUrl`）。CSP は index.html。
 - **公開（2026-10-28 本人指示「公開して自動更新」）**：https://hedficr-cyber.github.io/keizai-tsunagari/ （リポジトリ Hedficr-cyber/keizai-tsunagari、main をそのまま配信、`.nojekyll` あり）。push はこのフォルダの credential.helper（gh）で AI のシェルから通る。コミットの名前は Hedficr-cyber の noreply（個人のメールを公開しない）。
-- **自動更新**：Mac の launchd が 7:00・12:00・18:00 に `~/Library/Application Support/keizai-app/repo/tools/auto_update.py` を動かし、`data/` をコミットして push する。そのため **このフォルダで作業する前に必ず `git pull`**（公開側のデータが先に進んでいる）。runtime の写しは毎回 reset されるので、そちらは直さない。
+- **自動更新**：Mac の launchd が毎時5分に `~/Library/Application Support/keizai-app/repo/tools/auto_update.py` を動かす。毎回収集し、下記の条件を満たした回に読み解いて `data/` をコミットして push する。そのため **このフォルダで作業する前に必ず `git pull`**（公開側のデータが先に進んでいる）。runtime の写しは毎回 reset されるので、そちらは直さない。
 - 画面の部品は Service Worker が手元に保存する。js/css/index.html を変えたら `sw.js` の `CACHE` と `js/versions.js`・`CHANGELOG.md` の版を上げる。
 - **v0.3.0（2026-10-28 本人指示「修正から直す」「改善案は E と G 以外を実行」）**：予定とシナリオ（A）・答え合わせ（B）・流れ（C）・見方が分かれている点（D）・週のまとめ（F）を入れた。E（関心のある項目を選ぶ）と G（自分の予想メモ）は本人が不要とした。
 - 公開ページの読み取りで、相手が機械を断っている所（米労働省など）や、規約で機械の読み取りを禁じている所（YouTube の動画一覧ページ）は使わない。YouTube は公式の Data API（キーは Mac の `~/Library/Application Support/keizai-app/youtube_api_key`、リポジトリに入れない）。
