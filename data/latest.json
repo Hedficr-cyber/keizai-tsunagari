@@ -1,19 +1,19 @@
 {
- "updated": "2026-11-03T18:07:33+09:00",
- "collected": "2026-11-03T18:05:06+09:00",
+ "updated": "2026-11-03T21:53:14+09:00",
+ "collected": "2026-11-03T20:12:01+09:00",
  "ai": {
   "model": "sonnet",
-  "cost_usd": 0.5564446000000001,
-  "ms": 127959
+  "cost_usd": 0.6192364,
+  "ms": 215032
  },
  "brief": {
-  "headline": "米中間選挙前夜、原油急落でドル安・金利低下",
+  "headline": "中間選挙前夜、イラン交渉期待で原油急落、AI株は重い",
   "themes": [
    {
-    "title": "原油急落とイラン情勢",
-    "point": "外交期待で原油が急落",
+    "title": "原油急落とイラン交渉",
+    "point": "和平期待で原油が大きく下げた",
     "thread": "原油と地政学",
-    "what": "トランプ氏がイランとの合意はあり得ると発言。原油先物は7％超下落した。一方で米軍はイランの島を限定攻撃した。",
+    "what": "トランプ氏がイランとの合意はあり得ると発言した。原油先物は7%超下げ、その後は1バレル106ドル前後で落ち着いた。米軍は限定攻撃も行った。",
     "chain": [
      {
       "node": "geopolitics",
@@ -25,71 +25,72 @@
       "known": true
      },
      {
-      "node": "import_prices",
+      "node": "us_cpi",
       "dir": "down",
       "known": true
      }
     ],
-    "chain_text": "外交への期待で地政学リスクが和らぎ、原油が下落。原油安は輸入物価の下押しにつながる。ただ原油は106ドル台と高く、協議の行方しだいで戻る可能性もある。",
+    "chain_text": "交渉への期待で地政学リスクが和らぎ、原油が下げた。原油安は米国の物価の押し下げ要因になる。ただ米軍の攻撃も続き、先行きは不透明。",
     "outlook": [
-     "協議が進めば原油安が続くかもしれない",
-     "協議が止まれば原油が再び上がる可能性がある"
+     "交渉が進めば原油安が続き、物価の重しが軽くなるかもしれない",
+     "交渉が崩れれば原油が再び上がる可能性がある"
     ],
-    "watch": "米イラン協議の進展と原油価格",
+    "watch": "米イランの仲介案の行方と、中間選挙後の米国の動き",
     "news": [
-     "n197",
-     "n131",
-     "n27",
-     "n15",
-     "n240"
+     "n228",
+     "n21",
+     "n82",
+     "n170",
+     "n46",
+     "n7"
     ],
     "experts": []
    },
    {
     "title": "米中間選挙と市場",
-    "point": "選挙通過を前に様子見ムード",
+    "point": "投票を前に様子見が広がった",
     "thread": "米政治と市場",
-    "what": "米中間選挙の投票が始まる。ドル円は157円台後半で小動き。米長期金利は4.91％に低下した。",
+    "what": "米中間選挙が3日に投票された。物価高が争点で、為替や株は持ち高調整が目立った。米10年債利回りは4.91%で、1週間前より低い。",
     "chain": [
      {
-      "node": "risk_off",
+      "node": "us_cpi",
       "dir": "up"
+     },
+     {
+      "node": "fiscal",
+      "dir": "up",
+      "known": false
      },
      {
       "node": "ust10",
       "dir": "down",
-      "known": true
-     },
-     {
-      "node": "usdjpy",
-      "dir": "down",
-      "known": true,
-      "conflict": "ドル円は実際には円安方向（1週間で 157.45→157.9円（+0.45円））"
+      "known": false
      }
     ],
-    "chain_text": "選挙前の持ち高調整や原油安でドルが売られ、米長期金利が下がった。ドル円は小幅に動いただけで、上値の重さが意識された。",
+    "chain_text": "物価高への不満が選挙の焦点になっている。結果次第で財政や政策が変わりうる。今日は米金利がやや下がり、結果待ちの動きだった。",
     "outlook": [
-     "選挙結果で議会の勢力が変われば政策期待が動くかもしれない",
-     "データセンター投資への影響が意識される可能性がある"
+     "民主党が議会を握れば、政策運営の見方が変わるかもしれない",
+     "結果が出たあとに相場が大きく動く可能性がある"
     ],
-    "watch": "中間選挙の結果と市場の反応",
+    "watch": "選挙結果と、その後の株・金利・ドルの反応",
     "news": [
-     "n4",
-     "n143",
-     "n160",
-     "n19",
-     "n192"
+     "n55",
+     "n93",
+     "n88",
+     "n179",
+     "n72",
+     "n286"
     ],
     "experts": [
-     "e0",
-     "e9"
+     "e9",
+     "e0"
     ]
    },
    {
-    "title": "AI株の調整",
-    "point": "AI投資への不安で株が下落",
+    "title": "AI投資への不安と株",
+    "point": "巨額投資への懸念でAI株が下げた",
     "thread": "AI相場",
-    "what": "ナスダック100が今年3度目の調整局面に入った。AI企業の巨額の資金調達が相次ぎ、アップルは利益率低下を警告した。",
+    "what": "ナスダック100が今年3度目の調整局面に入った。アップルは利益率の懸念で売られた。オラクルなどは巨額の資金調達を進めている。",
     "chain": [
      {
       "node": "ai_semis",
@@ -106,18 +107,19 @@
       "known": true
      }
     ],
-    "chain_text": "AI投資の拡大そのものは続くが、資金負担や採算への不安から株価は下がっている。米株安は日本株にも波及しやすい。",
+    "chain_text": "AI投資の拡大は続くが、資金負担を市場が嫌っている。米株の下落は日本株にも波及しやすい。AI投資が減ったという意味ではない。",
     "outlook": [
-     "資金調達が続けば不安が長引くかもしれない",
-     "選挙後に買い戻しが出る可能性もある"
+     "資金調達が膨らめば、AI株の値動きが荒くなるかもしれない",
+     "業績が強ければ、再び買われる可能性もある"
     ],
-    "watch": "AI関連企業の決算と社債・株式の発行",
+    "watch": "大手ハイテクの社債発行と、AI関連の決算",
     "news": [
-     "n234",
-     "n125",
-     "n106",
-     "n105",
-     "n222"
+     "n166",
+     "n17",
+     "n148",
+     "n222",
+     "n292",
+     "n230"
     ],
     "experts": [
      "e3",
@@ -125,27 +127,37 @@
     ]
    },
    {
-    "title": "世界の金融引き締め",
-    "point": "豪中銀が18年ぶり高水準へ利上げ",
+    "title": "日米金利と豪の利上げ",
+    "point": "豪が利上げ、日米は金利が低下",
     "thread": "日米の金融政策",
-    "what": "オーストラリア中銀が政策金利を4.85％に引き上げた。日銀は10月30日に1.25％で据え置いた。",
+    "what": "豪中銀が政策金利を4.85%に上げた。日本の10年債利回りは2.817%、ドル円は157.9円だった。日銀は10月30日に1.25%で据え置いた。",
     "chain": [
      {
-      "node": "usdjpy",
+      "node": "ust10",
+      "dir": "down"
+     },
+     {
+      "node": "jgb10",
       "dir": "down",
-      "conflict": "ドル円は実際には円安方向（1週間で 157.45→157.9円（+0.45円））"
+      "known": true
+     },
+     {
+      "node": "usdjpy",
+      "dir": "up",
+      "known": false
      }
     ],
-    "chain_text": "もし日銀が利上げに進めば円高要因になる。市場では12月か来年1月の利上げ観測がある。",
+    "chain_text": "日米の長期金利は1か月前より低い。ドル円は157円台後半で大きく動いていない。日銀の次の利上げは12月か来年1月との見方がある。",
     "outlook": [
-     "日銀の次回利上げ時期の観測が強まるかもしれない",
-     "世界で引き締めが続く可能性がある"
+     "日銀が利上げに近づけば、円高に向かうかもしれない",
+     "米金利が下がれば、ドル高は一服する可能性がある"
     ],
-    "watch": "植田総裁の発言と日本のGDP",
+    "watch": "11月16日の日本のGDPと、日銀の次の動き",
     "news": [
-     "n29",
-     "n57",
-     "n210"
+     "n84",
+     "n179",
+     "n58",
+     "n97"
     ],
     "experts": [
      "e4"
@@ -157,47 +169,52 @@
   {
    "node": "oil",
    "dir": "down",
-   "why": "イランとの外交期待で先物が急落した"
-  },
-  {
-   "node": "ust10",
-   "dir": "down",
-   "why": "原油安と選挙前の動きで利回りが低下した"
-  },
-  {
-   "node": "us_stocks",
-   "dir": "down",
-   "why": "AI投資への不安でナスダックが調整入り"
+   "why": "米イラン交渉への期待で原油が急落した"
   },
   {
    "node": "geopolitics",
    "dir": "down",
-   "why": "米イラン協議への期待が出ている"
+   "why": "合意期待が出た。ただ限定攻撃は続く"
+  },
+  {
+   "node": "us_stocks",
+   "dir": "down",
+   "why": "AI投資の負担への不安でナスダックが調整局面に"
+  },
+  {
+   "node": "ust10",
+   "dir": "down",
+   "why": "1週間前の5.0%から4.91%に低下"
   },
   {
    "node": "jgb10",
    "dir": "down",
-   "why": "10月30日は2.817％で1か月前より低い"
+   "why": "1か月前の3.057%から2.817%に低下"
   },
   {
-   "node": "ai_semis",
+   "node": "usdjpy",
    "dir": "up",
-   "why": "AI企業の売上と資金調達が拡大している"
+   "why": "157.9円と1週間前よりやや円安"
+  },
+  {
+   "node": "nikkei",
+   "dir": "down",
+   "why": "AI関連の売りで小幅に値下がりした"
   }
  ],
  "news": [
   {
-   "id": "n197",
+   "id": "n228",
    "title": "原油先物7％超下落、イラン巡る協議で戦争終結に期待",
    "link": "https://news.google.com/rss/articles/CBMif0FVX3lxTE9vY3U1Uk0tLWYyXy1WYm84OHMtMFVGWFFoaklKWFYwdGk2b1BJZXF0UlZBTU5NWTRPRWhBbnJxZmdmR3laS0RBUmRvclYxVEZaZ1RzMEhjVVdvMjRtVWhPTjRqWWZ3cE9KRmRKUGw1OE1lM3ZMOGZJUU9QdHA1TTA?oc=5",
    "source": "Reuters",
    "time": "2026-11-03T05:43:44+09:00",
    "group": "新聞・放送・通信",
-   "plain": "原油先物が7％超下落した。イランをめぐる協議で戦争終結への期待が高まったためと伝えられた。",
-   "context": "原油は中東の緊張で値上がりしやすく、外交で緊張が和らぐと売られやすい。原油は輸入物価や物価全体に響く。",
-   "impact": "協議が止まれば再び上がるかもしれない。",
+   "plain": "原油先物が7%超下落した。イランをめぐる協議で戦争が終わるとの期待が出たため。",
+   "context": "原油は中東の供給不安で値が動く。協議が進むと供給途絶の心配が薄れ、売られやすい。",
+   "impact": "原油安が続けば、ガソリンや電気代、輸入コストの負担が軽くなる可能性がある。協議が崩れれば再び上がるかもしれない。",
    "watch": "米イラン協議の進展と原油価格の水準",
-   "next": "原油安が続けば物価高が和らぐ可能性",
+   "next": "原油安は物価の重しを軽くするかもしれない",
    "tags": [
     {
      "node": "oil",
@@ -209,17 +226,65 @@
    "related": []
   },
   {
-   "id": "n131",
+   "id": "n21",
+   "title": "Oil prices steady at $106 after sharp declines",
+   "link": "https://www.ft.com/content/d0ab9542-8542-4357-a534-ddbdd1a9678d?syn-25a6b1a6=1",
+   "source": "Financial Times",
+   "time": "2026-11-03T19:16:52+09:00",
+   "group": "海外（英語）",
+   "title_ja": "急落後、原油は106ドルで安定",
+   "plain": "中東の動きを見極める局面。",
+   "context": "大きな値動きのあとは、材料待ちで横ばいになりやすい。",
+   "impact": "水準はまだ高く、エネルギー負担は残る。協議の結果次第で再び動く可能性がある。",
+   "watch": "中東の外交と軍事の続報",
+   "next": "高水準が続けば負担は残る",
+   "tags": [
+    {
+     "node": "oil",
+     "dir": "down"
+    }
+   ],
+   "cat": "market",
+   "level": 2,
+   "related": [],
+   "lang": "en"
+  },
+  {
+   "id": "n82",
+   "title": "US strikes Iran’s Qeshm Island on eve of election",
+   "link": "https://www.ft.com/content/ebeaca62-8958-459a-be9d-d3d39e441a53?syn-25a6b1a6=1",
+   "source": "Financial Times",
+   "time": "2026-11-03T15:44:35+09:00",
+   "group": "海外（英語）",
+   "title_ja": "米、選挙前夜にイランのゲシュム島を攻撃",
+   "plain": "米軍がイランのゲシュム島を攻撃した。米側は、地対空ミサイルへの防衛措置だと説明している。原油は横ばいだった。",
+   "context": "限定的な攻撃は大規模作戦と区別される。市場は規模の拡大があるかを見る。",
+   "impact": "衝突が広がれば原油が上がるかもしれない。限定的にとどまれば相場への影響は小さい可能性がある。",
+   "watch": "追加攻撃の有無とイラン側の反応",
+   "next": "拡大すれば原油高の要因になる",
+   "tags": [
+    {
+     "node": "geopolitics",
+     "dir": "up"
+    }
+   ],
+   "cat": "politics",
+   "level": 2,
+   "related": [],
+   "lang": "en"
+  },
+  {
+   "id": "n170",
    "title": "トランプ氏、イランとの合意「実現あり得る」　中間選挙前日に発言",
    "link": "https://www.cnn.co.jp/usa/35254305.html?ref=rss",
    "source": "CNN.co.jp",
    "time": "2026-11-03T08:42:00+09:00",
    "group": "海外（日本語）",
-   "plain": "トランプ氏は中間選挙前日に、イランとの合意が実現する可能性があると述べた。戦争でガソリン価格が上がり、支持率が下がっている。",
-   "context": "ガソリン高は米家計の負担になり、政権への評価に響く。外交姿勢は原油相場にも影響する。",
-   "impact": "合意に進めば原油安と地政学リスクの低下につながる可能性がある。発言だけでは実現は不確かだ。",
-   "watch": "イラン側の対応と協議の具体的な日程",
-   "next": "合意期待が原油安を支える可能性",
+   "plain": "トランプ氏が、イランとの合意は実現する可能性があると述べた。戦争でガソリン価格が上がり、支持率が下がっていると報じられている。",
+   "context": "燃料価格は有権者の生活に直結し、選挙の争点になりやすい。",
+   "impact": "合意に進めば原油安と地政学リスクの低下につながるかもしれない。発言だけでは実現は決まらない。",
+   "watch": "合意に向けた具体的な動き",
+   "next": "合意なら原油安に向かう可能性",
    "tags": [
     {
      "node": "geopolitics",
@@ -231,98 +296,108 @@
     }
    ],
    "cat": "politics",
-   "level": 3,
+   "level": 2,
    "related": []
   },
   {
-   "id": "n27",
-   "title": "US strikes Iran’s Qeshm Island on eve of election",
-   "link": "https://www.ft.com/content/ebeaca62-8958-459a-be9d-d3d39e441a53?syn-25a6b1a6=1",
-   "source": "Financial Times",
-   "time": "2026-11-03T15:44:35+09:00",
-   "group": "海外（英語）",
-   "title_ja": "米、選挙前夜にイランのゲシュム島を攻撃",
-   "plain": "米国は選挙前夜にイランのゲシュム島を攻撃した。米側は地対空ミサイルへの防衛措置だと説明し、原油価格は横ばいだった。",
-   "context": "限定的な攻撃は市場への影響が小さいこともあるが、緊張が広がれば原油に響く。",
-   "impact": "攻撃が限定的なら相場への影響は小さい。拡大すれば原油高やリスク回避につながるかもしれない。",
-   "watch": "イランの反応と追加攻撃の有無",
-   "next": "攻撃拡大なら原油高の恐れ",
-   "tags": [],
-   "cat": "politics",
-   "level": 2,
-   "related": [],
-   "lang": "en"
-  },
-  {
-   "id": "n15",
-   "title": "Oil prices steady at $106 after sharp declines",
-   "link": "https://www.ft.com/content/d0ab9542-8542-4357-a534-ddbdd1a9678d?syn-25a6b1a6=1",
-   "source": "Financial Times",
-   "time": "2026-11-03T16:32:45+09:00",
-   "group": "海外（英語）",
-   "title_ja": "原油は急落後106ドルで安定",
-   "plain": "原油価格は大きく下げた後、106ドル前後で落ち着いた。市場は中東情勢の展開を見守っている。",
-   "context": "急落後は方向感が出にくく、情勢のニュースで動きやすい。",
-   "impact": "高い水準が続けば燃料費の負担は残る。協議が進めばさらに下がる可能性がある。",
-   "watch": "中東情勢の続報",
-   "next": "高値圏で情勢待ち",
-   "tags": [
-    {
-     "node": "oil",
-     "dir": "down"
-    }
-   ],
-   "cat": "market",
-   "level": 2,
-   "related": [],
-   "lang": "en"
-  },
-  {
-   "id": "n240",
-   "title": "イラン最高指導者、和平協議の権限を政府に付与－外交進展の可能性",
-   "link": "https://news.google.com/rss/articles/CBMid0FVX3lxTE5fQktBQWRkVjFwV3NhTEdJamRzNXlDVTVjYUJDMENCWEtKQkZteXB6V3pzZ0E0UlFsOEYwdGhRZF9QTXV6WGY0U28wWUUtb0pnd1NETU1EQ25fRElvcUxvSlhiWHdvcXo3SnRhZkZUOXlQUS1Jd0g0?oc=5",
+   "id": "n46",
+   "title": "米・イラン、仲介国の最新案を検討－全面戦争の再燃回避へ",
+   "link": "https://news.google.com/rss/articles/CBMid0FVX3lxTE82TVhTaGF1ZUNYR2cyWWNRRVlkbTE5U1loeGQ4TjB2UmpBUWZiRTR1bndjLWVBVmo2bVRJMlg4ajZ0VkZFQ3BIY2pISWZWNExUVFl0S0hsczBUYWd1MS03NkdUQnpHOF9VUUR5eHlLb3l2YUREY3dB?oc=5",
    "source": "Bloomberg.com",
-   "time": "2026-11-02T23:44:06+09:00",
+   "time": "2026-11-03T18:17:20+09:00",
    "group": "新聞・放送・通信",
-   "plain": "イランの最高指導者が、和平協議の権限を政府に与えた。外交が進む可能性が報じられた。",
-   "context": "交渉の権限が明確になると、協議が進みやすくなる。",
-   "impact": "協議が進めば原油安につながる可能性がある。進まなければ失望で原油が戻るかもしれない。",
-   "watch": "イラン政府の交渉姿勢",
-   "next": "外交進展が原油安材料に",
+   "plain": "全面戦争の再燃を避けるねらい。",
+   "context": "仲介国が案を出すと、双方が条件を検討する段階に入る。",
+   "impact": "合意できれば緊張が和らぎ、市場が落ち着くかもしれない。",
+   "watch": "両国の回答",
+   "next": "回答次第で相場が動く",
    "tags": [],
    "cat": "politics",
    "level": 2,
    "related": []
   },
   {
-   "id": "n4",
+   "id": "n7",
+   "title": "Oil has had a massive run, but a prominent bull sees a turning point on midterm eve",
+   "link": "https://www.marketwatch.com/story/oil-has-had-a-massive-run-but-a-prominent-bull-sees-a-turning-point-on-midterm-eve-be2c5fa7?mod=mw_rss_topstories",
+   "source": "MarketWatch",
+   "time": "2026-11-03T19:54:00+09:00",
+   "group": "海外（英語）",
+   "title_ja": "原油は急上昇、強気派は転換点とみる",
+   "plain": "著名な原油ストラテジストは、今年の上昇で利益を確定する時期だとみる。ただ、長期の強気見通しは変えていない。",
+   "context": "価格が大きく上がると、利益確定売りが出やすい。",
+   "impact": "短期の下げ余地を意識する見方が増えれば、原油が動きやすくなるかもしれない。",
+   "watch": "選挙後の原油の方向",
+   "next": "短期は調整の可能性",
+   "tags": [],
+   "cat": "market",
+   "level": 1,
+   "related": [],
+   "lang": "en"
+  },
+  {
+   "id": "n55",
    "title": "米中間選挙の投票開始へ、上下両院の多数派争う－政権2期目の審判",
    "link": "https://news.google.com/rss/articles/CBMijgFBVV95cUxPdzJUOTN0MU41WmpmS2xRNllBSGxtVFZ1VkVOX3h3R01jS2VVWWhDTHJ5U3QzbXJ3M1VnUFJZOEpaNWVLSXpEWmxZZ29oQW9BbGdRS2FDMDJ5aUotZEdOOG1xQjA3LXUwYTlMNG45U0VUSU9qRnQ1RE9VWlJyOVR6V2lqSXlQT1p2aS1aeEdn?oc=5",
    "source": "Bloomberg.com",
    "time": "2026-11-03T17:41:30+09:00",
    "group": "新聞・放送・通信",
-   "plain": "米中間選挙の投票が始まる。上下両院の多数派を争い、政権2期目の審判となる。",
-   "context": "議会の多数派は予算や政策の実現力を左右し、市場の見方にも影響する。",
-   "impact": "勢力が変われば政策の進み方が変わり、金利や株価に影響するかもしれない。",
-   "watch": "開票結果と上下両院の勢力",
-   "next": "結果次第で政策期待が変化",
+   "plain": "米中間選挙の投票が始まる。上下両院の多数派を争い、政権2期目への審判となる。",
+   "context": "議会の多数派は予算や法案を左右し、政策の実行力に影響する。",
+   "impact": "与党が過半数を失えば政策が通りにくくなり、市場の見方が変わるかもしれない。",
+   "watch": "開票の進み具合",
+   "next": "結果で政策期待が動く",
    "tags": [],
    "cat": "politics",
    "level": 3,
    "related": []
   },
   {
-   "id": "n143",
+   "id": "n93",
+   "title": "今夜のNEXT 米中間選挙きょう投票、トランプ氏への審判は？",
+   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE1XZDhBQlF6YS1PVGFFMHJKcHJGSXpwVXRHYVkxbWdVVGx0N1ljSEJFb3NhUURtczJHWkFZSGw2R1ZYMHhnX0ZHVUo0Vmw4a1NLbG95SmQwMS1fREdqZUo5Q2tMRmtpWDRfamFqVA?oc=5",
+   "source": "日本経済新聞",
+   "time": "2026-11-03T15:00:00+09:00",
+   "group": "新聞・放送・通信",
+   "plain": "米中間選挙がきょう投票される。トランプ氏への審判が焦点。",
+   "context": "",
+   "impact": "結果によって株や為替が動く可能性がある。",
+   "watch": "主要選挙区の結果",
+   "next": "結果待ちの様子見が続く",
+   "tags": [],
+   "cat": "politics",
+   "level": 2,
+   "related": []
+  },
+  {
+   "id": "n88",
+   "title": "トランプ政権で物価7％上昇 目玉政策が裏目、共和党に逆風",
+   "link": "https://news.google.com/rss/articles/CBMiS0FVX3lxTE0yVUVLN004SzQwaV9HaHplWXVYRG5JWlZCa1ZMRGhUZUU2WEY1WWRlLWF5ZjRxcUo4RlpOWGE4ZXRhSUNlNzlYZVBhVQ?oc=5",
+   "source": "47NEWS",
+   "time": "2026-11-03T15:17:21+09:00",
+   "group": "新聞・放送・通信",
+   "plain": "トランプ政権下で物価が7%上昇したと報じられた。目玉政策が裏目に出て、共和党に逆風になっている。",
+   "context": "物価高は有権者の不満を高め、選挙結果に響きやすい。",
+   "impact": "物価高が続けば、利下げがしにくくなるかもしれない。",
+   "watch": "",
+   "next": "物価高が続けば金利に影響",
+   "tags": [],
+   "cat": "economy",
+   "level": 2,
+   "related": []
+  },
+  {
+   "id": "n179",
    "title": "NY円相場、反落 1ドル=157円90銭〜158円00銭 選挙前の持ち高調整",
    "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTFAxRnhza3dtWkJhU0x0ajkzcG5KcjJaZTgzYkVKbThLOGNvRmkzdWZMMVJhWEFDekJUQmxkRnZ1YXBWM01QNXhpZEp6UjBxRmEwVXJLWVQ4aWpEMEczT1VQeXNLRnRmbzlZZTJteQ?oc=5",
    "source": "日本経済新聞",
    "time": "2026-11-03T08:06:00+09:00",
    "group": "新聞・放送・通信",
-   "plain": "NY円相場は反落し、1ドル=157円90銭〜158円00銭だった。選挙前の持ち高調整が背景とされた。",
-   "context": "重要イベントの前は、損失を避けるため取引を整理する動きが出やすい。",
-   "impact": "結果次第で円相場が動く可能性",
-   "watch": "",
-   "next": "結果次第で円相場が動く可能性",
+   "plain": "NY円相場は反落し、1ドル=157円90銭〜158円00銭だった。選挙前の持ち高調整が出た。",
+   "context": "大きな選挙の前は、投資家が持ち高を整理して値動きが小さくなりやすい。",
+   "impact": "結果次第でドルの方向が決まるかもしれない。158円近辺では警戒も出やすい。",
+   "watch": "選挙後のドル円",
+   "next": "結果でドルが動く可能性",
    "tags": [
     {
      "node": "usdjpy",
@@ -334,86 +409,52 @@
    "related": []
   },
   {
-   "id": "n160",
-   "title": "ＮＹ市場サマリー（2日）ドル軟調、長期債利回り低下 Ｓ＆Ｐ下落",
-   "link": "https://news.google.com/rss/articles/CBMifkFVX3lxTE82cTJFSFdKa2drWG5uRTExUDFoNGdyNzFpbWJZUWpvbVFDZVZCWXdWZGhBRWtrN3p0Z3hJSmh1ZjJOMGRodVlJcFRwcXI3QlE0eDViQ2hEWnF3WjhlZ0dFWVZvb0RqcWpMYjI0Q1lwdmQ1MVJvRk1WLXgzZlJ5Zw?oc=5",
-   "source": "Reuters",
-   "time": "2026-11-03T07:12:18+09:00",
-   "group": "ニュースのまとめ",
-   "plain": "2日のNY市場はドルが軟調で、長期債利回りが低下し、S&Pが下落した。",
-   "context": "原油安で物価不安が和らぐと、債券が買われ利回りが下がりやすい。",
-   "impact": "金利低下が続けばドル安・円高圧力になるかもしれない。",
-   "watch": "",
-   "next": "金利低下がドル安要因に",
-   "tags": [],
-   "cat": "market",
-   "level": 2,
-   "related": []
-  },
-  {
-   "id": "n19",
+   "id": "n72",
    "title": "米株調整は「最終局面」、モルガンＳ 中間選挙通過で買いの機会",
    "link": "https://news.google.com/rss/articles/CBMihgFBVV95cUxQTl9HTDlnNEtDSEZqaGo2MHByRFNBQV9nLWRSZFJLWmhkaXp1WTlxVGM5cTVMdTd6OElLSWJEc1Rpd2dMMEJsUFRBTVJvUHNzMVZvSFdYXy1TZ2g4UmZlZjR4RWt6U0ZoaDJybXpuVGNMaV81RUwyVWNMR19BU2RnYXcxVkJ4QQ?oc=5",
    "source": "Reuters",
    "time": "2026-11-03T16:19:00+09:00",
-   "group": "新聞・放送・通信",
-   "plain": "モルガン・スタンレーは、米株の調整は最終局面で、中間選挙を通過すれば買いの機会になるとみている。",
-   "context": "イベント通過で不透明感が薄れると、株が買い戻されることがある。",
-   "impact": "選挙後に不安が和らげば、株価が持ち直すかもしれない。ただし一つの見方にすぎない。",
-   "watch": "選挙後の株価と業績発表",
-   "next": "選挙後の反発余地を指摘",
+   "group": "ニュースのまとめ",
+   "plain": "モルガン・スタンレーは、米株の調整は最終局面とみている。中間選挙を通過すれば買いの機会になるとの見方。",
+   "context": "選挙後は不確実性が減り、相場が落ち着くことがある。",
+   "impact": "見方どおりになる保証はない。AI株の不安が続けば下げが長引く可能性もある。",
+   "watch": "選挙後の株価",
+   "next": "不安が減れば反発も",
    "tags": [],
    "cat": "market",
    "level": 1,
    "related": []
   },
   {
-   "id": "n192",
-   "title": "米中間選挙、民主党勝利ならデータセンター建設にブレーキか…プライベートクレジット経由で金融市場を揺るがす？",
-   "link": "https://jbpress.ismedia.jp/articles/-/97836?utm_source=ldr&utm_medium=feed&utm_campaign=link&utm_content=link",
-   "source": "JBpress",
-   "time": "2026-11-03T06:00:00+09:00",
-   "group": "経済誌・ネットメディア",
-   "plain": "民主党が勝てばデータセンター建設に歯止めがかかり、民間融資を通じて金融市場に響く可能性があると論じる記事。",
-   "context": "データセンターは大きな借入で建てられることが多く、規制は資金の流れに響く。",
-   "impact": "建設が鈍ればAI関連の投資計画に影響するかもしれない。見通しの一つだ。",
-   "watch": "選挙結果と議会のAI・電力政策",
-   "next": "AI投資に政治リスク",
-   "tags": [],
-   "cat": "politics",
-   "level": 2,
-   "related": []
-  },
-  {
-   "id": "n234",
-   "title": "【米国市況】ナスダック100指数が調整局面入り、半導体株売り続く",
-   "link": "https://news.google.com/rss/articles/CBMid0FVX3lxTE1kRTUyOFdUMU9WYnlSb29ZRkpLYjRNZXZfX0dNYlhlTnNhekR4VEhNdnpoQzRKalN5X2x2RDMxbjdnbVZiNG5NMmxySldTU1RfT3dxMWJpQ0lvVVNiVXowV1dGb001ZjFUZWNNcHEtMUdhVF9qZU9R?oc=5",
-   "source": "Bloomberg.com",
-   "time": "2026-11-03T01:01:36+09:00",
+   "id": "n286",
+   "title": "米中間選挙で民主勝利なら株価、金利、為替どう動く　専門家の読みは",
+   "link": "https://www.asahi.com/articles/ASVC22J5WVC2ULFA00YM.html?ref=rss",
+   "source": "朝日新聞",
+   "time": "2026-11-02T18:11:44+09:00",
    "group": "新聞・放送・通信",
-   "plain": "ナスダック100指数が調整局面に入った。半導体株の売りが続いた。",
-   "context": "高値から一定以上下がると調整局面と呼ばれる。",
-   "impact": "",
-   "watch": "半導体株の値動きと決算",
-   "next": "",
+   "plain": "民主党が勝った場合の株価・金利・為替の動きについて、専門家の読みを紹介する記事。",
+   "context": "議会の勢力図が変わると、財政や規制の見通しが変わる。",
+   "impact": "見通しが変われば金利や為替が動くかもしれない。",
+   "watch": "選挙結果と専門家の見方",
+   "next": "結果で相場の見方が変わる",
    "tags": [],
    "cat": "market",
-   "level": 3,
+   "level": 1,
    "related": []
   },
   {
-   "id": "n125",
+   "id": "n166",
    "title": "Nasdaq-100 tumbles into its third correction this year as AI worries mount",
    "link": "https://www.marketwatch.com/story/nasdaq-100-tumbles-into-its-third-correction-this-year-as-ai-worries-mount-abee4c0d?mod=mw_rss_topstories",
    "source": "MarketWatch",
    "time": "2026-11-03T09:03:00+09:00",
    "group": "海外（英語）",
-   "title_ja": "ナスダック100、今年3度目の調整入り",
+   "title_ja": "ナスダック100、今年3度目の調整局面に",
    "plain": "The “tech wreck” from October continues. Is a bear market next?",
-   "context": "期待が高い株は、業績や資金負担への不安で大きく売られやすい。",
-   "impact": "下げが続けば弱気の見方も出るかもしれない。",
-   "watch": "大手ハイテクの決算と資金調達",
-   "next": "下げ長期化の懸念",
+   "context": "調整局面は、高値から一定程度下がった状態を指す。",
+   "impact": "",
+   "watch": "半導体株と大手ハイテクの決算",
+   "next": "",
    "tags": [
     {
      "node": "us_stocks",
@@ -421,125 +462,166 @@
     }
    ],
    "cat": "market",
+   "level": 3,
+   "related": [],
+   "lang": "en"
+  },
+  {
+   "id": "n17",
+   "title": "What analysts are saying as Apple’s stock falls after earnings report",
+   "link": "https://www.marketwatch.com/story/what-analysts-are-saying-as-apples-stock-falls-after-earnings-report-f0afa357?mod=mw_rss_topstories",
+   "source": "MarketWatch",
+   "time": "2026-11-03T19:20:00+09:00",
+   "group": "海外（英語）",
+   "title_ja": "アップル決算後、株価が下落",
+   "plain": "アップルの株は、寄り付き前に4.5%下がった。利益率の見通しとサービス収入の伸びの鈍化が失望された。",
+   "context": "株価は、好決算でも見通しが期待を下回ると下がることがある。",
+   "impact": "他のハイテク株の売りにつながる可能性がある。",
+   "watch": "アップルの年末商戦の動き",
+   "next": "利益率への懸念が重し",
+   "tags": [],
+   "cat": "industry",
    "level": 2,
    "related": [],
    "lang": "en"
   },
   {
-   "id": "n106",
+   "id": "n210",
+   "title": "アップル、年末商戦期の利益率低下見込む メモリーコスト増が圧迫",
+   "link": "https://news.google.com/rss/articles/CBMifkFVX3lxTE9YSVR4U3I2cGtBWVhtUHBOakx4aFJVTWdUMW1kX3NocHJvRFVUdndVa1A4WFk0cHMxZHpvMGtxb3hvVzgzdzNYQXozX1A3UVR2TGdfQm9OM3k1dHBaMDdqQVpzZmVMQk9zTVNVX0FJSmVUc2puRFhSVENnekF2UQ?oc=5",
+   "source": "Reuters",
+   "time": "2026-11-03T06:42:00+09:00",
+   "group": "新聞・放送・通信",
+   "plain": "アップルは年末商戦期の利益率低下を見込む。メモリーのコスト増が圧迫する。",
+   "context": "部品の値上がりは、価格に転嫁できないと利益率を下げる。",
+   "impact": "メモリー不足が続けば、他の電子機器メーカーのコストも上がるかもしれない。",
+   "watch": "メモリー価格の動き",
+   "next": "部品高が収益の重しに",
+   "tags": [],
+   "cat": "industry",
+   "level": 2,
+   "related": []
+  },
+  {
+   "id": "n148",
    "title": "オラクルが3.1兆円調達、Googleはユーロ建社債 AI投資へ資金確保",
    "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE9XcVNIcVVPc0hVdG5vYl85SHJxZnNLMVctY09zLTgzYWxZempUREVvN0RjQVhwa0xMd09sZFhKZEc2djdTS0I0TDlibkFoaFhUV3RjYlVUZm03clJHalRvY3BlOE9IRk5ZYVBOYw?oc=5",
    "source": "日本経済新聞",
    "time": "2026-11-03T10:17:11+09:00",
    "group": "新聞・放送・通信",
-   "plain": "オラクルが3.1兆円を調達し、Googleはユーロ建て社債を出す。AI投資の資金を確保する動きだ。",
-   "context": "AI設備は巨額で、社債や株式の発行で賄う企業が増えている。",
-   "impact": "発行が続けば需給の悪化や財務への不安が意識されるかもしれない。",
-   "watch": "発行条件と投資家の需要",
-   "next": "資金調達の負担が焦点",
+   "plain": "オラクルが3.1兆円を調達し、Googleはユーロ建て社債を発行する。AI投資に向けた資金確保。",
+   "context": "巨額の設備投資は、社債や株の発行で賄われる。",
+   "impact": "債券の供給が増えると、金利や市場の需給に影響する可能性がある。",
+   "watch": "債券市場の需要",
+   "next": "資金調達の増加が続く",
    "tags": [],
    "cat": "industry",
    "level": 2,
    "related": []
-  },
-  {
-   "id": "n105",
-   "title": "Apple warns ‘unprecedented’ memory chip costs will hit margins",
-   "link": "https://www.ft.com/content/f6ad8c32-cacb-48ad-ad85-a9a7edac3f16?syn-25a6b1a6=1",
-   "source": "Financial Times",
-   "time": "2026-11-03T10:17:37+09:00",
-   "group": "海外（英語）",
-   "title_ja": "アップル「前例のない」メモリー高騰で利益率に打撃",
-   "plain": "アップルはメモリーチップの費用が前例のない水準で、利益率に響くと警告した。年末商戦の販売は堅調と見込む。",
-   "context": "部品が高騰すると、値上げしない限り利益率が下がる。",
-   "impact": "部品高が続けば、他の電機メーカーの採算にも影響するかもしれない。",
-   "watch": "メモリー価格と製品価格",
-   "next": "部品高が採算を圧迫",
-   "tags": [],
-   "cat": "industry",
-   "level": 2,
-   "related": [],
-   "lang": "en"
   },
   {
    "id": "n222",
-   "title": "米半導体マーベル、ルメンタムを18兆円で買収 AI設備に光接続活用",
-   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTFA4aW1ITDNkNTk4VGZDVmFiUjJKZmk5NmlvX084VWppWGRoWjBlb1o3S3BGcWdZd291UXBCTGx3S1dldldPNkU0eWVLQkwwZVhyN1o0V1czcnlvcnE2cWpQVXJfSmt4dUNLWHhFMg?oc=5",
-   "source": "日本経済新聞",
-   "time": "2026-11-03T04:15:28+09:00",
-   "group": "新聞・放送・通信",
-   "plain": "米半導体のマーベルが、ルメンタムを18兆円で買収する。AI設備向けの光接続を活用する。",
-   "context": "AIには大量のデータを高速で結ぶ部品が必要になる。",
-   "impact": "統合が進めば関連の部品需要に影響するかもしれない。両社の株主には反発もある。",
-   "watch": "買収の承認と株主の反応",
-   "next": "AI関連の再編が進む",
+   "title": "アマゾン、AWS急伸39％増も予想未達で株価下落　設備投資2200億ドル計画とFCF424億ドル赤字の波紋生成AIインフラ独走狙う巨額支出、立ちはだかる電力制約と政治リスク",
+   "link": "https://jbpress.ismedia.jp/articles/-/97838?utm_source=ldr&utm_medium=feed&utm_campaign=link&utm_content=link",
+   "source": "JBpress",
+   "time": "2026-11-03T06:00:00+09:00",
+   "group": "経済誌・ネットメディア",
+   "plain": "アマゾンのAWSは39%増収だったが、予想に届かず株価が下がった。設備投資は2200億ドルの計画。",
+   "context": "高い成長でも、期待に届かないと売られる。",
+   "impact": "投資負担が重くなれば、市場の評価が厳しくなるかもしれない。",
+   "watch": "投資と収益のバランス",
+   "next": "AI投資の採算が焦点",
    "tags": [],
    "cat": "industry",
-   "level": 1,
+   "level": 2,
    "related": []
   },
   {
-   "id": "n29",
+   "id": "n292",
+   "title": "株価 小幅な値下がり AI関連には売り注文も",
+   "link": "https://news.web.nhk/newsweb/na/nd-20261102de69468",
+   "source": "NHK",
+   "time": "2026-11-02T17:12:09+09:00",
+   "group": "新聞・放送・通信",
+   "plain": "2日の東京株式市場は小幅に値下がりした。AI関連の投資計画への懸念で売りが出た。選挙前で積極的な売買は控えられた。",
+   "context": "",
+   "impact": "AI関連が重い",
+   "watch": "今日の米株の反応",
+   "next": "AI関連が重い",
+   "tags": [],
+   "cat": "market",
+   "level": 2,
+   "related": []
+  },
+  {
+   "id": "n230",
+   "title": "米アンソロピック 売り上げ13倍もAI開発への支出は140兆円余に",
+   "link": "https://news.web.nhk/newsweb/na/nd-20261103de69869",
+   "source": "NHK",
+   "time": "2026-11-03T05:43:00+09:00",
+   "group": "新聞・放送・通信",
+   "plain": "アンソロピックは、1〜9月の売り上げが前年の13倍になったと明らかにした。一方でAI開発の支出は140兆円余。",
+   "context": "成長企業は、収益より先に巨額の投資が必要になることがある。",
+   "impact": "収益化が遅れれば、市場の期待が変わるかもしれない。",
+   "watch": "IPOの評価額",
+   "next": "支出の大きさが注目点",
+   "tags": [],
+   "cat": "industry",
+   "level": 2,
+   "related": []
+  },
+  {
+   "id": "n84",
    "title": "オーストラリア中銀、政策金利を4.85%に引き上げ 18年ぶり水準に",
    "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE5nSUZfNzdsajNzUUFSR1g3eS1oUVU5QWxPYUFldUVRTk9UWUN1aTlSeEZQNUNPa2ttMjMzWXVDeWZ0NnNoR2otdzdRTEtMdVhOTThDRk96QzV1U0xQSi0wblpwSlBkZmVGSXJvRw?oc=5",
    "source": "日本経済新聞",
    "time": "2026-11-03T15:41:58+09:00",
    "group": "新聞・放送・通信",
-   "plain": "オーストラリア中銀が政策金利を4.85％に引き上げた。18年ぶりの水準だ。",
-   "context": "物価の上振れが続くと、中央銀行は利上げで需要を抑える。",
-   "impact": "世界的な引き締め観測",
-   "watch": "他国の中銀の対応",
-   "next": "世界的な引き締め観測",
+   "plain": "オーストラリア中銀が政策金利を4.85%に引き上げた。18年ぶりの水準。",
+   "context": "物価が上がりやすいときは、利上げで需要を抑える。",
+   "impact": "他の国の金融政策に直ちに同じ影響が出るとは限らない。",
+   "watch": "豪州の物価と次の会合",
+   "next": "世界で引き締めの動き",
    "tags": [],
    "cat": "policy",
    "level": 2,
-   "related": []
+   "related": [
+    {
+     "title": "豪中銀、政策金利を18年ぶり高水準に引き上げ－賛成6、反対3",
+     "link": "https://news.google.com/rss/articles/CBMijgFBVV95cUxQcWNSUmJnTjd6VmFrOUViQU4xb0UxSV9HLXR4cVFaUXhnd3VGd3ZtSFV6X1JmM1hOVXJTN216QzNval9WcWVHZ0prTm04aUt2Vy1uZkxhU0RuVlNBaFNHVHFVZklBOVZxajRwNkV3bW1iaG1vR0NQUDlIOGZJaEptRjAza25pbW9TekZYR0pB?oc=5",
+     "source": "Bloomberg.com",
+     "time": "2026-11-03T12:44:00+09:00"
+    }
+   ]
   },
   {
-   "id": "n57",
-   "title": "豪中銀が利上げ、18年ぶり高水準に 判断分かれ引き締め休止観測",
-   "link": "https://news.google.com/rss/articles/CBMifkFVX3lxTE9JZkxBLTBOM3VTN1liLTZ4T0U1aHFEbmhxbUFCME1OenFTNkdWOTdmcGpHck16TThuVFl1ejh6M01kZk96SG9TVEgzMERwek5DYnJGb3VHWXFMNGR6WTd0LUFTR1FRM1RtN2hkX3hia0MwaUZiREFwRVhQNE80UQ?oc=5",
-   "source": "Reuters",
-   "time": "2026-11-03T13:20:00+09:00",
+   "id": "n58",
+   "title": "東京為替：ドル・円は小幅安、上値の重さを意識",
+   "link": "https://news.google.com/rss/articles/CBMiS0FVX3lxTE5BQlhtUHhRaUdBZFBNTmJYYnJ4bTdiaFhlZHE2RXdkMHBvU1FNUzRJWGx0T3ZhbjRoUUhKdUhMeEQ5eXI4cjFDaHBqWQ?oc=5",
+   "source": "47NEWS",
+   "time": "2026-11-03T17:14:07+09:00",
    "group": "新聞・放送・通信",
-   "plain": "豪中銀が利上げし、判断は分かれた。インフレ予測は大きく上方修正された。",
-   "context": "採決が割れるのは、見通しに不確実性があるためだ。",
-   "impact": "物価リスクが上向きなら追加利上げの可能性が残る。",
-   "watch": "豪州の物価統計",
-   "next": "追加利上げの余地が残る",
+   "plain": "東京為替市場でドル円は小幅安だった。上値の重さが意識された。",
+   "context": "",
+   "impact": "選挙後に動きが出る可能性がある。",
+   "watch": "",
+   "next": "上値は重い",
    "tags": [],
-   "cat": "policy",
+   "cat": "fx",
    "level": 1,
    "related": []
   },
   {
-   "id": "n210",
-   "title": "日米欧、来春まで2度利上げ オックスフォード・エコノミクスCEO",
-   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTFBlWUFZRmgzRU4zamNGcTN3LU5NYXBONUp0SkdoVTVLcXhVU0UyeVMxZzhZbmtEM29wVnJCU0NJLUJQdjVwaTFYRGd2S2s1WmZ0V29ianVmc2dBZVFiUGdDdlBvZmFNY1pxNlRBLQ?oc=5",
-   "source": "日本経済新聞",
-   "time": "2026-11-03T05:00:00+09:00",
-   "group": "新聞・放送・通信",
-   "plain": "オックスフォード・エコノミクスのCEOは、日米欧が来春までに2度利上げするとみている。",
-   "context": "一つの機関の見通しで、確定ではない。",
-   "impact": "実現すれば借入金利が上がり、住宅ローンにも響くかもしれない。",
-   "watch": "各国の物価と会合の結果",
-   "next": "利上げ予想の一つ",
-   "tags": [],
-   "cat": "policy",
-   "level": 1,
-   "related": []
-  },
-  {
-   "id": "n40",
+   "id": "n97",
    "title": "米財務省、第4四半期借り入れ見通し6180億ドルに下振れ",
    "link": "https://news.google.com/rss/articles/CBMifkFVX3lxTE95RHliZDZ3R3ZiN1B1emtGaVFNN1RvNVJZMUZjeXY5bkZDbEs3Z181NDBHTmRkTzZMbU1qRTNXR0J1VVZ6VjFHbzJjQzZNZ1RXXzJKRlFaUGFGdGJmRC0xbEZZU1h1RlFuSFRiRTZxcHNhQlpBejQzY243TEJlUQ?oc=5",
    "source": "Reuters",
    "time": "2026-11-03T14:47:00+09:00",
    "group": "新聞・放送・通信",
    "plain": "米財務省は第4四半期の借り入れ見通しを6180億ドルに下方修正した。",
-   "context": "国債の発行が減ると需給が緩み、金利が下がりやすい。",
+   "context": "国債の発行が減ると、需給が緩んで金利が下がる材料になる。",
    "impact": "金利の低下要因",
-   "watch": "今後の国債入札",
+   "watch": "",
    "next": "金利の低下要因",
    "tags": [],
    "cat": "rates",
@@ -547,71 +629,277 @@
    "related": []
   },
   {
-   "id": "n49",
-   "title": "Nvidia orders data centre clients to reduce China exposure",
-   "link": "https://www.ft.com/content/1902df70-1380-4588-bad5-171352b575f2?syn-25a6b1a6=1",
-   "source": "Financial Times",
-   "time": "2026-11-03T14:00:13+09:00",
-   "group": "海外（英語）",
-   "title_ja": "エヌビディア、顧客に中国向け比率の削減を要請",
-   "plain": "エヌビディアはデータセンター事業者に、顧客の過半を中国以外にするよう求めた。",
-   "context": "米中の技術規制で、半導体の供給先が制限される動きがある。",
-   "impact": "規制が強まれば、中国向けの売上や関連企業に影響するかもしれない。",
-   "watch": "米中の半導体規制の動き",
-   "next": "中国向けの供給が制約される恐れ",
+   "id": "n91",
+   "title": "米企業の銀行借り入れ需要減退、割安な調達先に移行も ＦＲＢ調査",
+   "link": "https://news.google.com/rss/articles/CBMihgFBVV95cUxNcGs3UV9HT21Xck55VHE1NW54RG9yWURPWnE2aXVENUpOczIxbjBqR0YtX1c3aU56NjItQUtleC1KOFM0MFJTcEprT190dDYzY3A4ZHZWWkJtckVFWUtEd3BuS3dVVGVSY1JrQXFVcklJY3dKalV4WlNXbWRiNkNQRGQyLVVUQQ?oc=5",
+   "source": "Reuters",
+   "time": "2026-11-03T15:05:00+09:00",
+   "group": "新聞・放送・通信",
+   "plain": "米企業の銀行借り入れ需要が減っている。FRBの調査で、割安な調達先に移る動きがある。",
+   "context": "銀行融資は景気の先行きを映す。",
+   "impact": "需要の減少が続けば、景気の勢いが鈍る可能性がある。",
+   "watch": "次の融資調査",
+   "next": "融資減は景気に影響",
    "tags": [],
-   "cat": "global",
-   "level": 2,
+   "cat": "economy",
+   "level": 1,
+   "related": []
+  },
+  {
+   "id": "n171",
+   "title": "米銀の融資基準、ノンバンク向けで厳しく FRBの7〜9月調査",
+   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE9LYzZCNjEyOVl1ZUhNREVtYldBczhPd2hfOVZkcVBKcG1FYldaNnVfM2xqY3RHUzI5ejNVaW1LaGU2bDVCRm1xUVZ2TXVEeW9Oa1pkVmhDUXU2cWNZOEZYSl91TVdCSU50bmJOWg?oc=5",
+   "source": "日本経済新聞",
+   "time": "2026-11-03T08:40:49+09:00",
+   "group": "新聞・放送・通信",
+   "plain": "米銀の融資基準は、ノンバンク向けで厳しくなった。FRBの7〜9月調査。",
+   "context": "貸し出しが厳しくなると資金が回りにくくなる。",
+   "impact": "私募ファンドなどの資金調達に影響するかもしれない。",
+   "watch": "ノンバンクの資金繰り",
+   "next": "信用の引き締まり",
+   "tags": [],
+   "cat": "economy",
+   "level": 1,
+   "related": []
+  },
+  {
+   "id": "n14",
+   "title": "This signal from the corporate bond market has historically preceded big drawdowns for the S&P 500",
+   "link": "https://www.marketwatch.com/story/this-signal-from-the-corporate-bond-market-has-historically-preceded-big-drawdowns-for-the-s-p-500-8c1a3d25?mod=mw_rss_topstories",
+   "source": "MarketWatch",
+   "time": "2026-11-03T19:31:00+09:00",
+   "group": "海外（英語）",
+   "title_ja": "社債市場の信号、S&P500の下落に先行",
+   "plain": "社債市場が、過去に株の大きな下落の前に出た信号を示している。",
+   "context": "社債の上乗せ金利は、企業の信用不安を映す。",
+   "impact": "当たるとは限らないが、リスク資産への警戒材料になるかもしれない。",
+   "watch": "社債の上乗せ金利",
+   "next": "株の下落に警戒",
+   "tags": [],
+   "cat": "market",
+   "level": 1,
    "related": [],
    "lang": "en"
   },
   {
-   "id": "n20",
+   "id": "n77",
    "title": "中国当局、市場回復までＩＰＯ停止を証券各社に指示 ＝ＦＴ",
    "link": "https://news.google.com/rss/articles/CBMihgFBVV95cUxNYWFtZU04N0lwRU1HY3ZrTkZzM0dfNGEyNXhDNzVGakF1OEpxUUp0RjNMdGRPcFZXSzFHcllOX1loTVNMdDdrdUhMUFhmcnU0N1NBYmJrLWR3emkwWUNwcDV1eDkxaUFIbGQwdWZpemNueTM2U2gyekp0Ul9vc3UxbHZ5Y0FKUQ?oc=5",
    "source": "Reuters",
    "time": "2026-11-03T16:12:00+09:00",
-   "group": "新聞・放送・通信",
-   "plain": "中国当局が、市場が回復するまで証券各社にIPOの停止を指示したとFTが報じた。",
-   "context": "新規上場は株の供給を増やすため、相場が弱いときは抑えられることがある。",
-   "impact": "中国の株式市場の弱さの表れで、資金調達に響くかもしれない。",
+   "group": "ニュースのまとめ",
+   "plain": "中国当局が、市場が回復するまでIPOを止めるよう証券会社に指示したとFTが報じた。",
+   "context": "新規上場が増えると市場の資金が吸われる。",
+   "impact": "中国株の弱さを示す可能性がある。",
    "watch": "中国の追加の市場対策",
-   "next": "中国市場の不安定さ",
+   "next": "市場安定策が続く",
    "tags": [],
    "cat": "global",
    "level": 2,
    "related": []
   },
   {
-   "id": "n42",
+   "id": "n100",
    "title": "中国、資本市場安定へ一連の措置 スワップオペや自社株買い支援など",
    "link": "https://news.google.com/rss/articles/CBMihgFBVV95cUxQd3AxVGMwX2hXS05ObTR6SzRRcUdlRnRWWFdSTzdRZWliS0hLandHUlRfYjZZOXQ2a2NuRWlidm8yek9MQ2drQ3lRQnZzREJDUW55bHVNLVBlM1pZLXN2eTE4M1dPTTB0dzNsTnRBYl92ZHZEV2RudTNXb3NXbHE3eUhONmdXdw?oc=5",
    "source": "Reuters",
    "time": "2026-11-03T14:36:00+09:00",
    "group": "新聞・放送・通信",
-   "plain": "中国が資本市場を安定させる一連の措置を出した。スワップオペや自社株買いの支援などが含まれる。",
-   "context": "当局が資金を供給し、株価の下支えを狙う政策だ。",
-   "impact": "効果が出れば不安が和らぐが、限られるかもしれない。",
-   "watch": "中国株の動き",
-   "next": "市場安定策の効果が焦点",
+   "plain": "中国は資本市場安定のため、スワップオペや自社株買い支援などの措置を出した。",
+   "context": "当局が資金を供給し、株価の下支えを図る。",
+   "impact": "効果が続くかは不透明。",
+   "watch": "中国株の反応",
+   "next": "株価対策が続く",
    "tags": [],
    "cat": "global",
    "level": 2,
    "related": []
   },
   {
+   "id": "n156",
+   "title": "中国人民銀、外貨預金準備率を2ポイント引き上げへ－15日から実施",
+   "link": "https://news.google.com/rss/articles/CBMid0FVX3lxTFAzOWhxdVNrdVRzVTBQOVBIQlVYWjE4RzJrZG1DaVhzUDlxUUNiM2dyZzJIQ0k2V3B6cDNRYnpRU0VqV0VXaWlJSmtZSlFoaVgtRlZWQlRCdkxVR1NzREl0R0ozdzJaWVRCS3RaaHJieTRmMjdqcnRv?oc=5",
+   "source": "Bloomberg.com",
+   "time": "2026-11-03T09:52:00+09:00",
+   "group": "新聞・放送・通信",
+   "plain": "中国人民銀が外貨預金準備率を2ポイント引き上げる。15日から実施。",
+   "context": "外貨の準備率を上げると、元安を抑える効果がある。",
+   "impact": "元安圧力への対応とみられるが、理由は資料に書かれていない。",
+   "watch": "元相場",
+   "next": "元の安定をねらう",
+   "tags": [],
+   "cat": "fx",
+   "level": 1,
+   "related": []
+  },
+  {
+   "id": "n107",
+   "title": "Nvidia orders data centre clients to reduce China exposure",
+   "link": "https://www.ft.com/content/1902df70-1380-4588-bad5-171352b575f2?syn-25a6b1a6=1",
+   "source": "Financial Times",
+   "time": "2026-11-03T14:00:13+09:00",
+   "group": "海外（英語）",
+   "plain": "エヌビディアが、クラウド事業者に中国向け比率を下げるよう求めたとFTが報じた。",
+   "context": "米中の規制が半導体の販売を左右する。",
+   "impact": "中国向けの売上や供給網に影響するかもしれない。",
+   "watch": "エヌビディアの説明",
+   "next": "中国向け供給に影響",
+   "tags": [],
+   "cat": "industry",
+   "level": 2,
+   "related": [],
+   "lang": "en"
+  },
+  {
+   "id": "n259",
+   "title": "半導体マーベルがルメンタム買収へ､規模1150億ドル-ハイテクで最大級",
+   "link": "https://news.google.com/rss/articles/CBMid0FVX3lxTE9aRGVHZE1LR3ExOG5NdDdxbnMyRXRBd2tzY0JXZHhQU2R6WnFnbTJuVkZLRlhZODNtbHhhZkpvMXN1SzBKbHpjNmVMZERkSHZvZ2UzYkZEREphaUxKMERZZktwTHlrUXVLVU9xNVRERkJWcXIxeGJz?oc=5",
+   "source": "Bloomberg.com",
+   "time": "2026-11-02T22:17:34+09:00",
+   "group": "新聞・放送・通信",
+   "plain": "半導体のマーベルが、ルメンタムを1150億ドルで買収する。ハイテクで最大級。",
+   "context": "巨額買収は株主の評価が分かれやすい。",
+   "impact": "双方の株主が反発しており、実現するかは見通せない。",
+   "watch": "株主の反応",
+   "next": "買収の行方が焦点",
+   "tags": [],
+   "cat": "industry",
+   "level": 1,
+   "related": []
+  },
+  {
+   "id": "n112",
+   "title": "Apple、 iPhone「高価格機種頼み」の年末商戦 供給制約で成長鈍化",
+   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTFBvSlVwcmZGa1E0cXFQamxzMHI0SjVnS0V0ZjhSOGZ4dEdBX1BpVVdtZ3pMUHFkUHY3WHQ5VUNvcWk1SWpqUXAtdmNHX2g0eEZ4aXRaeDNuak9BamhHaUxRM01QNUFzelEySUMtUA?oc=5",
+   "source": "日本経済新聞",
+   "time": "2026-11-03T13:38:44+09:00",
+   "group": "新聞・放送・通信",
+   "plain": "アップルのiPhoneは高価格機種に頼る年末商戦。供給制約で成長が鈍る。",
+   "context": "部品不足は販売数量を制約する。",
+   "impact": "供給が改善しなければ、販売が伸びにくいかもしれない。",
+   "watch": "供給の改善",
+   "next": "供給制約が重し",
+   "tags": [],
+   "cat": "industry",
+   "level": 1,
+   "related": []
+  },
+  {
+   "id": "n32",
+   "title": "【「保護主義」加速で資本市場にも影響？】激化する仏デモの余波／“高福祉”でもフランスが北欧諸国と異なる点／独仏で「極右政権」誕生の現実味／国債不安はどこまで深刻化？／「ホームバイアス」時代の資産運用",
+   "link": "https://toyokeizai.net/articles/-/963404?utm_source=rss&utm_medium=http&utm_campaign=link_back",
+   "source": "東洋経済オンライン",
+   "time": "2026-11-03T19:00:00+09:00",
+   "group": "経済誌・ネットメディア",
+   "plain": "フランスの抗議デモの激化と、国債不安の関係を扱う記事。2027年春の大統領選にも触れる。",
+   "context": "財政不安が強まると、国債の利回りが上がりやすい。",
+   "impact": "欧州の政治不安が市場に影響する可能性がある。",
+   "watch": "フランスの国債利回り",
+   "next": "欧州の財政不安に注意",
+   "tags": [],
+   "cat": "global",
+   "level": 1,
+   "related": []
+  },
+  {
+   "id": "n1",
+   "title": "A tariff reprieve, but weak data halts stock rally in Europe",
+   "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE1YMV9HWUZwRkNtZUdCeUFsS2lUMnl6VVBEZDJXVlFDS3VFM25Ua2kwM2F5R0NOclpnWnhnbkpKd3c5WW9XSUtKNkwwUzNpQUZCWnNwNXJfcktnajlYMEJQMg?oc=5",
+   "source": "Reuters",
+   "time": "2026-11-03T20:07:55+09:00",
+   "group": "新聞・放送・通信",
+   "plain": "関税の猶予があったが、弱い経済指標で欧州株の上昇が止まった。",
+   "context": "関税の緩和は株にプラスだが、景気指標が弱いと打ち消される。",
+   "impact": "景気の弱さが重し",
+   "watch": "欧州の経済指標",
+   "next": "景気の弱さが重し",
+   "tags": [],
+   "cat": "global",
+   "level": 2,
+   "related": []
+  },
+  {
+   "id": "n2",
+   "title": "自動車部品大手の独シェフラー、3400人削減へ－欧州で5拠点閉鎖",
+   "link": "https://news.google.com/rss/articles/CBMijgFBVV95cUxNY0hKQVJ6WFRMZ1F5MGFsaUN5QVNtOWF1c0tCdUhaelRUZ05KYjN6QU5hd2htNFhsNGZPQ3l4a1hvMEdab1dUVkhXWl9HblpXRDZjNTk0bndzZFg5aXR3TGdHMjVPdHlRLTE0bTlaaG1jVkFuOFVLYXV3SGZOZ2hVamE5ZHk3eEVJU1BnU1pn?oc=5",
+   "source": "Bloomberg",
+   "time": "2026-11-03T20:03:03+09:00",
+   "group": "新聞・放送・通信",
+   "plain": "独自動車部品大手シェフラーが、欧州で3400人を削減し5拠点を閉鎖する。",
+   "context": "需要減とコスト増で、欧州の部品業界は再編が進む。",
+   "impact": "他の部品会社にも広がる可能性がある。",
+   "watch": "欧州の自動車生産",
+   "next": "欧州産業の雇用に影響",
+   "tags": [],
+   "cat": "industry",
+   "level": 1,
+   "related": []
+  },
+  {
    "id": "n8",
-   "title": "US, Russia and China discuss trilateral meeting between Trump, Putin and Xi",
+   "title": "銀行が期待する資本規制緩和、ＥＣＢマシャド氏が慎重姿勢示す",
+   "link": "https://news.google.com/rss/articles/CBMifkFVX3lxTE9GS0tUYjV0a19hTEtCV0poQTAyTUk4RVBOWTZjYVVzMzhuY0dPYlZwLUkteWNGYU9GMWp2VEh5cFBFYlB6THFHTHZWZTczQVhxc25CejFQaHM3V1RnY2RlNkRGWVdkX3BnTDdxLTVVQTZPOGxMVC1ESDVteXVBUQ?oc=5",
+   "source": "Reuters",
+   "time": "2026-11-03T19:38:21+09:00",
+   "group": "新聞・放送・通信",
+   "plain": "ECBのマシャド氏が、銀行が期待する資本規制の緩和に慎重な姿勢を示した。",
+   "context": "資本規制は銀行の損失への備えを決める。",
+   "impact": "緩和が進まなければ、銀行の貸し出し余力は増えにくい。",
+   "watch": "ECBの検討",
+   "next": "規制緩和は慎重",
+   "tags": [],
+   "cat": "policy",
+   "level": 1,
+   "related": []
+  },
+  {
+   "id": "n10",
+   "title": "Thousands of Disney job cuts may be coming. Investors are asking what comes next.",
+   "link": "https://www.marketwatch.com/story/thousands-of-disney-job-cuts-may-be-coming-investors-are-asking-what-comes-next-19cc0662?mod=mw_rss_topstories",
+   "source": "MarketWatch",
+   "time": "2026-11-03T19:36:00+09:00",
+   "group": "海外（英語）",
+   "plain": "ディズニーが数千人を削減する可能性があると報じられた。株価はあまり動かなかった。",
+   "context": "人員削減はコスト削減策の一つ。",
+   "impact": "今後の戦略が注目される。",
+   "watch": "会社の発表",
+   "next": "戦略が注目点",
+   "tags": [],
+   "cat": "industry",
+   "level": 1,
+   "related": [],
+   "lang": "en"
+  },
+  {
+   "id": "n38",
+   "title": "UK and EU agree draft deal to scrap Brexit red tape over food exports",
+   "link": "https://www.bbc.co.uk/news/articles/cmp3grwre9xdo?at_medium=RSS&at_campaign=rss",
+   "source": "BBC Business",
+   "time": "2026-11-03T18:55:47+09:00",
+   "group": "海外（英語）",
+   "plain": "ブレグジット後の関係の見直しの一環。",
+   "context": "検査や書類が減ると、貿易のコストが下がる。",
+   "impact": "英EU間の食品貿易が円滑になるかもしれない。",
+   "watch": "今月の英EU首脳会議",
+   "next": "貿易の障壁が減る",
+   "tags": [],
+   "cat": "global",
+   "level": 1,
+   "related": [],
+   "lang": "en"
+  },
+  {
+   "id": "n59",
+   "title": "US, Russia and China discuss meeting between Trump, Putin and Xi",
    "link": "https://www.ft.com/content/73c1d1cc-6bb2-43a6-8532-7823e5c1a40b?syn-25a6b1a6=1",
    "source": "Financial Times",
    "time": "2026-11-03T17:10:41+09:00",
    "group": "海外（英語）",
-   "title_ja": "米露中、トランプ・プーチン・習の3者会談を協議",
-   "plain": "US, Russia and China discuss trilateral meeting between Trump, Putin and Xi",
-   "context": "首脳会談は貿易や安全保障の方向性を示す場になる。",
-   "impact": "対話が進めば貿易摩擦が和らぐ可能性がある。実現は未定だ。",
-   "watch": "APECでの会談の有無",
-   "next": "米中関係の緩和期待",
+   "plain": "米国、ロシア、中国が、トランプ氏・プーチン氏・習氏の会談を協議している。",
+   "context": "首脳会談は貿易や安全保障の緊張に影響する。",
+   "impact": "実現すれば関税や地政学リスクの見方が変わるかもしれない。",
+   "watch": "APECでの動き",
+   "next": "米中関係が焦点",
    "tags": [],
    "cat": "politics",
    "level": 2,
@@ -619,17 +907,34 @@
    "lang": "en"
   },
   {
-   "id": "n12",
+   "id": "n176",
+   "title": "米、ウクライナとロシアの協議仲介 10─11日にＵＡＥで3者協議",
+   "link": "https://news.google.com/rss/articles/CBMihgFBVV95cUxOcGJNYTVETTJJZVd1TWY2R3kxMmJSUEZ5aFlCd2JTNDU5UHpXWVBXQ0FKb2FEWW5NdHBHQTBkMklVQ2pNSlR2X1czS3ZNSFZ3dl9ubjAwalBNaTBmYWszbHplOG0zbzVhTXUtZVhrdkl5UEZZZ0xuaWtKdkRRQ2VnNF9fNl82UQ?oc=5",
+   "source": "Reuters",
+   "time": "2026-11-03T08:30:00+09:00",
+   "group": "新聞・放送・通信",
+   "plain": "米、ウクライナとロシアの協議仲介 10─11日にＵＡＥで3者協議",
+   "context": "停戦の動きは欧州の安全保障と資源市場に関わる。",
+   "impact": "進展すれば地政学リスクが和らぐかもしれない。",
+   "watch": "協議の結果",
+   "next": "停戦期待が出る",
+   "tags": [],
+   "cat": "politics",
+   "level": 2,
+   "related": []
+  },
+  {
+   "id": "n63",
    "title": "黒海で相次ぐロシアの商船攻撃、空と海からドローンで襲撃　「世界で最も危険な海域」に",
    "link": "https://www.cnn.co.jp/world/35254314.html?ref=rss",
    "source": "CNN.co.jp",
    "time": "2026-11-03T16:51:00+09:00",
    "group": "海外（日本語）",
-   "plain": "黒海でロシアのドローンが12隻以上の商船を攻撃した。ウクライナ産穀物の輸出ルートを封じる狙いとされる。",
-   "context": "黒海は穀物の主要な輸送路で、攻撃は食料価格に響く。",
-   "impact": "攻撃が続けば穀物価格や海上保険料に影響するかもしれない。",
-   "watch": "黒海の航行状況と穀物価格",
-   "next": "食料供給の不安",
+   "plain": "黒海でロシアによる商船攻撃が相次いでいる。ウクライナ産穀物の輸出が脅かされている。",
+   "context": "黒海は穀物の主要な輸送路。",
+   "impact": "輸送が滞れば穀物価格に影響するかもしれない。",
+   "watch": "商船被害の続報",
+   "next": "穀物輸送に影響",
    "tags": [
     {
      "node": "geopolitics",
@@ -641,187 +946,85 @@
    "related": []
   },
   {
-   "id": "n138",
-   "title": "米、ウクライナとロシアの協議仲介 10─11日にＵＡＥで3者協議",
-   "link": "https://news.google.com/rss/articles/CBMihgFBVV95cUxOcGJNYTVETTJJZVd1TWY2R3kxMmJSUEZ5aFlCd2JTNDU5UHpXWVBXQ0FKb2FEWW5NdHBHQTBkMklVQ2pNSlR2X1czS3ZNSFZ3dl9ubjAwalBNaTBmYWszbHplOG0zbzVhTXUtZVhrdkl5UEZZZ0xuaWtKdkRRQ2VnNF9fNl82UQ?oc=5",
-   "source": "Reuters",
-   "time": "2026-11-03T08:30:00+09:00",
+   "id": "n60",
+   "title": "サウジ国有石油、41％増益 原油高が寄与、販売量は減少",
+   "link": "https://news.google.com/rss/articles/CBMiS0FVX3lxTFAyVlo2aS02TU9RY3RPVzFuSWZlUTVRb3BPZWJaaW43V1J3UTNwWUd4ODdiRVF5VUVXZ2xzd0p6dWtIRF8wV2xLOHdFZw?oc=5",
+   "source": "47NEWS",
+   "time": "2026-11-03T17:08:00+09:00",
    "group": "新聞・放送・通信",
-   "plain": "米、ウクライナとロシアの協議仲介 10─11日にＵＡＥで3者協議",
-   "context": "停戦協議が進むと、地政学リスクが下がりやすい。",
-   "impact": "進展すればエネルギーや穀物の不安が和らぐかもしれない。",
-   "watch": "協議の結果",
-   "next": "和平への期待",
-   "tags": [],
-   "cat": "politics",
-   "level": 2,
-   "related": []
-  },
-  {
-   "id": "n167",
-   "title": "決算:Appleの7〜9月、iPhone堅調で純利益12％増 AI投資競争とは距離",
-   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE5SOThCZ21wSDJMRExfdkJZdFlRTUlkS09FREpsWUdDUUhlX3pGUEdiSGhYbkhUVzUwcy0ydzdUeUh1bVVhS05LY1YteHBfbEI1Rzl6d2RFUjVxT1AzdGIxNkpaeHZ1dUlYRGpLbQ?oc=5",
-   "source": "日本経済新聞",
-   "time": "2026-11-03T06:55:25+09:00",
-   "group": "新聞・放送・通信",
-   "plain": "アップルの7〜9月は、iPhoneが堅調で純利益が12％増えた。AI投資競争とは距離を置く。",
-   "context": "主力製品の販売が利益を支える。",
-   "impact": "好決算でも部品高の懸念から株価は軟調だった。",
-   "watch": "年末商戦の販売",
-   "next": "好調でも利益率が課題",
-   "tags": [],
-   "cat": "industry",
-   "level": 2,
-   "related": []
-  },
-  {
-   "id": "n220",
-   "title": "キオクシア株急落 失望売り促す「保守的」見通し、株主還元も期待薄",
-   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE9UTjNzTkF0RUowZGxiSEFqVjVZSGN3OExrR1kwdHZySV9OYzZhWG90YlZ4ZHFhNFpwbXpIWE56QkgydzJnWWUyLTI0SFd1LVVGbGtsaGFkcjNma0ZIT3IxVUpPeHdZNEo2T0oxZQ?oc=5",
-   "source": "日本経済新聞",
-   "time": "2026-11-03T04:30:00+09:00",
-   "group": "新聞・放送・通信",
-   "plain": "キオクシア株が急落した。保守的な見通しと株主還元への期待薄が失望売りを誘った。",
-   "context": "成長期待が高い株は、見通しが控えめだと売られやすい。",
-   "impact": "他の半導体関連にも警戒が広がるかもしれない。",
-   "watch": "メモリー需要と同社の次の発表",
-   "next": "半導体株の重荷",
-   "tags": [],
-   "cat": "industry",
-   "level": 2,
-   "related": []
-  },
-  {
-   "id": "n162",
-   "title": "パランティア、民間売上高が政府向けを逆転 7〜9月は96%増収",
-   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTFB3YVIwdjdDcEk2LVlaSHlmNlVzRUlIV21PU251MXh3dWo2XzN4MEVONTM5REhyendGbWt1YkdBWlcxZUhfaG5CNkprUmJ4eDNwMkVMRlZzSC1FbG1yb2hfa3NEdUIzakl0UkVCUA?oc=5",
-   "source": "日本経済新聞",
-   "time": "2026-11-03T07:00:17+09:00",
-   "group": "新聞・放送・通信",
-   "plain": "パランティアの民間売上高が政府向けを逆転した。7〜9月は96％の増収だった。",
-   "context": "企業向けのAI活用が広がっていることを示す。",
-   "impact": "企業のAI導入が進めば関連需要が伸びるかもしれない。株価は鈍化懸念で下がった。",
-   "watch": "",
-   "next": "AI需要は強いが期待も高い",
-   "tags": [],
-   "cat": "industry",
-   "level": 2,
-   "related": []
-  },
-  {
-   "id": "n238",
-   "title": "アンソロピック売上高、前年同期比12倍の約170億ドル－IPO期待高まる",
-   "link": "https://news.google.com/rss/articles/CBMid0FVX3lxTE1PeXNnZ0FXMHhXTUJ2OEVVVWpDM2FuT25NMHVOS3VfS3Nmb0JxWTZfMWNqeDVJWkFGQWlUWFJnLTVLallDSUppaXJRUE92N19fbmtaZXJlNVJmeDNxNmM3c0VHNXhXaGx3TGdjMVNHOGxVZXJhZlQ0?oc=5",
-   "source": "Bloomberg.com",
-   "time": "2026-11-02T23:56:58+09:00",
-   "group": "新聞・放送・通信",
-   "plain": "アンソロピックの売上高が前年同期比12倍の約170億ドルになった。IPOへの期待が高まる。",
-   "context": "AI企業は売上が急増する一方、巨額の開発費もかかる。",
-   "impact": "IPOが成功すればAI投資への資金が集まるかもしれない。",
-   "watch": "IPOの評価額と時期",
-   "next": "AI企業の成長と費用負担",
-   "tags": [],
-   "cat": "industry",
-   "level": 2,
-   "related": []
-  },
-  {
-   "id": "n134",
-   "title": "アンソロピックIPO評価額、1.5兆ドル規模に下振れか WSJ報道",
-   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE1CNEdaRFJqZlpKeGdLTURDbHNyUk1qU3ZjU2tZc1lHNzA5WHhleWNWM1pQbDhzWXJYZHVicG9JdEU2a0NyNEVyMkJvMUhSTm5BWEZpVkRFUERpOWoyMzZxR0lZN091ZEtkNUJheA?oc=5",
-   "source": "日本経済新聞",
-   "time": "2026-11-03T08:38:49+09:00",
-   "group": "新聞・放送・通信",
-   "plain": "アンソロピックのIPO評価額が1.5兆ドル規模に下振れする可能性があるとWSJが報じた。",
-   "context": "評価額は投資家の期待を映す。",
-   "impact": "下振れが続けばAI関連の投資心理が冷えるかもしれない。",
-   "watch": "IPOの正式な条件",
-   "next": "AI期待の見直し",
+   "plain": "サウジ国有石油は41%の増益だった。原油高が寄与したが、販売量は減った。",
+   "context": "産油企業は原油高で利益が増える。",
+   "impact": "原油が下がれば利益は減りやすい。",
+   "watch": "原油価格の水準",
+   "next": "原油安なら利益は減る",
    "tags": [],
    "cat": "industry",
    "level": 1,
    "related": []
   },
   {
-   "id": "n191",
-   "title": "アマゾン、AWS急伸39％増も予想未達で株価下落　設備投資2200億ドル計画とFCF424億ドル赤字の波紋生成AIインフラ独走狙う巨額支出、立ちはだかる電力制約と政治リスク",
-   "link": "https://jbpress.ismedia.jp/articles/-/97838?utm_source=ldr&utm_medium=feed&utm_campaign=link&utm_content=link",
-   "source": "JBpress",
-   "time": "2026-11-03T06:00:00+09:00",
-   "group": "経済誌・ネットメディア",
-   "plain": "アマゾンのAWSは39％増と急伸したが予想に届かず、株価が下落した。設備投資は2200億ドル計画だ。",
-   "context": "投資が巨額だと、成長しても現金が減る。",
-   "impact": "収益化が遅れれば投資への見方が厳しくなるかもしれない。",
-   "watch": "フリーキャッシュフローの改善",
-   "next": "AI投資の採算が焦点",
-   "tags": [],
-   "cat": "industry",
-   "level": 2,
-   "related": []
-  },
-  {
-   "id": "n85",
-   "title": "米オラクル、100億ドルの株式売却で条件決定へ－11%のディスカウント",
-   "link": "https://news.google.com/rss/articles/CBMijgFBVV95cUxQX0lSSUoyNGh6QzBIQVNuVkZRSGdWSUlJd1FQUHd5Y240UzFtWTNRQldxU2xPaF9xbFNzbENPTG9KR0VWaFpRLUZqZnNZV0xfTk1Cd0hBYzRoMk04R1ZERFBLMkFLY0ZVdUUtbmVBcGhqalJYTGJhNVBXRF9hTWpuS2NpZnR4QjdRSU1PdXFB?oc=5",
-   "source": "Bloomberg.com",
-   "time": "2026-11-03T11:22:00+09:00",
+   "id": "n92",
+   "title": "金の投資需要、7〜9月は14%減 相場軟調で先高観薄れる",
+   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE9MYVJ4eGJmWFg2YkNIdWVPYzF2NjVKZVpiMlBEcmkxUUNjREdXc1lRNHJYdGZURGM5cllSS1hHM3dHVEVwQy1wU2lpZXFDZUlET1o2SWFrSUJ5SEhGdk9KN0tDRDBjVnhkMEl5MQ?oc=5",
+   "source": "日本経済新聞",
+   "time": "2026-11-03T15:00:00+09:00",
    "group": "新聞・放送・通信",
-   "plain": "オラクルが100億ドルの株式売却の条件を決める。11％のディスカウントだ。",
-   "context": "",
-   "impact": "AI投資の資金調達コストが意識されるかもしれない。",
-   "watch": "株価の反応",
-   "next": "資金調達の負担",
-   "tags": [],
-   "cat": "industry",
-   "level": 1,
-   "related": []
-  },
-  {
-   "id": "n287",
-   "title": "株価 小幅な値下がり AI関連には売り注文も",
-   "link": "https://news.web.nhk/newsweb/na/nd-20261102de69468",
-   "source": "NHK",
-   "time": "2026-11-02T17:12:09+09:00",
-   "group": "新聞・放送・通信",
-   "plain": "週明け2日の東京株式市場は、AI関連の売りと選挙前の様子見で小幅に値下がりした。",
-   "context": "投資計画への懸念で、AI関連株が売られた。",
-   "impact": "",
-   "watch": "米株の動きと半導体株",
-   "next": "",
+   "plain": "7〜9月の金の投資需要は14%減った。相場が軟調で、先高観が薄れた。",
+   "context": "価格上昇が見込めないと、投資の買いが減る。",
+   "impact": "需要の弱さが続けば、金の価格の重しになるかもしれない。",
+   "watch": "金価格",
+   "next": "金は上がりにくい",
    "tags": [],
    "cat": "market",
-   "level": 2,
+   "level": 1,
    "related": []
   },
   {
-   "id": "n319",
-   "title": "経済・物価情勢の展望（10月、全文）",
-   "link": "http://www.boj.or.jp/mopo/outlook/gor2610b.pdf",
-   "source": "日本銀行",
-   "time": "2026-11-02T14:00:00+09:00",
-   "group": "公的機関",
-   "plain": "経済・物価情勢の展望（10月、全文）",
-   "context": "",
-   "impact": "物価の見通しが上向けば利上げ観測が強まるかもしれない。",
-   "watch": "次回会合までの物価と賃金",
-   "next": "利上げ時期の材料",
+   "id": "n61",
+   "title": "暗号資産取引所大手バイナンスが北朝鮮サイバー犯罪グループの標的に…｢1兆円強奪｣の裏で広がる2つの信用不安",
+   "link": "https://toyokeizai.net/articles/-/963389?utm_source=rss&utm_medium=http&utm_campaign=link_back",
+   "source": "東洋経済オンライン",
+   "time": "2026-11-03T17:00:00+09:00",
+   "group": "経済誌・ネットメディア",
+   "plain": "バイナンスから約1兆円相当が流出し、北朝鮮系ハッカーの関与が指摘されている。北朝鮮は否定している。",
+   "context": "取引所への信用不安は、暗号資産全体に波及しやすい。",
+   "impact": "出金が続けば市場の不安が広がる可能性がある。",
+   "watch": "出金の動き",
+   "next": "信用不安に注意",
    "tags": [],
-   "cat": "policy",
-   "level": 2,
+   "cat": "market",
+   "level": 1,
    "related": []
   },
   {
-   "id": "n323",
+   "id": "n80",
+   "title": "都心タワマン下落で中国人投資家が悲鳴「泣く泣く1億円値引き…」SNSにあふれる“損切り”の現場。晴海フラッグも「売れない」",
+   "link": "https://news.google.com/rss/articles/CBMif0FVX3lxTE9BVnJoeFhEUW9rTnpGdGpQRENOM2xzTmhpS00zQjBRUFViaElFbXlfTkxXMmNBTVA3NXhMQXBHd1pKUHhxWG1fczJkNEVObFJsNzltQ1ZfVWUyWHg5Z0dFandoYlRLVUpEZWlMR3lYc0E0VkVmTTBTYkkyVnRENDg?oc=5",
+   "source": "Yahoo!ニュース",
+   "time": "2026-11-03T15:54:04+09:00",
+   "group": "ニュースのまとめ",
+   "plain": "都心のタワーマンションが下落し、中国人投資家が値引きして売っているという。",
+   "context": "海外マネーの動きは、都心の不動産価格に影響する。",
+   "impact": "売りが続けば、都心の価格調整が広がるかもしれない。",
+   "watch": "取引価格",
+   "next": "都心の価格に調整圧力",
+   "tags": [],
+   "cat": "life",
+   "level": 1,
+   "related": []
+  },
+  {
+   "id": "n328",
    "title": "固定住宅ローン「フラット35」、11月金利3.81%で過去2番目",
    "link": "https://www.asahi.com/articles/ASVC210YTVC2ULFA01SM.html?ref=rss",
    "source": "朝日新聞",
    "time": "2026-11-02T12:15:00+09:00",
    "group": "新聞・放送・通信",
-   "plain": "フラット35の11月金利は3.81％で、過去2番目の高さだ。",
-   "context": "固定型は長期金利に連動しやすい。",
-   "impact": "金利が高止まりすれば住宅購入の負担が重くなるかもしれない。",
-   "watch": "長期金利の動き",
-   "next": "住宅ローンは高水準",
+   "plain": "フラット35の11月金利は3.81%で、過去2番目の高さだった。",
+   "context": "固定型の住宅ローンは長期金利に連動しやすい。",
+   "impact": "長期金利が下がれば、今後の金利は下がるかもしれない。",
+   "watch": "長期金利",
+   "next": "高い水準が続く",
    "tags": [
     {
      "node": "mortgage",
@@ -833,107 +1036,78 @@
    "related": []
   },
   {
-   "id": "n322",
+   "id": "n324",
+   "title": "経済・物価情勢の展望（10月、全文）",
+   "link": "http://www.boj.or.jp/mopo/outlook/gor2610b.pdf",
+   "source": "日本銀行",
+   "time": "2026-11-02T14:00:00+09:00",
+   "group": "公的機関",
+   "plain": "経済・物価情勢の展望（10月、全文）",
+   "context": "",
+   "impact": "次の利上げの時期を読む材料になる。",
+   "watch": "植田総裁の発言",
+   "next": "利上げ時期の手がかり",
+   "tags": [],
+   "cat": "policy",
+   "level": 2,
+   "related": []
+  },
+  {
+   "id": "n50",
+   "title": "消費税減税法案、公明党が衆院で反対調整 政府が新給付の詳細明示なく",
+   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE5hbDkxRk9uSWJoVkJWQld1ODVrSUo3X1VEMUhmSGtwX2JEN25ydUdmb3diUTlNZW9EZ04xcEgyS3lYYVpQbTI3VEhSR1BxQU1WcDFSZWZjcjN5TmVMckMyWUZxWGJVSmJPcEhzRw?oc=5",
+   "source": "日本経済新聞",
+   "time": "2026-11-03T18:00:00+09:00",
+   "group": "新聞・放送・通信",
+   "plain": "消費税の減税法案で、公明党が衆院で反対する調整をしている。政府が新しい給付の詳細を示していないため。",
+   "context": "減税や給付は財源が国債に頼る場合、長期金利に影響する。",
+   "impact": "法案が進めば財政不安から金利が上がるかもしれない。",
+   "watch": "国会での審議",
+   "next": "財政への見方が焦点",
+   "tags": [
+    {
+     "node": "fiscal",
+     "dir": "down"
+    }
+   ],
+   "cat": "politics",
+   "level": 2,
+   "related": []
+  },
+  {
+   "id": "n327",
    "title": "JAL、増収減益　中間決算、国際線好調も燃油費高騰が重しに",
    "link": "https://www.asahi.com/articles/ASVC2132RVC2ULFA008M.html?ref=rss",
    "source": "朝日新聞",
    "time": "2026-11-02T12:45:33+09:00",
    "group": "新聞・放送・通信",
-   "plain": "JALは中間決算で増収減益だった。国際線は好調だが、燃油費の高騰が重しになった。",
-   "context": "航空会社は燃料費の割合が大きい。",
-   "impact": "原油安が続けば燃料負担が軽くなる可能性がある。",
-   "watch": "原油価格と国際線需要",
-   "next": "原油が業績を左右",
+   "plain": "JALは中間決算で増収減益だった。国際線は好調だが、燃油費が重しになった。",
+   "context": "燃料費は航空会社の大きなコスト。",
+   "impact": "原油安が続けばコスト負担は軽くなるかもしれない。",
+   "watch": "原油価格",
+   "next": "原油安は追い風",
    "tags": [],
    "cat": "industry",
    "level": 2,
    "related": []
   },
   {
-   "id": "n252",
+   "id": "n265",
    "title": "Ryanair says it may freeze workers' pay and raise airfares",
    "link": "https://www.bbc.co.uk/news/articles/cr0qkve1x224o?at_medium=RSS&at_campaign=rss",
    "source": "BBC Business",
    "time": "2026-11-02T21:22:10+09:00",
    "group": "海外（英語）",
-   "plain": "ライアンエアーは、イラン戦争が続けば燃料費が増え、賃金凍結や運賃値上げの可能性があると述べた。",
-   "context": "燃料高は運賃に転嫁されやすい。",
-   "impact": "運賃が上がれば旅行需要に響くかもしれない。",
-   "watch": "原油価格",
-   "next": "燃料高が運賃に波及",
+   "plain": "ライアンエアーは、イラン戦争が終わらなければ燃料費が増え、賃金凍結や運賃引き上げをする可能性があると述べた。",
+   "context": "燃料費の上昇は運賃に転嫁されやすい。",
+   "impact": "航空運賃が上がれば家計や旅行に影響するかもしれない。",
+   "watch": "燃料価格",
+   "next": "運賃上昇の可能性",
    "tags": [],
    "cat": "industry",
    "level": 1,
    "related": [],
    "lang": "en"
-  },
-  {
-   "id": "n36",
-   "title": "米企業の銀行借り入れ需要減退、割安な調達先に移行も ＦＲＢ調査",
-   "link": "https://news.google.com/rss/articles/CBMihgFBVV95cUxNcGs3UV9HT21Xck55VHE1NW54RG9yWURPWnE2aXVENUpOczIxbjBqR0YtX1c3aU56NjItQUtleC1KOFM0MFJTcEprT190dDYzY3A4ZHZWWkJtckVFWUtEd3BuS3dVVGVSY1JrQXFVcklJY3dKalV4WlNXbWRiNkNQRGQyLVVUQQ?oc=5",
-   "source": "Reuters",
-   "time": "2026-11-03T15:05:00+09:00",
-   "group": "新聞・放送・通信",
-   "plain": "FRB調査によると、米企業の銀行借り入れ需要が弱まった。割安な調達先に移る動きもある。",
-   "context": "銀行融資は景気の温度を映す指標の一つだ。",
-   "impact": "弱さが続けば景気の減速を示すかもしれない。",
-   "watch": "今後の米経済指標",
-   "next": "融資需要の弱さ",
-   "tags": [],
-   "cat": "global",
-   "level": 1,
-   "related": []
-  },
-  {
-   "id": "n237",
-   "title": "米ISM製造業景況指数、拡大ペースやや加速－生産が約5年ぶり高水準",
-   "link": "https://news.google.com/rss/articles/CBMid0FVX3lxTE5vSGxiYmJkWWMxY05XejZEYjBIWEtLTi1yWEFCUFhab3BRQWdaX01HS3pNVmF5b1JRNW80MFZJMmJEZ01uNUY5SE5VVG1MN1NMUFpER2pQZG1kRDdXUFkzX0I0Nm5ULXpvbld1QjAwR1VzSkNBRzRj?oc=5",
-   "source": "Bloomberg.com",
-   "time": "2026-11-03T00:11:14+09:00",
-   "group": "新聞・放送・通信",
-   "plain": "生産は約5年ぶりの高水準だ。",
-   "context": "",
-   "impact": "景気が強ければ利下げ期待が後退するかもしれない。",
-   "watch": "雇用統計など米指標",
-   "next": "米製造業は堅調",
-   "tags": [],
-   "cat": "global",
-   "level": 2,
-   "related": []
-  },
-  {
-   "id": "n14",
-   "title": "【組織の重大欠陥】侵入口も原因も不明､2カ月半放置された理由も調査中…GMOは明らかに優先順位を間違えている",
-   "link": "https://toyokeizai.net/articles/-/963399?utm_source=rss&utm_medium=http&utm_campaign=link_back",
-   "source": "東洋経済オンライン",
-   "time": "2026-11-03T16:37:00+09:00",
-   "group": "経済誌・ネットメディア",
-   "plain": "GMOインターネットグループの代表が不正アクセス問題で謝罪会見を開いた。原因などは調査中だ。",
-   "context": "情報流出は信用の低下につながる。",
-   "impact": "対策が遅れれば信用や業績に響くかもしれない。",
-   "watch": "調査結果と再発防止策",
-   "next": "企業の信用が焦点",
-   "tags": [],
-   "cat": "industry",
-   "level": 1,
-   "related": []
-  },
-  {
-   "id": "n9",
-   "title": "暗号資産取引所大手バイナンスが北朝鮮サイバー犯罪グループの標的に…｢1兆円強奪｣の裏で広がる2つの信用不安",
-   "link": "https://toyokeizai.net/articles/-/963389?utm_source=rss&utm_medium=http&utm_campaign=link_back",
-   "source": "東洋経済オンライン",
-   "time": "2026-11-03T17:00:00+09:00",
-   "group": "経済誌・ネットメディア",
-   "plain": "暗号資産取引所バイナンスで約1兆円相当が流出し、北朝鮮系ハッカーの関与が指摘されている。",
-   "context": "取引所への信用が揺らぐと、資金が引き出される。",
-   "impact": "信用不安が続けば暗号資産市場に影響するかもしれない。",
-   "watch": "補償策と引き出しの動き",
-   "next": "暗号資産の信用不安",
-   "tags": [],
-   "cat": "market",
-   "level": 1,
-   "related": []
   }
  ],
  "experts": [
@@ -947,7 +1121,21 @@
    "link": "https://note.com/goto_finance/n/n772ca50b6fb8",
    "source": "後藤達也",
    "time": "2026-11-02T06:17:28+09:00",
-   "view": "月曜の朝メモで、米中間選挙のポイントと今週の予定を整理している。",
+   "view": "米中間選挙のポイントと、今週の予定を整理している。",
+   "stance": "中立",
+   "tags": []
+  },
+  {
+   "id": "e1",
+   "expert": "goto",
+   "name": "後藤達也",
+   "role": "経済ジャーナリスト（元日経記者）",
+   "kind": "投稿",
+   "title": "ニュース1週ふりかえり",
+   "link": "https://note.com/goto_finance/n/nd36c3a0e4d77",
+   "source": "後藤達也",
+   "time": "2026-11-01T18:07:57+09:00",
+   "view": "平日に拾いきれなかったニュースを振り返っている。",
    "stance": "中立",
    "tags": []
   },
@@ -961,8 +1149,8 @@
    "link": "https://note.com/goto_finance/n/n347e3ffa8588",
    "source": "後藤達也",
    "time": "2026-10-31T14:55:17+09:00",
-   "view": "バイナンスの1兆円流出を、仕組みや資産が戻るかの疑問に沿って解説している。",
-   "stance": "中立",
+   "view": "バイナンスの約1兆円流出は過去最大の暗号資産流出だと解説している。",
+   "stance": "慎重",
    "tags": []
   },
   {
@@ -975,7 +1163,7 @@
    "link": "https://note.com/goto_finance/n/n6d7458a7ca7e",
    "source": "後藤達也",
    "time": "2026-10-31T09:09:01+09:00",
-   "view": "ナスダックが約5か月ぶりの大幅安となり、キオクシアも急落したと伝えている。",
+   "view": "ナスダックが2.9%下げたと伝え、キオクシアの急落にも触れている。",
    "stance": "慎重",
    "tags": [
     {
@@ -994,7 +1182,7 @@
    "link": "https://note.com/goto_finance/n/n361864565d3a",
    "source": "後藤達也",
    "time": "2026-10-30T18:27:02+09:00",
-   "view": "日銀は1.25％で据え置いた。次回利上げは12月か来年1月との見方が優勢だとしている。",
+   "view": "日銀は1.25%に据え置き。12月か来年1月の利上げ観測が優勢とみる。",
    "stance": "中立",
    "tags": []
   },
@@ -1008,7 +1196,7 @@
    "link": "https://note.com/goto_finance/n/n8462a9d6465d",
    "source": "後藤達也",
    "time": "2026-10-30T07:26:50+09:00",
-   "view": "Googleの決算を受けてハイテク株が売られ、アマゾンのFCF赤字拡大も注目された。",
+   "view": "グーグル決算でハイテク株が売られ、アマゾンのFCF赤字拡大も伝えている。",
    "stance": "慎重",
    "tags": [
     {
@@ -1027,7 +1215,7 @@
    "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTFBvdTZwbFdLR2FMdVRWUnFjcm5CRG56bTA2cTM2Qk10YXJmc2hDaDRCeGZnZm9PY3F2Wkt5Wk9zNGxQdVJiaEZXbUdIUnEzZXJPVWxkRjVoRktqWjBlcjRiU0YxUkxVb1V4cW4zeGVNdw?oc=5",
    "source": "宮崎日日新聞",
    "time": "2026-10-28T06:00:00+09:00",
-   "view": "来年もAI景気が拡大するとの見方を示している。",
+   "view": "来年もAI景気が拡大すると指摘している。",
    "stance": "強気",
    "tags": [
     {
@@ -1046,12 +1234,64 @@
    "link": "https://news.google.com/rss/articles/CBMiXEFVX3lxTE91MXpyRkNqZGtKcUJGUGdoM1F4X2J2QVBfTGpRUXIySXdIZ0VVSW96cjJqVHFVQ1pFV3JwYUloWlkybkNrT3JKeWRhNkNhUXlhWkpEeXVlM2xsX01J?oc=5",
    "source": "朝日新聞",
    "time": "2026-11-03T05:00:00+09:00",
-   "view": "米中間選挙が金融市場に与える影響を解説している。",
+   "view": "米中間選挙の金融市場への影響を解説する記事。内容は要約からは不明。",
    "stance": "中立",
    "tags": []
   },
   {
-   "id": "e15",
+   "id": "e11",
+   "expert": "kiuchi",
+   "name": "木内登英",
+   "role": "エコノミスト（野村総合研究所・元日銀審議委員）",
+   "kind": "記事",
+   "title": "野村総研・木内登英さんが語る 衆院選後の円高は「政策修正への期待」 日銀利上げへの影響は？",
+   "link": "https://news.google.com/rss/articles/CBMiX0FVX3lxTFBOUExnSHEtbW9VMl9aNnhsUGRSRDFnM3ZUa3phQVJVaFFIMFQtUEdOQ3RSTDIwcnBSZlE4R0ZrYnY4U0p1WTZzd3BKMENELXAtRmZGMXFRaFNNSnBQY0Jn?oc=5",
+   "source": "野村證券",
+   "time": "2026-10-30T16:00:00+09:00",
+   "view": "衆院選後の円高は政策修正への期待だと語っている。",
+   "stance": "中立",
+   "tags": [
+    {
+     "node": "usdjpy",
+     "dir": "down"
+    }
+   ]
+  },
+  {
+   "id": "e12",
+   "expert": "kiuchi",
+   "name": "木内登英",
+   "role": "エコノミスト（野村総合研究所・元日銀審議委員）",
+   "kind": "記事",
+   "title": "【高市１強の行方】４の（２）＜経済政策＞野村総合研究所の木内登英さん 金融市場の警鐘に耳傾けよ 積極財政姿勢、修正を",
+   "link": "https://news.google.com/rss/articles/CBMiUkFVX3lxTE5rbzNDV3oybkFkZDFkVngxcDJMQi1mbkkxd1pnd2NmM3NUQ25nNTl2bjRrb2haZHNXWEU4OUZTTnY3LWxVeVAzQm9idGhZcGo1M1E?oc=5",
+   "source": "山陽新聞",
+   "time": "2026-10-30T16:00:00+09:00",
+   "view": "金融市場の警鐘に耳を傾け、積極財政を修正すべきだとみる。",
+   "stance": "慎重",
+   "tags": [
+    {
+     "node": "fiscal",
+     "dir": "down"
+    }
+   ]
+  },
+  {
+   "id": "e13",
+   "expert": "kiuchi",
+   "name": "木内登英",
+   "role": "エコノミスト（野村総合研究所・元日銀審議委員）",
+   "kind": "記事",
+   "title": "【第２次高市改造内閣】財務相留任に大きな意味 市場は首相のスタンス凝視 野村総合研究所エグゼクティブ・エコノミスト 木内登英氏",
+   "link": "https://news.google.com/rss/articles/CBMiUkFVX3lxTFBUckxyV21vUlpjMWUxY2RGRDJRWmJpOHhpLWhOX0paWmlMemxCY2hfdkVXZFZvMVlTclJvSzVOelFsU2JEb1hOeHNwaXpUSE9RMUE?oc=5",
+   "source": "山陽新聞",
+   "time": "2026-10-30T16:00:00+09:00",
+   "view": "財務相の留任に意味があり、市場は首相の姿勢を見ているとみる。",
+   "stance": "中立",
+   "tags": []
+  },
+  {
+   "id": "e16",
    "expert": "nli",
    "name": "ニッセイ基礎研究所",
    "role": "シンクタンク（研究員のレポート）",
@@ -1060,12 +1300,12 @@
    "link": "https://www.nli-research.co.jp/topics_detail1/id=87234?site=nli",
    "source": "ニッセイ基礎研究所",
    "time": "2026-11-02T15:27:06+09:00",
-   "view": "ユーロ圏の7-9月GDPは前期比0.4％で予想を上回ったが、前期からは低下したと整理している。",
+   "view": "ユーロ圏の7〜9月は前期比0.4%で、前期から伸びが低下したと整理している。",
    "stance": "中立",
    "tags": []
   },
   {
-   "id": "e17",
+   "id": "e18",
    "expert": "nli",
    "name": "ニッセイ基礎研究所",
    "role": "シンクタンク（研究員のレポート）",
@@ -1074,22 +1314,22 @@
    "link": "https://www.nli-research.co.jp/topics_detail1/id=87236?site=nli",
    "source": "ニッセイ基礎研究所",
    "time": "2026-11-02T13:58:54+09:00",
-   "view": "企業の物価見通しは2％超でも、自社の販売価格の見通しは1％未満とずれていると指摘している。",
+   "view": "企業の物価見通しは2%超でも、自社の販売価格見通しは1%未満と指摘している。",
    "stance": "中立",
    "tags": []
   }
  ],
  "debates": [
   {
-   "topic": "AI相場の先行き",
-   "crux": "AI株の下げを調整とみるか、不安の始まりとみるか。",
+   "topic": "AI関連株の先行き",
+   "crux": "AI景気が続くか、投資負担で株が崩れるか",
    "sides": [
     {
      "stance": "強気",
      "experts": [
       "e8"
      ],
-     "view": "来年もAI景気は拡大するとみている。"
+     "view": "来年もAI景気は拡大するとみる。"
     },
     {
      "stance": "慎重",
@@ -1097,16 +1337,16 @@
       "e3",
       "e5"
      ],
-     "view": "ハイテク株の売りが続き、資金負担への不安が強い。"
+     "view": "ナスダックの下げや巨額投資の負担を警戒している。"
     }
    ]
   }
  ],
  "scenarios": [
   {
-   "event": "日本のGDP（2026年7-9月期・1次速報）",
+   "event": "日本のGDP（7-9月期・1次速報）",
    "date": "2026-11-16",
-   "focus": "個人消費など内需が持ち直したか。日銀の利上げ判断の材料になる。",
+   "focus": "個人消費や設備投資が持ち直しているか",
    "cases": [
     {
      "label": "予想より強い",
@@ -1128,7 +1368,7 @@
        }
       ]
      ],
-     "text": "景気が強ければ株に追い風で、利上げ観測が強まり円高要因になるかもしれない。"
+     "text": "景気が強ければ株高や、日銀の利上げ観測から円高になるかもしれない。"
     },
     {
      "label": "予想より弱い",
@@ -1142,15 +1382,9 @@
         "node": "nikkei",
         "dir": "down"
        }
-      ],
-      [
-       {
-        "node": "consumption",
-        "dir": "down"
-       }
       ]
      ],
-     "text": "消費が弱いと景気不安が強まり、利上げを急ぎにくくなるかもしれない。"
+     "text": "景気が弱ければ株が重くなり、日銀は慎重になる可能性がある。"
     }
    ]
   }
@@ -1648,23 +1882,23 @@
  "terms": [
   {
    "term": "調整局面",
-   "explain": "株価が高値から一定以上(一般に10％以上)下がった状態。"
+   "explain": "株価が高値から一定程度下がった状態のこと。"
   },
   {
    "term": "IPO",
-   "explain": "会社が初めて株を一般の投資家に売り出し、上場すること。"
+   "explain": "会社が初めて株を一般に売り出し、上場すること。"
   },
   {
-   "term": "フリーキャッシュフロー",
-   "explain": "事業で稼いだ現金から投資を引いた、自由に使えるお金。"
+   "term": "スワップオペ",
+   "explain": "中央銀行が資金や債券を交換して市場に資金を供給する操作。"
+  },
+  {
+   "term": "準備率",
+   "explain": "銀行が中央銀行に預けなければならない預金の割合。"
   },
   {
    "term": "社債",
-   "explain": "企業が投資家からお金を借りるために出す債券。"
-  },
-  {
-   "term": "ディスカウント",
-   "explain": "株を市場価格より安く売ること。"
+   "explain": "企業が資金を借りるために出す債券。"
   }
  ],
  "sources": [
@@ -1673,7 +1907,7 @@
    "group": "新聞・放送・通信",
    "lang": "ja",
    "collected": 45,
-   "shown": 9,
+   "shown": 8,
    "related": 0
   },
   {
@@ -1681,15 +1915,15 @@
    "group": "ニュースのまとめ",
    "lang": "ja",
    "collected": 30,
-   "shown": 1,
+   "shown": 3,
    "related": 0
   },
   {
    "name": "NHK",
    "group": "新聞・放送・通信",
    "lang": "ja",
-   "collected": 17,
-   "shown": 1,
+   "collected": 18,
+   "shown": 2,
    "related": 0
   },
   {
@@ -1712,7 +1946,7 @@
    "name": "ITmedia ビジネス",
    "group": "経済誌・ネットメディア",
    "lang": "ja",
-   "collected": 12,
+   "collected": 11,
    "shown": 0,
    "related": 0
   },
@@ -1736,16 +1970,16 @@
    "name": "ブルームバーグ",
    "group": "新聞・放送・通信",
    "lang": "ja",
-   "collected": 20,
-   "shown": 6,
-   "related": 0
+   "collected": 22,
+   "shown": 5,
+   "related": 1
   },
   {
    "name": "朝日新聞",
    "group": "新聞・放送・通信",
    "lang": "ja",
    "collected": 20,
-   "shown": 2,
+   "shown": 3,
    "related": 0
   },
   {
@@ -1761,7 +1995,7 @@
    "group": "新聞・放送・通信",
    "lang": "ja",
    "collected": 20,
-   "shown": 0,
+   "shown": 3,
    "related": 0
   },
   {
@@ -1777,7 +2011,7 @@
    "group": "経済誌・ネットメディア",
    "lang": "ja",
    "collected": 10,
-   "shown": 2,
+   "shown": 1,
    "related": 0
   },
   {
@@ -1832,8 +2066,8 @@
    "name": "BBC Business",
    "group": "海外（英語）",
    "lang": "en",
-   "collected": 14,
-   "shown": 1,
+   "collected": 15,
+   "shown": 2,
    "related": 0
   },
   {
@@ -1841,7 +2075,7 @@
    "group": "海外（英語）",
    "lang": "en",
    "collected": 10,
-   "shown": 1,
+   "shown": 5,
    "related": 0
   },
   {
@@ -1849,7 +2083,7 @@
    "group": "海外（英語）",
    "lang": "en",
    "collected": 10,
-   "shown": 5,
+   "shown": 4,
    "related": 0
   }
  ]
