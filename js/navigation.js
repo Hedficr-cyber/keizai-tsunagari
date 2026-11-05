@@ -1,5 +1,6 @@
 // ナビのレンズと横スワイプ。画面・読書位置・詳細履歴は既存ルーターが管理する。
-export function initNavigation({ nav, main, getView, canNavigate, navigate }) {
+// inner(step, commit) は画面の中の分類の移動。移れるなら true（commit のときは実際に移る）。端では隣の画面へ。
+export function initNavigation({ nav, main, getView, canNavigate, navigate, inner = () => false }) {
   const links = [...nav.querySelectorAll('a[data-v]')];
   const views = links.map(a => a.dataset.v);
   const lens = nav.querySelector('.nav-lens');
@@ -92,7 +93,7 @@ export function initNavigation({ nav, main, getView, canNavigate, navigate }) {
       nav.dataset.preview = views[index];
       moveLens(index, x);
     } else if (!reduced.matches) {
-      const outside = (g.index === 0 && dx > 0) || (g.index === views.length - 1 && dx < 0);
+      const outside = !inner(dx < 0 ? 1 : -1, false) && ((g.index === 0 && dx > 0) || (g.index === views.length - 1 && dx < 0));
       const offset = outside ? dx * .12 : dx * .65;
       g.page.style.transform = `translateX(${Math.max(-160, Math.min(160, offset))}px)`;
     }
@@ -109,8 +110,15 @@ export function initNavigation({ nav, main, getView, canNavigate, navigate }) {
     } else {
       const distance = Math.abs(dx), elapsed = performance.now() - g.start;
       const threshold = Math.max(56, Math.min(96, innerWidth * .18));
-      if (distance > Math.abs(dy) * 1.35 && (distance >= threshold || (distance >= 28 && distance / elapsed > .45))) next += dx < 0 ? 1 : -1;
-      next = Math.max(0, Math.min(views.length - 1, next));
+      const step = distance > Math.abs(dy) * 1.35 && (distance >= threshold || (distance >= 28 && distance / elapsed > .45)) ? (dx < 0 ? 1 : -1) : 0;
+      if (step && inner(step, false)) {
+        suppress(g);
+        cancel(false);
+        inner(step, true);
+        if (!reduced.matches) entry = page()?.animate([{ opacity: .6, transform: `translateX(${step * 56}px)` }, { opacity: 1, transform: 'translateX(0)' }], { duration: 220, easing: 'cubic-bezier(.2,.8,.2,1)' });
+        return;
+      }
+      next = Math.max(0, Math.min(views.length - 1, next + step));
     }
     suppress(g);
     cancel(next === g.index);

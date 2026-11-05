@@ -15,6 +15,8 @@ import re
 import shutil
 import subprocess
 import sys
+import time
+from concurrent.futures import ThreadPoolExecutor
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
@@ -45,7 +47,8 @@ SYSTEM = """あなたは経済・金融ニュースの解説者です。経済�
 - 「起きたこと」と「この先の見通し」をはっきり分け、見通しは「〜かもしれない」「〜の可能性がある」と書く。
 - 特定の銘柄の売買をすすめない。
 - 有識者の見方は、その人自身の発言・寄稿として読み取れるものだけを要約する。名前が出てくるだけの記事や、別人の記事は relevant を false にする。
-- 日本語で書く。一文は40字くらいまでに短く切る。むずかしい言葉は少なくし、使うときはかんたんな言い換えを添える。"""
+- 日本語で書く。一文は40字くらいまでに短く切る。そのぶん文を重ねて、読む人が「何が起きて、なぜ大事で、どこに響くのか」までわかるようにする。むずかしい言葉は少なくし、使うときはかんたんな言い換えを添える。略語（FCF・CPI など）は、そのまま使わず言い換えるか、かっこで意味を添える。
+- 文章の中に、つながり図の項目の id（fed・boj・ust10 など）を書かない。名前（FRB・日銀・米国の長期金利など）で書く。"""
 
 DIR = {"type": "string", "enum": ["up", "down"]}
 
@@ -83,6 +86,7 @@ def main_schema(nodes, cats):
             "title": s("テーマ名（20字以内）"),
             "point": s("ひとことで言うと（30字以内。一覧に出す）"),
             "thread": s("このテーマが続いている『流れ』の名前（15字以内）。既にある流れと同じ話題ならその名前をそのまま使う"),
+            "story": s("この流れを追うと何がわかるか（2文・100字以内）。これまでの流れの内容と今日を比べ、何がどう変わってきたか・いま何が焦点かを書く。新しい流れなら、この話題が何に響くかを書く"),
             "what": s("何が起きたか（事実だけ・100字以内・短い文で）"),
             "chain": arr(tag, 2, 6, "原因から影響へ、つながり図の項目を順に並べる"),
             "chain_text": s("そのつながりの説明（150字以内）"),
@@ -95,15 +99,13 @@ def main_schema(nodes, cats):
             "id": s(), "tags": arr(tag, hi=3),
             "cat": {"type": "string", "enum": cats, "description": "分類を1つ（そのニュースのいちばん大事な面で選ぶ）"},
             "title_ja": s("英語の記事だけ短い日本語の見出し（40字以内）。主語・対象・国・輸出入の向きを変えない。原産国の製品と輸出先を取り違えない。日本語の記事は空文字"),
-            "plain": s("原資料から確認できる事実を2〜3文で（目安80〜180字）。資料が少なければ短くし、足りない事情を補わない"),
-            "context": s("背景・仕組み（80〜140字）。その記事を理解するのに必要な一般的な経済の仕組み。原資料にない会社固有の事情を断定しない"),
-            "impact": s("この先の影響（80〜140字）。条件を明示し、企業・家計・相場へのつながりを具体的に。見通しと断定を分ける"),
-            "watch": s("次に見ること（40〜80字）。何を確かめれば判断できるか。資料にない発表日を作らない"),
-            "next": s("影響の短い要点（70字以内）。impactと矛盾させない"),
+            "next": s("このニュースが何に響くかの短い要点（70字以内）"),
             "level": {"type": "integer", "minimum": 1, "maximum": 3, "description": "重要度 3=大きい"},
         })),
         "experts": arr(obj({
-            "id": s(), "relevant": {"type": "boolean"}, "view": s("この人の見方（90字以内）"),
+            "id": s(), "relevant": {"type": "boolean"},
+            "view": s("この人が何をどう見ているか（60字以内・言い切りで）。『〜を整理した』『〜をまとめた』『〜と伝えた』『〜を論じた』のような記事の紹介にしない"),
+            "reason": s("そう見る理由・根拠（80字以内）。発信から読み取れる範囲で。読み取れなければ空文字"),
             "stance": {"type": "string", "enum": ["強気", "慎重", "中立"]}, "tags": arr(tag, hi=3),
         })),
         "debates": arr(obj({
@@ -131,6 +133,16 @@ def main_schema(nodes, cats):
         "quiz": arr(obj({"q": s(), "choices": arr(s(), 3, 3),
                          "answer": {"type": "integer", "minimum": 0, "maximum": 2}, "explain": s()}), 0, 0),
     })
+
+
+def detail_schema():
+    return obj({"items": arr(obj({
+        "id": s(),
+        "plain": s("何が起きたか（2〜3文・80〜160字）。誰が・何を・どれくらい・なぜを、材料にある範囲で。見出ししかない記事は、何が新しい動きなのかを言い換える"),
+        "context": s("背景・仕組み（2〜3文・80〜160字）。このニュースを読むのに必要な経済の仕組みやこれまでの経緯。むずかしい言葉は言い換える"),
+        "impact": s("この先の影響（2〜3文・80〜160字）。日本の家計・企業・円や金利や株にどう響きうるかを、条件をはっきりさせて。見通しは『〜かもしれない』"),
+        "watch": s("次に見ること（1〜2文・40〜90字）。判断の決め手になる発表・指標・値動き。材料にない日付は作らない"),
+    }))})
 
 
 def review_schema():
@@ -232,8 +244,11 @@ def build_prompt(graph, raw, experts_cfg, threads):
     today = datetime.now(JST).date()
     cal = "\n".join(f"{e['date']}｜{e['name']}｜{e['note']}" for e in raw.get("calendar", [])
                     if e["date"] <= (today + timedelta(days=14)).isoformat()) or "（なし）"
+    recent = sorted(threads.get("threads", []), key=lambda t: t["entries"][-1]["date"], reverse=True)[:25]
+    # 流れの続きを書けるように、最近の流れは直近2日分の中身も渡す
     th = "\n".join(f"{t['name']}（最後 {t['entries'][-1]['date']}・{len(t['entries'])}日分）"
-                   for t in sorted(threads.get("threads", []), key=lambda t: t["entries"][-1]["date"], reverse=True)[:25]) or "（まだない）"
+                   + "".join(f"\n  {e['date']} {e['title']}：{e['what'][:90]}" for e in t["entries"][-2:]) * (k < 10)
+                   for k, t in enumerate(recent)) or "（まだない）"
     return f"""今日は {datetime.now(JST).strftime('%Y年%m月%d日 %H時')}。下の材料から、今日の経済の動きを読み解いてください。
 
 ## 相場の数字（公的な実データ。上がった・下がったはこの数字を優先する）
@@ -265,17 +280,50 @@ def build_prompt(graph, raw, experts_cfg, threads):
 
 ## 作るもの
 - headline: 今日の世の中の動きを一言で。
-- themes: 今日いちばん大事な動きを3〜5個、大事な順に並べる。経済への影響が大きい動きだけにする（情報流出・サイバー攻撃などの事件は、相場や業績を大きく動かしたときだけ）。chain は原因から影響へ、項目を順に並べる（なるべく上の基本の関係に沿う。沿わないつながりは chain_text で理由を書く）。chain の向きは今日実際に起きている向き（相場の数字とニュース）に合わせ、まだ起きていない仮の向きを使うときは chain_text に「もし〜なら」と書く。outlook は「〜かもしれない」で。thread は、上の『流れ』と同じ話題ならその名前をそのまま使い、新しい話題なら短い名前を付ける。つながり図の基本の関係でうまくつながらないときは、chain を2項目にとどめ、無理に項目を足さない。
-- news: 経済・金融・ビジネスに関係し、世の中の流れを知るために押さえておきたいものを30〜50本選び、重要な順に並べる。個人の好みやクリックされやすさでは選ばない。金融政策・為替・物価や景気・企業や産業・海外や政治の動きを広く見渡し、原資料に大事な動きがある分野を落とさない。一つの人気業界や銘柄だけで埋めない。新聞・通信社・経済誌・公的機関・海外の媒体を広く見渡し、同じ大事さなら一つの媒体ばかりにならないようにする。海外の媒体（[英語] を含む）は、日本の経済や世界の流れに関わる大事な動きを拾う。公的機関の発表は、政策や統計として大事なものだけにする。ただし原資料にない話題を分野の穴埋めのために作らない。スポーツ・事件・芸能などは入れない。同じ国・主体・発表対象・期間の出来事を伝える続報・見出し違いは、いちばん詳しい1本を優先する。別の国・企業・発表・期間は独立した記事として扱う。cat は下の分類から1つ選ぶ（例：日経平均の動き→market、日銀の決定→policy、企業の決算→industry、物価の統計→economy、海外の景気→global、政府の予算や選挙→politics、家計や住宅→life）。情報流出・サイバー攻撃・事件・選挙制度などは、経済への影響がはっきりしているときだけ入れ、level は1にする。level=3 は経済全体に広く影響する動きや重要な政策・統計、level=2 はその分野の流れを知るために押さえる動き、level=1 は補足。plain は原資料の事実を2〜3文でやさしく説明する。見出ししかない記事は短くてもよいので、原因・事情・数字を推測で足さない。context にはそのニュースを読むための一般的な経済の仕組み、impact には条件付きの影響、watch には次に見る具体的なポイントを書く。4欄の同じ内容の繰り返しや、どの記事にも当てはまる定型文は避ける。context の一般論を、その企業・国で実際に起きた事情として書かない。元の記事に行かなくても要点と意味を理解できる内容にする。tags はそのニュースが動かす項目と向き（関係が薄ければ空でよい）。
-- news の参照: themes.newsで参照する記事は、必ずnewsにも同じIDで含め、plain/context/impact/watchをその記事の材料から書く。テーマの参照だけにしてニュース本文を省略しない。
-- news の同一判定: 1件には1本の元記事の情報だけを使い、同業他社の決算、別国の金融政策、同じ業界の別の変化を1件へまとめない。plain・context・impact・watch・next は選んだその記事についてだけ書き、別記事の事実を混ぜない。原資料にない数字・固有の会社名・国名・日付は足さない。同じ出来事と確実に分かる記事を重ねて選びすぎず、別の重要な出来事は独立して選ぶ。最終的な統合はアプリ側が国・主体・指標・期間を照合して行う。
+- themes: 今日いちばん大事な動きを3〜5個、大事な順に並べる。経済への影響が大きい動きだけにする（情報流出・サイバー攻撃などの事件は、相場や業績を大きく動かしたときだけ）。chain は原因から影響へ、項目を順に並べる（なるべく上の基本の関係に沿う。沿わないつながりは chain_text で理由を書く）。chain の向きは今日実際に起きている向き（相場の数字とニュース）に合わせ、まだ起きていない仮の向きを使うときは chain_text に「もし〜なら」と書く。outlook は「〜かもしれない」で。thread は、上の『流れ』と同じ話題ならその名前をそのまま使い、新しい話題なら短い名前を付ける。story は、その流れの最近の中身（上に書いた直近の内容）と今日を比べて「何がどう変わってきたか・いま何が焦点か」を2文で書く（例：「据え置きが続き、焦点は12月の利上げの有無に移った。円は158円前後で方向が出ていない」）。日数や日付の数え上げにしない。つながり図の基本の関係でうまくつながらないときは、chain を2項目にとどめ、無理に項目を足さない。
+- news: 経済・金融・ビジネスに関係し、世の中の流れを知るために押さえておきたいものを30〜50本選び、重要な順に並べる。個人の好みやクリックされやすさでは選ばない。金融政策・為替・物価や景気・企業や産業・海外や政治の動きを広く見渡し、原資料に大事な動きがある分野を落とさない。一つの人気業界や銘柄だけで埋めない。新聞・通信社・経済誌・公的機関・海外の媒体を広く見渡し、同じ大事さなら一つの媒体ばかりにならないようにする。海外の媒体（[英語] を含む）は、日本の経済や世界の流れに関わる大事な動きを拾う。公的機関の発表は、政策や統計として大事なものだけにする。ただし原資料にない話題を分野の穴埋めのために作らない。スポーツ・事件・芸能などは入れない。同じ国・主体・発表対象・期間の出来事を伝える続報・見出し違いは、いちばん詳しい1本を優先する。別の国・企業・発表・期間は独立した記事として扱う。cat は下の分類から1つ選ぶ（例：日経平均の動き→market、日銀の決定→policy、企業の決算→industry、物価の統計→economy、海外の景気→global、政府の予算や選挙→politics、家計や住宅→life）。情報流出・サイバー攻撃・事件・選挙制度などは、経済への影響がはっきりしているときだけ入れ、level は1にする。level=3 は経済全体に広く影響する動きや重要な政策・統計、level=2 はその分野の流れを知るために押さえる動き、level=1 は補足。くわしい解説（何が起きた・背景・影響・次に見ること）は別に作るので、ここでは next に「何に響くか」の短い要点だけを書く。tags はそのニュースが動かす項目と向き（関係が薄ければ空でよい）。
+- news の参照: themes.newsで参照する記事は、必ずnewsにも同じIDで含める。
+- news の同一判定: 1件には1本の元記事の情報だけを使い、同業他社の決算、別国の金融政策、同じ業界の別の変化を1件へまとめない。next は選んだその記事についてだけ書き、別記事の事実を混ぜない。原資料にない数字・固有の会社名・国名・日付は足さない。同じ出来事と確実に分かる記事を重ねて選びすぎず、別の重要な出来事は独立して選ぶ。最終的な統合はアプリ側が国・主体・指標・期間を照合して行う。
 - news の項目札: 各項目の「対象」と上下の意味を、元の見出し・配信要約の国・指標・主体・変化と照合する。実際に書かれた対象の変化だけを tags にし、そこから推測した波及は next に分ける。「AI投資増を嫌気して株安」は投資の拡大で、株安を ai_semis の縮小に読み替えない。半導体企業の好決算・株価上昇・AIへの期待だけでは設備投資が増えた根拠にならない。import_prices は日本の円建て輸入物価で、米企業の原材料費では代用しない。中国の政治・軍事の出来事だけで china（中国経済）の回復・減速を決めない。「豪州の物価」を「米国の物価」、「海外の中央銀行」を「日銀」「FRB」で代用しない。複数の対象が逆に動く記事では、それぞれの方向を分ける。否定・据え置き・期待だけの変化を実績として付けず、根拠がない・曖昧・図に適切な項目がないときは tags を空にする。
-- experts: すべての有識者の発信について、その人の見方として読めるかを判断する（relevant）。
+- experts: すべての有識者の発信について、その人の見方として読めるかを判断する（relevant）。view は「その人が何をどう見ているか」を言い切りで書き（例：「長期金利の急な上昇は国の借金の負担を重くするとみる」）、reason にそう見る理由（その人が挙げている根拠や仕組み）を書く。事実の紹介が中心の発信でも、何に注目しているかを書き、stance は中立にする。reason に「題名から」「〜を整理した朝メモ」のような、材料や記事そのものの説明は書かない。理由が読み取れないときは reason を空にする。
 - debates: relevant な有識者の発信のなかで、同じ話題について強気と慎重に見方が分かれているもの。無理に作らない。
 - scenarios: 上の予定のうち2週間以内のものそれぞれに、結果が2通りに分かれた場合の広がり。各caseのpathsには、上の基本の関係の向きと符号が合う因果経路を、1経路ずつ別配列で入れる。日銀の利上げから円高と長期金利上昇へ分かれるなら、日銀→円高 と 日銀→長期金利→住宅ローン の2配列にする。隣接する根拠のない項目や逆符号を矢印で結ばない。日銀・FRBが実際に据え置く条件だけdirをholdにし、holdは単独札にする。「利下げに前向き」「慎重な姿勢」など発言姿勢だけを政策金利の引き下げに置換せず、textで区別する。ニュースに日付つきで出てくる大きな予定（米雇用統計・米消費者物価など）があれば足してよい（日付がわからなければ date は空文字）。
 - moving: 今日のニュースから見て、いま動いている項目と向き。
 - quiz: クイズの画面は使わないため、空配列にする。
-- terms: あなたが書いた文章（what・chain_text・outlook・plain・context・impact・watch・next・view など）に出てくる難しい言葉で、上の用語集にないもの。会社名・人名は入れない。"""
+- terms: あなたが書いた文章（what・chain_text・outlook・story・next・view・reason など）に出てくる難しい言葉で、上の用語集にないもの。会社名・人名は入れない。"""
+
+
+def build_detail_prompt(graph, raw, items, glossary):
+    """選んだニュースの解説（何が起きた・背景・影響・次に見ること）を作る材料。数本ずつ分けて呼ぶ。"""
+    by_id = {n["id"]: n for n in graph["nodes"]}
+    lines = []
+    for it in items:
+        x = raw["news"][int(it["id"][1:])]
+        tags = "・".join(f"{by_id[t['node']]['name']}が{by_id[t['node']]['up'] if t.get('dir') == 'up' else by_id[t['node']]['down']}"
+                         for t in it.get("tags", []) if t.get("node") in by_id and t.get("dir") in ("up", "down"))
+        lines.append(f"[{it['id']}] {'[英語] ' if x.get('lang') == 'en' else ''}{x['source']} {short_time(x['time'])}｜{x['title']}"
+                     + (f"｜{x['summary'][:700]}" if x.get("summary") else "")
+                     + (f"｜動く項目：{tags}" if tags else "")
+                     + (f"｜要点：{it['next']}" if it.get("next") else ""))
+    return f"""今日は {datetime.now(JST).strftime('%Y年%m月%d日')}。経済を学び始めた大学生が、元の記事に行かなくても「何が起きて、なぜ大事で、自分たちの暮らしや日本の経済のどこに響くのか」まで理解できるように、下のニュースそれぞれの解説を書いてください。
+
+## 相場の数字（公的な実データ）
+{markets_text(raw.get('markets', {}))}
+
+## ニュース（ID｜媒体 日時｜見出し｜配信の要約｜動く項目｜要点）
+{chr(10).join(lines)}
+
+## 書き方
+- items には上のニュースを全部、同じ id で入れる。
+- 文末は「〜した」「〜だ」「〜かもしれない」の形にする（です・ます調にしない）。
+- 相場の数字は、背景・影響・次に見ることで使ってよい。plain（何が起きた）には記事の材料の数字だけを使う。
+- plain は材料（見出し・配信の要約）に書かれた事実だけで書く。誰が・何を・どれくらい（数字は材料にあるものだけ）・なぜ。見出ししかない記事は、その見出しが「何が新しい動きなのか」を言い換えて説明し、事情や数字を推測で足さない。
+- context は、このニュースを読むのに必要な一般的な経済の仕組みや、これまでの経緯。一般論を、その会社・国で実際に起きた事情のように書かない。
+- impact は、日本の家計・企業・円や金利や株にどう響きうるかを、条件をはっきりさせて書く（「〜なら〜かもしれない」）。「動く項目」があれば、そのつながりに沿って説明する。
+- watch は、次に何を確かめれば判断できるか（発表・指標・値動き）。材料にない日付は作らない。
+- 1件の解説には、その記事の材料だけを使う。別の記事の会社・国・数字を混ぜない。
+- 4つの欄で同じことを繰り返さない。どの記事にも当てはまる決まり文句にしない。
+- 用語集にある言葉（{"、".join(glossary[:80])} など）はそのまま使ってよい（アプリでタップすると説明が出る）。"""
 
 
 def find_claude():
@@ -288,8 +336,16 @@ def find_claude():
     return found[-1] if found else None
 
 
-def run_claude(prompt, schema, name):
-    """Claude を1回呼ぶ。結果は _work/raw/ai_{name}.json にも残す（--reuse で使い回せる）。"""
+# 一時的な失敗（Mac が途中で眠って接続が切れた・通信できない・混み合い）だけを、少し待って呼び直す。
+# 利用枠の上限や認証の失敗は呼び直さない。
+TRANSIENT = re.compile(r"timed out|enotfound|can't reach the api|econnreset|etimedout|socket hang up|network|overloaded"
+                       r"|internal server error|\"api_error_status\":\s*(?:500|502|503|504|529)\b")
+PERMANENT = re.compile(r"usage limit|rate limit|credit|authentication|unauthorized|log ?in|\"api_error_status\":\s*(?:401|403|429)\b")
+RETRY_WAITS = (20, 60)
+
+
+def run_claude(prompt, schema, name, timeout=900):
+    """Claude を呼ぶ。結果は _work/raw/ai_{name}.json にも残す（--reuse で使い回せる）。"""
     keep = ROOT / "_work" / "raw" / f"ai_{name}.json"
     if "--reuse" in ARGS:
         got = load(keep, None)
@@ -303,9 +359,19 @@ def run_claude(prompt, schema, name):
            "--output-format", "json", "--model", MODEL, "--system-prompt", SYSTEM,
            "--json-schema", json.dumps(schema, ensure_ascii=False)]
     (ROOT / "_work").mkdir(exist_ok=True)
-    p = subprocess.run(cmd, input=prompt, capture_output=True, text=True, timeout=900, cwd=str(ROOT / "_work"))
-    if p.returncode != 0:
-        raise RuntimeError(f"claude が失敗: {p.stderr[-400:] or p.stdout[-400:]}")
+    for attempt in range(len(RETRY_WAITS) + 1):
+        try:
+            p = subprocess.run(cmd, input=prompt, capture_output=True, text=True, timeout=timeout, cwd=str(ROOT / "_work"))
+            error = None if p.returncode == 0 else f"claude が失敗: {p.stderr[-400:] or p.stdout[-400:]}"
+        except subprocess.TimeoutExpired:
+            error = "claude が失敗: timed out（時間切れ）"
+        if not error:
+            break
+        low = error.casefold()
+        if attempt == len(RETRY_WAITS) or PERMANENT.search(low) or not TRANSIENT.search(low):
+            raise RuntimeError(error)
+        print(f"{name}：一時的な失敗なので {RETRY_WAITS[attempt]}秒後に呼び直す（{attempt + 1}/{len(RETRY_WAITS)}）", file=sys.stderr, flush=True)
+        time.sleep(RETRY_WAITS[attempt])
     out = json.loads(p.stdout)
     data = out.get("structured_output")
     if data is None:
@@ -376,6 +442,72 @@ def economic_candidate(article):
 def placeholder_news(item):
     return any(re.fullmatch(r"\s*(?:ダミー|dummy|tbd|仮置き|テストデータ)[。.!]?\s*", str(item.get(k) or ""), re.I)
                for k in ("plain", "next", "title_ja"))
+
+
+DETAILS_CACHE = ROOT / "_work" / "raw" / "details_cache.json"
+DETAIL_BATCH, DETAIL_WORKERS, DETAIL_KEEP_DAYS = 12, 4, 10
+
+
+def detail_key(x):
+    return f"{x.get('link', '')}|{x.get('title', '')}"
+
+
+def add_details(graph, raw, news):
+    """ニュースの解説を、数本ずつ分けて Claude に書かせる。前に書いた記事は使い回す（利用枠を節約）。
+
+    失敗した組は配信の要約だけを残し、次の読み解きで書き直す。日付をまたいでも同じ記事の解説は同じ。
+    """
+    cache = load(DETAILS_CACHE, {})
+    cut = (datetime.now(JST) - timedelta(days=DETAIL_KEEP_DAYS)).isoformat()
+    cache = {k: v for k, v in cache.items() if v.get("made", "") >= cut}
+    todo = [n for n in news if detail_key(raw["news"][int(n["id"][1:])]) not in cache]
+    batches = [todo[i:i + DETAIL_BATCH] for i in range(0, len(todo), DETAIL_BATCH)]
+    glossary = glossary_words()
+
+    def one(k, items):
+        try:
+            got, _ = run_claude(build_detail_prompt(graph, raw, items, glossary), detail_schema(), f"detail{k}", timeout=600)
+            return {g.get("id"): g for g in got.get("items", []) if isinstance(g, dict)}
+        except Exception as e:  # noqa: BLE001
+            print(f"解説 {k + 1} 組目に失敗（配信の要約だけを出す）:", str(e)[:200], file=sys.stderr)
+            return {}
+
+    made = datetime.now(JST).isoformat(timespec="seconds")
+    with ThreadPoolExecutor(max_workers=DETAIL_WORKERS) as pool:
+        for items, got in zip(batches, pool.map(lambda b: one(*b), enumerate(batches))):
+            for n in items:
+                g = got.get(n["id"])
+                if g and g.get("plain"):
+                    cache[detail_key(raw["news"][int(n["id"][1:])])] = {
+                        "made": made, "fields": {k: str(g.get(k) or "") for k in ("plain", "context", "impact", "watch")}}
+    done = 0
+    for n in news:
+        x = raw["news"][int(n["id"][1:])]
+        hit = cache.get(detail_key(x))
+        if hit:
+            done += 1
+        n.update(news_detail_fields(x, {**(hit or {}).get("fields", {}), "next": n.get("next", "")}, facts_fallback=True,
+                                    markets=raw.get("markets")))
+    save(DETAILS_CACHE, cache)
+    print(f"解説：{done}/{len(news)} 本（新しく書いた組 {len(batches)}）")
+
+
+def humanize(value, graph):
+    """AI の文章に紛れた項目の id（fed など）を、画面の名前に直す。英語の見出しや id の欄は触らない。"""
+    names = {n["id"]: n["short"] for n in graph["nodes"]}
+    pattern = re.compile(r"(?<![A-Za-z0-9_])(" + "|".join(sorted(map(re.escape, names), key=len, reverse=True)) + r")(?![A-Za-z0-9_])")
+    skip = {"id", "node", "dir", "link", "title", "source", "time", "expert", "kind", "role", "name", "cat", "group",
+            "lang", "date", "from", "to", "feed", "nodes", "thread", "stance", "verdict", "experts", "news", "conflict"}
+
+    def walk(v, key=""):
+        if isinstance(v, dict):
+            return {k: (x if k in skip else walk(x, k)) for k, x in v.items()}
+        if isinstance(v, list):
+            return [walk(x, key) for x in v]
+        if isinstance(v, str) and re.search(r"[぀-ヿ一-鿿]", v):
+            return pattern.sub(lambda m: names[m.group(1)], v)
+        return v
+    return walk(value)
 
 
 def daily(graph, cfg, raw):
@@ -484,7 +616,7 @@ def daily(graph, cfg, raw):
             i = ref("e", e.get("id"), len(raw["experts"]))
             if i is None or not e.get("relevant"):
                 continue
-            experts.append(expert_item(i, {"view": e.get("view", ""), "stance": e.get("stance", "中立"),
+            experts.append(expert_item(i, {"view": e.get("view", ""), "reason": e.get("reason", ""), "stance": e.get("stance", "中立"),
                                            "tags": ok_tags(e.get("tags"))}))
         shown = {x["id"] for x in experts}
         themes = []
@@ -512,7 +644,8 @@ def daily(graph, cfg, raw):
                     used.add(i)
                     news.append(news_item(i, {"tags": [], "cat": "", "plain": "", "next": "", "level": 1, "related": []}))
             themes.append({
-                "title": t.get("title", ""), "point": t.get("point", ""), "thread": (t.get("thread") or t.get("title", ""))[:20], "what": t.get("what", ""),
+                "title": t.get("title", ""), "point": t.get("point", ""), "thread": (t.get("thread") or t.get("title", ""))[:20],
+                "story": t.get("story", ""), "what": t.get("what", ""),
                 "chain": chain, "chain_text": t.get("chain_text", ""), "outlook": t.get("outlook", []), "watch": t.get("watch", ""),
                 # まとめた記事を指していたら、代表の1本に置きかえる
                 "news": list(dict.fromkeys(alias.get(f"n{i}", f"n{i}") for i in refs if i is not None)),
@@ -531,10 +664,15 @@ def daily(graph, cfg, raw):
                 if key not in refs:
                     refs.append(key)
             theme["news"] = refs
+        add_details(graph, raw, news)
         brief = {"headline": ai.get("headline", ""), "themes": themes}
         moving = []
+        # 日銀・FRB の利上げ・利下げは、実際の決定を伝える記事の札があるときだけ「動いている」とする
+        decided = {(t["node"], t.get("dir")) for n in news for t in n.get("tags", []) if t.get("node") in ("boj", "fed")}
         for m in ai.get("moving", []):
             if m.get("node") not in node_ids:
+                continue
+            if m["node"] in ("boj", "fed") and (m["node"], m.get("dir")) not in decided:
                 continue
             mv = moves.get(m["node"])
             if mv and mv["dir"] != m["dir"]:
@@ -572,6 +710,7 @@ def daily(graph, cfg, raw):
         experts = [expert_item(i, {"view": "", "stance": "中立", "tags": keyword_tags(x["title"], graph)})
                    for i, x in enumerate(raw["experts"]) if x["kind"] != "記事"]
         brief, moving, quiz = {"headline": "", "themes": []}, [], []
+    brief, news, experts, debates, scenarios, moving, terms = humanize([brief, news, experts, debates, scenarios, moving, terms], graph)
 
     data = {
         "updated": now.isoformat(timespec="seconds"),
@@ -598,7 +737,7 @@ def daily(graph, cfg, raw):
         for t in th.values():
             t["entries"] = [e for e in t["entries"] if e["date"] != today]
         for t in brief["themes"]:
-            entry = {"date": today, "title": t["title"], "what": t["what"], "chain": t["chain"],
+            entry = {"date": today, "title": t["title"], "story": t.get("story", ""), "what": t["what"], "chain": t["chain"],
                      "outlook": t["outlook"], "watch": t["watch"]}
             th.setdefault(t["thread"], {"name": t["thread"], "entries": []})["entries"].append(entry)
         cut = (now.date() - timedelta(days=60)).isoformat()
@@ -671,6 +810,7 @@ def review(graph):
     except Exception as e:  # noqa: BLE001
         print("答え合わせに失敗:", str(e)[:300], file=sys.stderr)
         return 2
+    ai = humanize(ai, graph)
     items = [i for i in ai.get("items", []) if i.get("verdict")]
     entry = {"reviewed": today.isoformat(), "target": target, "summary": ai.get("summary", ""), "items": items, "ai": meta}
     reviews["reviews"] = [entry] + [r for r in reviews["reviews"] if r["target"] != target][:59]
@@ -738,6 +878,7 @@ def weekly(graph):
     except Exception as e:  # noqa: BLE001
         print("週のまとめに失敗:", str(e)[:300], file=sys.stderr)
         return 2
+    ai = humanize(ai, graph)
     for mv in ai.get("moves", []):
         mv["chain"] = [t for t in mv.get("chain", []) if t.get("node") in node_ids]
     entry = {"id": wid, "from": monday.isoformat(), "to": today.isoformat(), "made": now.isoformat(timespec="seconds"),

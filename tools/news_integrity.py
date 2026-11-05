@@ -34,7 +34,7 @@ def _has(text, words):
 
 _COUNTRIES = {
     "jp": r"日本|日銀|東証|日経平均|topix|japan(?:ese)?|\bboj\b",
-    "us": r"米(?:国|株|経済|景気|雇用|消費者|金利|長期|連邦|小売|物価|cpi|pce|利上げ|利下げ)|アメリカ|frb|fomc|\bfed\b|federal reserve|u\.?s\.?\b|united states|nyダウ|ny株|s&p\s*500|ナスダック|nasdaq|wall street",
+    "us": r"米(?:国|株|経済|景気|雇用|消費者|金利|長期|連邦|小売|物価|cpi|pce|利上げ|利下げ|中間選挙|大統領|議会|上院|下院|共和党|民主党|政権|財務省|ドル)|アメリカ|frb|fomc|\bfed\b|federal reserve|u\.?s\.?\b|united states|nyダウ|ny株|s&p\s*500|ナスダック|nasdaq|wall street",
     "au": r"豪州|豪(?:中銀|経済|物価)|オーストラリア|australia(?:n)?|\brba\b",
     "nz": r"ニュージーランド|(?<![a-z])nz(?![a-z])|new zealand|\brbnz\b",
     "tw": r"台湾|taiwan(?:ese)?",
@@ -559,8 +559,10 @@ def _text_sentences(text):
         yield text[start:]
 
 
-def clean_news_text(article, text):
+def clean_news_text(article, text, allow=()):
     """元見出し/配信要約にない既知の別主体が混入した文を外す。
+
+    allow に入れた国（解説欄の「日本」「米国」など、読み手の視点として出る国）は外さない。
 
     言い換えや事実の訂正はしない。自社の別表記や、固有名を新しく足さない
     金利・株価などの一般的な波及見通しは残す。未知の社名・国名や、数字・
@@ -575,7 +577,7 @@ def clean_news_text(article, text):
         normalized = _norm(sentence)
         if _text_company_keys(normalized) - companies:
             continue
-        if _countries(normalized) - countries:
+        if _countries(normalized) - countries - set(allow):
             continue
         kept.append(sentence)
     return "".join(kept).strip()

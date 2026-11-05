@@ -444,6 +444,18 @@ def main():
         "calendar": calendar(now, log),
         "log": log,
     }
+    # 相場・予定の取得が一時的に失敗した回も、今日の画面から消さないように前回の値で補う
+    try:
+        prev = json.loads(OUT.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        prev = {}
+    for key, m in (prev.get("markets") or {}).items():
+        if key not in data["markets"]:
+            data["markets"][key] = m
+            log.append(f"-- 相場 {m.get('name', key)}：前回の値を使う")
+    if not data["calendar"] and prev.get("calendar"):
+        data["calendar"] = [e for e in prev["calendar"] if e.get("date", "") >= now.date().isoformat()]
+        log.append("-- 予定：前回の一覧を使う")
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
     print("\n".join(log))

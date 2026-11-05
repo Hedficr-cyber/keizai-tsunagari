@@ -2,6 +2,7 @@ import { makeGraph, dirWord, dirNum, dirClass } from "./graph.js";
 import { renderRelationships, relationshipDetail, relationshipReason } from "./relationships.js";
 import { VERSION } from "./versions.js";
 import { initNavigation } from "./navigation.js";
+import { initSheetGesture } from "./sheet-gesture.js";
 
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -20,7 +21,6 @@ const state = {
   view: "today",
   newsMode: "list",
   newsCat: "all",
-  expert: "all",
   connectionCat: "all",
   connectionDirections: {},
   connectionTarget: null,
@@ -216,10 +216,9 @@ function renderToday() {
     ${foot()}`;
 }
 function themeRow(t, i) {
-  const th = threadByName[t.thread];
   return `<button class="card trow" data-theme="${i}">
     <div class="tr-top"><h3>${esc(t.title)}</h3><span class="chev-r" aria-hidden="true">›</span></div>
-    <p class="tr-pt">${esc(t.point || firstSentence(t.what))}${th && th.entries.length > 1 ? `<span class="tr-days">${th.entries.length}日目</span>` : ""}</p>
+    <p class="tr-pt">${esc(t.point || firstSentence(t.what))}</p>
     <div class="chain">${chainHtml(t.chain, true)}</div>
   </button>`;
 }
@@ -228,7 +227,7 @@ function openTheme(i, context = detailContext()) {
   if (!t) return;
   const S = new Set();
   const th = context.threads[t.thread];
-  // 点線は画面の上から最初の1回だけ付けるので、表示の順に組み立てる（有識者の見方は下で作る）
+  // 点線は画面の上から最初の1回だけ付けるので、表示の順に組み立てる（有識者の見解は下で作る）
   const voices = () => (t.experts || []).map(id => context.experts[id]).filter(Boolean).slice(0, 2)
     .map(e => `<div class="voice"><div class="who">${esc(e.name)}<span class="muted" style="font-weight:500">｜${esc(e.role)}</span></div>${gl(e.view, S, context)}</div>`).join("");
   const hasVoices = (t.experts || []).some(id => context.experts[id]);
@@ -236,13 +235,13 @@ function openTheme(i, context = detailContext()) {
   const conf = (t.chain || []).filter(c => c.conflict).map(c => `<p class="conf-note">※ ${esc(c.conflict)}</p>`).join("");
   const first = (t.chain || [])[0];
   openSheet(`
-    ${th && th.entries.length > 1 ? `<p class="cat">流れ「${esc(th.name)}」${th.entries.length}日目</p>` : ""}
+    ${th && th.entries.length > 1 ? `<p class="cat">流れ「${esc(th.name)}」</p>` : ""}
     <h2>${esc(t.title)}</h2>
     <div class="q-sec"><div class="q-h">何が起きた？</div><p>${gl(t.what, S, context)}</p></div>
     <div class="q-sec"><div class="q-h">どうつながる？</div><div class="chain">${chainHtml(t.chain)}</div><p>${gl(t.chain_text, S, context)}</p>${conf}</div>
     <div class="q-sec"><div class="q-h">この先どうなるかも</div><ul class="outlook">${(t.outlook || []).map(o => `<li>${gl(o, S, context)}</li>`).join("")}</ul></div>
     ${t.watch ? `<div class="q-sec"><div class="q-h">次に見るもの</div><p>${gl(t.watch, S, context)}</p></div>` : ""}
-    ${hasVoices ? `<div class="q-sec"><div class="q-h">有識者はどう見ている？</div>${voices()}</div>` : ""}
+    ${hasVoices ? `<div class="q-sec"><div class="q-h">有識者の見解</div>${voices()}</div>` : ""}
     ${rel ? `<div class="q-sec"><div class="q-h">元のニュース</div><div class="rel">${rel}</div></div>` : ""}
     <div class="row-btns">${first ? `<button class="btn" data-connection-to="${esc(first.node)}:${esc(first.dir)}">つながりを見る</button>` : ""}${th && th.entries.length > 1 ? `<button class="btn ghost" data-thread="${esc(th.name)}">これまでの流れ</button>` : ""}</div>
     ${HINT}`, context);
@@ -270,22 +269,22 @@ function agendaItems(data = D) {
 function agendaRow(e, i) {
   return `<button class="ag-row" data-agi="${i}">
     <div class="ag-date">${e.date ? `${esc(md(e.date))}<span>${esc(dayLabel(e.date))}</span>` : `<span>日付未定</span>`}</div>
-    <div class="ag-main"><b>${esc(e.name)}</b>${e.date && e.date < todayStr() ? `<span>結果が出ました</span>` : ""}</div>
+    <div class="ag-main"><b>${esc(e.name)}</b>${e.date && e.date < todayStr() ? `<span>結果が出ました</span>` : e.scenario?.focus ? `<span class="ag-focus-line">${esc(e.scenario.focus)}</span>` : ""}</div>
     <span class="chev" aria-hidden="true">›</span></button>`;
 }
 function agendaRows(limit) {
   AGENDA = agendaItems();
   if (!AGENDA.length) return "";
-  return `<div class="sec"><h2>これからの予定</h2></div>
+  return `<div class="sec"><h2>今後の展望</h2></div>
     <div class="card ag-list">${AGENDA.slice(0, limit).map(agendaRow).join("")}
-    ${AGENDA.length > limit ? `<button class="ag-all" data-agenda>予定をすべて見る（${AGENDA.length}）</button>` : ""}</div>`;
+    ${AGENDA.length > limit ? `<button class="ag-all" data-agenda>すべて見る（${AGENDA.length}）</button>` : ""}</div>`;
 }
 function openAgendaItem(i, context = detailContext()) {
   const e = context.agenda[i];
   if (!e) return;
   const s = e.scenario;
   const S = new Set();
-  openSheet(`<p class="cat">これからの予定${e.date ? `・${esc(md(e.date))}（${esc(dayLabel(e.date))}）` : ""}</p>
+  openSheet(`<p class="cat">今後の展望${e.date ? `・${esc(md(e.date))}（${esc(dayLabel(e.date))}）` : ""}</p>
     <h2>${esc(e.name)}</h2>
     ${e.note ? `<p class="muted small">${esc(e.note)}</p>` : ""}
     ${(e.nodes || []).length ? `<div class="q-sec"><div class="q-h">動きそうなもの</div><div class="chips">${e.nodes.map(n => chip(n)).join("")}</div></div>` : ""}
@@ -296,7 +295,7 @@ function openAgendaItem(i, context = detailContext()) {
     ${HINT}`, context);
 }
 function openAgenda(context = detailContext()) {
-  openSheet(`<p class="cat">これからの予定</p><h2>予定</h2>
+  openSheet(`<h2>今後の展望</h2>
     <div class="card ag-list" style="margin-top:14px">${context.agenda.map(agendaRow).join("")}</div>`, context);
 }
 
@@ -353,13 +352,12 @@ function renderNews() {
     $("#v-news").innerHTML = `
       <h1 class="page-title">ニュース</h1>
       ${modes}
-      <div style="margin-top:14px">${X.threads.map(threadCard).join("")}</div>
+      <div style="margin-top:14px">${recentThreads(X.threads).map(threadCard).join("") || `<p class="empty">次の更新で表示されます。</p>`}</div>
       ${X.weeks.length ? `<div class="sec"><h2>週のまとめ</h2></div><div class="rel">${X.weeks.map(w => `<button data-weekly="${esc(w.id)}">${esc(w.title)}<span class="src">${esc(md(w.from))}〜${esc(md(w.to))}</span></button>`).join("")}</div>` : ""}
       ${foot()}`;
     return;
   }
-  const present = new Set(all.flatMap(n => [...newsCats(n)]));
-  const filters = [["all", "すべて"], ["top", "重要"], ...G.cats.filter(c => present.has(c.id)).map(c => [c.id, c.name])];
+  const filters = newsFilters();
   const list = all.filter(n => state.newsCat === "all" ? true : state.newsCat === "top" ? n.level >= 3 : newsCats(n).has(state.newsCat)).sort(newsOrder);
   const selectedName = filters.find(([id]) => id === state.newsCat)?.[1] || "すべて";
   const body = state.newsCat === "all" ? allNewsSections(all) : list.length ? newsSection(`${selectedName}のニュース`, list) : "";
@@ -372,24 +370,39 @@ function renderNews() {
     ${foot()}`;
   $("#v-news .news-filters").scrollLeft = filtersScroll;
 }
+function newsFilters() {
+  const present = new Set((D.news || []).flatMap(n => [...newsCats(n)]));
+  return [["all", "すべて"], ["top", "重要"], ...G.cats.filter(c => present.has(c.id)).map(c => [c.id, c.name])];
+}
+// 流れで分かること（AI のまとめ）。まとめがない古い記録は、一覧では見出しの移り変わりで代える。
+const threadStory = t => t.entries[t.entries.length - 1].story || "";
+const threadSteps = t => [...new Set(t.entries.slice(-3).map(e => e.title))].join(" → ");
+// 2週間以上動きのない流れは出さない（いま追う流れだけにする）
+function recentThreads(threads) {
+  const cut = new Date(); cut.setDate(cut.getDate() - 14);
+  return threads.filter(t => t.entries.length && t.entries[t.entries.length - 1].date >= cut.toLocaleDateString("sv"));
+}
 function threadCard(t) {
   const last = t.entries[t.entries.length - 1];
-  const first = t.entries[0];
   return `<button class="card thread" data-thread="${esc(t.name)}">
-    <div class="no">${t.entries.length > 1 ? `${t.entries.length}日分・${esc(md(first.date))}〜${esc(md(last.date))}` : esc(md(last.date))}</div>
-    <h3>${esc(t.name)}</h3>
-    <p class="what">${esc(last.title)}</p>
+    <div class="tr-top"><h3>${esc(t.name)}</h3><span class="chev-r" aria-hidden="true">›</span></div>
+    <p class="what">${esc(threadStory(t) || threadSteps(t))}</p>
+    ${(last.chain || []).length ? `<div class="chain">${chainHtml(last.chain, true)}</div>` : ""}
   </button>`;
 }
 function openThread(name, context = detailContext()) {
   const t = context.threads[name];
   if (!t) return;
   const S = new Set();
-  openSheet(`<p class="cat">流れ・${t.entries.length}日分</p><h2>${esc(t.name)}</h2>
-    <div class="timeline">${[...t.entries].reverse().map(e => `<div class="tl">
+  const last = t.entries[t.entries.length - 1];
+  openSheet(`<p class="cat">流れ</p><h2>${esc(t.name)}</h2>
+    ${threadStory(t) ? `<div class="q-sec"><div class="q-h">この流れで分かること</div><p>${gl(threadStory(t), S, context)}</p></div>` : ""}
+    ${(last.outlook || []).length ? `<div class="q-sec"><div class="q-h">この先どうなるかも</div><ul class="outlook">${last.outlook.map(o => `<li>${gl(o, S, context)}</li>`).join("")}</ul></div>` : ""}
+    ${last.watch ? `<div class="q-sec"><div class="q-h">次に見るもの</div><p>${gl(last.watch, S, context)}</p></div>` : ""}
+    <div class="q-sec"><div class="q-h">これまでの動き</div><div class="timeline">${[...t.entries].reverse().map(e => `<div class="tl">
       <div class="tl-date">${esc(md(e.date))}</div>
       <div class="tl-body"><h3>${esc(e.title)}</h3><p>${gl(e.what, S, context)}</p>
-        <div class="chain" style="margin-top:8px">${chainHtml(e.chain)}</div></div></div>`).join("")}</div>
+        <div class="chain" style="margin-top:8px">${chainHtml(e.chain)}</div></div></div>`).join("")}</div></div>
     ${HINT}`, context);
 }
 // 英語の記事は、AI が付けた日本語の見出しを出す（元の見出しは詳細に）
@@ -492,33 +505,44 @@ function goConnection(value) {
 }
 
 // ---------- 有識者 ----------
+// 人ごとにまとめ、新しい発信の人から並べる（名前と肩書きは1回だけ出す）
 function renderExperts() {
-  const all = D.experts || [];
-  const names = [...new Map(all.map(e => [e.expert, e.name])).entries()];
-  const list = all.filter(e => state.expert === "all" || e.expert === state.expert);
+  const people = new Map();
+  for (const e of [...(D.experts || [])].sort((a, b) => (Date.parse(b.time) || 0) - (Date.parse(a.time) || 0))) {
+    if (!people.has(e.expert)) people.set(e.expert, []);
+    people.get(e.expert).push(e);
+  }
   const debates = (D.debates || []).map(debateCard).join("");
   $("#v-experts").innerHTML = `
-    <h1 class="page-title">有識者の見方</h1>
-    ${debates ? `<div class="sec" style="margin-top:8px"><h2>見方が分かれている点</h2></div>${debates}<div class="sec"><h2>それぞれの発信</h2></div>` : ""}
-    <div class="chips scroll" role="group" aria-label="人で絞り込む">${[["all", "すべて"], ...names].map(([id, nm]) => `<button class="filter ${state.expert === id ? "on" : ""}" data-expert="${esc(id)}">${esc(nm)}</button>`).join("")}</div>
-    <div style="margin-top:14px">${list.map(expertCard).join("") || `<p class="empty">いまは表示できる発信がありません。</p>`}</div>
+    <h1 class="page-title">有識者の見解</h1>
+    ${debates ? `<div class="sec" style="margin-top:8px"><h2>見解が分かれている点</h2></div>${debates}` : ""}
+    ${people.size ? `<div class="sec"><h2>それぞれの見解</h2></div>${[...people.values()].map(personCard).join("")}` : `<p class="empty">いまは表示できる発信がありません。</p>`}
     ${foot()}`;
 }
 function debateCard(d) {
   const S = new Set();
   const side = s => {
-    const who = s.experts.map(id => expertById[id]).filter(Boolean);
-    return `<div class="side ${s.stance === "強気" ? "bull" : "bear"}"><div class="side-h">${esc(s.stance)}</div><p>${gl(s.view, S)}</p><div class="side-who">${[...new Set(who.map(e => e.name))].map(esc).join("・")}</div></div>`;
+    const who = [...new Set(s.experts.map(id => expertById[id]?.name).filter(Boolean))];
+    return `<div class="side ${s.stance === "強気" ? "bull" : "bear"}"><div class="side-h"><span>${esc(s.stance)}</span><b>${who.map(esc).join("・")}</b></div><p>${gl(s.view, S)}</p></div>`;
   };
-  return `<article class="card debate"><h3>${esc(d.topic)}</h3><p class="crux"><b>分かれ目</b>${gl(d.crux, S)}</p><div class="sides">${d.sides.map(side).join("")}</div></article>`;
+  return `<article class="card debate"><h3>${esc(d.topic)}</h3><p class="crux">${gl(d.crux, S)}</p><div class="sides">${d.sides.map(side).join("")}</div></article>`;
 }
-function expertCard(e) {
-  const url = safeUrl(e.link);
-  return `<article class="card">
-    <div class="ex-head"><div><div class="n">${esc(e.name)}</div><div class="r">${esc(e.role)}</div></div><span class="stance s-${esc(e.stance)}">${esc(e.stance)}</span></div>
-    <p class="ex-view">${gl(e.view, new Set())}</p>
-    ${url ? `<a class="ex-src" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(e.kind)}・${esc(e.source)}・${esc(ago(e.time))}<br><b>${esc(e.title)}</b></a>` : ""}
+function personCard(posts) {
+  const S = new Set();
+  return `<article class="card ex-person">
+    <div class="ex-who"><b>${esc(posts[0].name)}</b><span>${esc(posts[0].role)}</span></div>
+    ${posts.map(e => expertPost(e, S)).join("")}
   </article>`;
+}
+function expertPost(e, S) {
+  const url = safeUrl(e.link);
+  const from = e.source && e.source !== e.name ? `${e.source}・` : "";
+  return `<div class="ex-post">
+    <div class="ex-meta"><span class="stance s-${esc(e.stance)}">${esc(e.stance)}</span><span>${esc(from + ago(e.time))}</span></div>
+    <p class="ex-view">${gl(e.view, S)}</p>
+    ${e.reason ? `<p class="ex-reason">${gl(e.reason, S)}</p>` : ""}
+    ${url ? `<a class="ex-src" href="${esc(url)}" target="_blank" rel="noopener noreferrer"><span>${esc(e.title)}</span><span class="chev-r" aria-hidden="true">›</span></a>` : ""}
+  </div>`;
 }
 
 // ---------- 見通しの答え合わせ ----------
@@ -666,6 +690,8 @@ function showSheetFrame(session, depth) {
   sheetOpen = true;
   $("#sheet-body").innerHTML = frame.html;
   $("#sheet-back").hidden = depth <= 1;
+  // 下へスライドして閉じた直後に開き直しても、閉じる途中の位置を残さない
+  $("#sheet").style.transform = "";
   $("#sheet").classList.add("on");
   $("#scrim").classList.add("on");
   document.body.style.overflow = "hidden";
@@ -744,8 +770,36 @@ function syncSheetHistory() {
 
 // ---------- 画面の切り替え ----------
 const RENDER = { today: renderToday, news: renderNews, map: renderMap, experts: renderExperts };
+// つながり・ニュース一覧では、左右のスワイプでまず分類を移る。端の分類からさらにスワイプすると隣の画面へ。
+function swipeFilters() {
+  if (loadStatus !== "ready") return null;
+  if (state.view === "map") return { ids: ["all", ...G.cats.filter(c => G.nodes.some(n => n.cat === c.id)).map(c => c.id)], key: "connectionCat", render: renderMap, bar: ".relationship-filters", attr: "data-connection-cat" };
+  if (state.view === "news" && state.newsMode === "list") return { ids: newsFilters().map(([id]) => id), key: "newsCat", render: renderNews, bar: ".news-filters", attr: "data-newscat" };
+  return null;
+}
+function swipeInner(step, commit) {
+  const f = swipeFilters();
+  const i = f ? f.ids.indexOf(state[f.key]) : -1;
+  const next = i >= 0 ? f.ids[i + step] : undefined;
+  if (!next) return false;
+  if (!commit) return true;
+  state[f.key] = next;
+  f.render();
+  const bar = $(`#v-${state.view} ${f.bar}`);
+  if (!bar) return true;
+  // 分類の列より下まで読み進めていたら、新しい分類の先頭が見える位置へ戻す
+  const top = bar.getBoundingClientRect().top + window.scrollY - ($(".top")?.offsetHeight || 0) - 8;
+  if (window.scrollY > top) window.scrollTo(0, top);
+  const chip = $(`[${f.attr}="${CSS.escape(next)}"]`, bar);
+  if (chip) {
+    const left = chip.getBoundingClientRect().left - bar.getBoundingClientRect().left + bar.scrollLeft;
+    bar.scrollTo({ left: left - (bar.clientWidth - chip.offsetWidth) / 2, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  }
+  return true;
+}
 const navigation = initNavigation({
   nav: $(".nav"), main: $("main"), getView: () => state.view,
+  inner: swipeInner,
   canNavigate: () => loadStatus === "ready" && !activeModal(),
   navigate: view => {
     if (!RENDER[view] || view === state.view || activeModal()) return;
@@ -813,7 +867,7 @@ document.addEventListener("click", ev => {
   }
   const term = ev.target.closest("[data-term]");
   if (term) { ev.preventDefault(); ev.stopPropagation(); showTerm(term.dataset.term); return; }
-  const t = ev.target.closest("[data-node],[data-news],[data-newscat],[data-newsmode],[data-expert],[data-connection-cat],[data-connection-dir],[data-connection-node],[data-connection-to],[data-relation],[data-thread],[data-weekly],[data-agenda],[data-agi],[data-reviews],[data-reviewfull],[data-theme],[data-sources]");
+  const t = ev.target.closest("[data-node],[data-news],[data-newscat],[data-newsmode],[data-connection-cat],[data-connection-dir],[data-connection-node],[data-connection-to],[data-relation],[data-thread],[data-weekly],[data-agenda],[data-agi],[data-reviews],[data-reviewfull],[data-theme],[data-sources]");
   if (!t) return;
   const ds = t.dataset;
   if (ds.connectionTo) goConnection(ds.connectionTo);
@@ -831,7 +885,6 @@ document.addEventListener("click", ev => {
   else if (ds.newsmode) { state.newsMode = ds.newsmode; renderNews(); $(`#v-news [data-newsmode="${state.newsMode}"]`)?.focus({ preventScroll: true }); }
   else if (ds.sources !== undefined) openSources();
   else if (ds.newscat) { state.newsCat = ds.newscat; renderNews(); $(`#v-news [data-newscat="${state.newsCat}"]`)?.focus({ preventScroll: true }); }
-  else if (ds.expert) { state.expert = ds.expert; renderExperts(); }
   else if (ds.theme !== undefined) openTheme(+ds.theme);
   else if (ds.thread) openThread(ds.thread);
   else if (ds.weekly) openWeekly(ds.weekly);
@@ -852,6 +905,7 @@ document.addEventListener('focusin', ev => {
   if (modal && !modal.contains(ev.target)) ($$(FOCUSABLE, modal).find(usableFocus) || modal).focus({ preventScroll: true });
 });
 $("#scrim").addEventListener("click", closeSheet);
+initSheetGesture({ sheet: $("#sheet"), scrim: $("#scrim"), isOpen: () => sheetOpen && $("#termcard").hidden, close: closeSheet });
 $("#sheet-close").addEventListener("click", closeSheet);
 $("#sheet-back").addEventListener("click", backSheet);
 window.addEventListener("popstate", syncNavigation);
@@ -909,6 +963,9 @@ $("#update-btn").addEventListener("click", async () => {
   location.reload();
 });
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkFresh(); });
+window.addEventListener("pageshow", ev => { if (ev.persisted) checkFresh(); });
+// 開いたまま読んでいるあいだも、15分ごとに新しい内容があるかを見る
+setInterval(() => { if (document.visibilityState === "visible" && loadStatus === "ready") checkFresh(); }, 15 * 60000);
 
 async function load() {
   loadStatus = "loading";
