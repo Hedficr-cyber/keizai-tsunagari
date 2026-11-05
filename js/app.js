@@ -692,6 +692,7 @@ function showSheetFrame(session, depth) {
   $("#sheet-back").hidden = depth <= 1;
   // 下へスライドして閉じた直後に開き直しても、閉じる途中の位置を残さない
   $("#sheet").style.transform = "";
+  $("#sheet").style.transition = "";
   $("#sheet").classList.add("on");
   $("#scrim").classList.add("on");
   document.body.style.overflow = "hidden";

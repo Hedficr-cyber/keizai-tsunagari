@@ -517,6 +517,9 @@ details.fold[open] summary::after { content: "閉じる"; }
 .grab .close { min-height: 44px; padding: 6px 2px 4px 12px; }
 
 /* v0.8.0：下へスライドして閉じる詳細 */
+/* 開く・閉じるは出だしが急に進まない曲線で。開いている間は別の層にして、動かすたびに描き直さない */
+.sheet { transform: translate3d(0,100%,0); transition: transform .38s cubic-bezier(.32,.72,0,1); }
+.sheet.on { will-change: transform; }
 .sheet.is-dragging { transition: none; }
 .grab { cursor: grab; touch-action: none; }
 .grab .close, .grab .sheet-back { touch-action: manipulation; }

@@ -5,7 +5,7 @@ export function initNavigation({ nav, main, getView, canNavigate, navigate, inne
   const views = links.map(a => a.dataset.v);
   const lens = nav.querySelector('.nav-lens');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  let gesture = null, current = getView(), entry = null, snap = null;
+  let gesture = null, current = getView(), entry = null, snap = null, leaving = null;
   let suppressedClick = null;
 
   const zoomed = () => (window.visualViewport?.scale || 1) > 1.02;
@@ -19,11 +19,11 @@ export function initNavigation({ nav, main, getView, canNavigate, navigate, inne
       return { x: (r.left - rect.left) / scale - nav.clientLeft, width: r.width / scale, center: (r.left + r.right) / 2 };
     });
   }
-  function moveLens(index, x = null) {
-    const m = metrics()[index];
+  function moveLens(index, x = null, ms = metrics()) {
+    const m = ms[index];
     if (!m) return;
     lens.style.width = `${m.width}px`;
-    lens.style.transform = `translateX(${x ?? m.x}px)`;
+    lens.style.transform = `translate3d(${x ?? m.x}px,0,0)`;
   }
   function settleLens() {
     nav.classList.remove('is-dragging');
@@ -35,11 +35,36 @@ export function initNavigation({ nav, main, getView, canNavigate, navigate, inne
     if (!el) return;
     const from = el.style.transform;
     el.style.transform = '';
-    el.style.willChange = '';
     if (animate && from && !reduced.matches) {
       snap?.cancel();
-      snap = el.animate([{ transform: from }, { transform: 'translateX(0)' }], { duration: 180, easing: 'ease-out' });
-    }
+      snap = el.animate([{ transform: from }, { transform: 'translate3d(0,0,0)' }], { duration: 220, easing: 'cubic-bezier(.22,.8,.32,1)' });
+      snap.onfinish = () => { el.style.willChange = ''; };
+    } else el.style.willChange = '';
+  }
+  // 指を離したら、いまの位置から同じ向きへ流しながら薄くし、中身を替えてから反対側から入れる。
+  // 途中で位置を元に戻さないので、カクッと飛ばない。
+  function leave(g, step, change) {
+    const el = g.page, from = getView();
+    const offset = new DOMMatrixReadOnly(getComputedStyle(el).transform === 'none' ? undefined : getComputedStyle(el).transform).m41;
+    gesture = null;
+    if (g.owner.hasPointerCapture?.(g.id)) g.owner.releasePointerCapture(g.id);
+    if (reduced.matches) { el.style.transform = ''; el.style.willChange = ''; change(); return; }
+    leaving = el.animate([{ transform: `translate3d(${offset}px,0,0)`, opacity: 1 }, { transform: `translate3d(${offset - step * 90}px,0,0)`, opacity: 0 }],
+      { duration: 130, easing: 'cubic-bezier(.3,.6,.6,1)', fill: 'forwards' });
+    leaving.onfinish = () => {
+      const done = leaving;
+      leaving = null;
+      el.style.transform = '';
+      if (getView() === from) change();
+      done.cancel();
+      el.style.willChange = '';
+    };
+  }
+  function enter(el, step) {
+    if (!el || reduced.matches) return;
+    entry?.cancel();
+    entry = el.animate([{ opacity: 0, transform: `translate3d(${step * 44}px,0,0)` }, { opacity: 1, transform: 'translate3d(0,0,0)' }],
+      { duration: 260, easing: 'cubic-bezier(.22,.8,.32,1)' });
   }
   function cancel(animate = false) {
     const old = gesture;
@@ -51,8 +76,7 @@ export function initNavigation({ nav, main, getView, canNavigate, navigate, inne
   function suppress(g) {
     suppressedClick = { until: performance.now() + 450, target: g.target };
   }
-  function indexAt(x) {
-    const ms = metrics();
+  function indexAt(x, ms = metrics()) {
     return ms.reduce((best, m, i) => Math.abs(x - m.center) < Math.abs(x - ms[best].center) ? i : best, 0);
   }
   function hasHorizontalScroller(target) {
@@ -64,7 +88,7 @@ export function initNavigation({ nav, main, getView, canNavigate, navigate, inne
     return false;
   }
   function start(ev, kind) {
-    if (!ev.isPrimary || !ready() || (ev.pointerType === 'mouse' && (kind === 'page' || ev.button !== 0))) return;
+    if (leaving || !ev.isPrimary || !ready() || (ev.pointerType === 'mouse' && (kind === 'page' || ev.button !== 0))) return;
     if (gesture) cancel();
     if (kind === 'page' && (ev.clientX < 24 || ev.clientX > innerWidth - 24 || hasHorizontalScroller(ev.target) || window.getSelection()?.toString())) return;
     entry?.cancel(); snap?.cancel();
@@ -81,21 +105,22 @@ export function initNavigation({ nav, main, getView, canNavigate, navigate, inne
       if (Math.abs(dx) < 10 || Math.abs(dx) < Math.abs(dy) * 1.35) return;
       g.active = true;
       g.owner.setPointerCapture(ev.pointerId);
-      if (g.kind === 'nav') nav.classList.add('is-dragging');
-      else g.page.style.willChange = 'transform';
+      // 動かしている間に読み直さないよう、ナビの位置と分類の移れる向きは最初に1回だけ測る
+      if (g.kind === 'nav') { nav.classList.add('is-dragging'); g.ms = metrics(); g.rect = nav.getBoundingClientRect(); }
+      else { g.page.style.willChange = 'transform'; g.inner = { 1: inner(1, false), '-1': inner(-1, false) }; }
     }
     if (ev.cancelable) ev.preventDefault();
     if (g.kind === 'nav') {
-      const ms = metrics(), rect = nav.getBoundingClientRect(), scale = rect.width / nav.offsetWidth || 1;
-      const index = indexAt(ev.clientX);
+      const ms = g.ms, rect = g.rect, scale = rect.width / nav.offsetWidth || 1;
+      const index = indexAt(ev.clientX, ms);
       const width = ms[index].width;
       const x = Math.max(ms[0].x, Math.min(ms.at(-1).x, (ev.clientX - rect.left) / scale - nav.clientLeft - width / 2));
-      nav.dataset.preview = views[index];
-      moveLens(index, x);
+      if (nav.dataset.preview !== views[index]) nav.dataset.preview = views[index];
+      moveLens(index, x, ms);
     } else if (!reduced.matches) {
-      const outside = !inner(dx < 0 ? 1 : -1, false) && ((g.index === 0 && dx > 0) || (g.index === views.length - 1 && dx < 0));
+      const outside = !g.inner[dx < 0 ? 1 : -1] && ((g.index === 0 && dx > 0) || (g.index === views.length - 1 && dx < 0));
       const offset = outside ? dx * .12 : dx * .65;
-      g.page.style.transform = `translateX(${Math.max(-160, Math.min(160, offset))}px)`;
+      g.page.style.transform = `translate3d(${Math.max(-160, Math.min(160, offset))}px,0,0)`;
     }
   }
   function end(ev) {
@@ -111,14 +136,18 @@ export function initNavigation({ nav, main, getView, canNavigate, navigate, inne
       const distance = Math.abs(dx), elapsed = performance.now() - g.start;
       const threshold = Math.max(56, Math.min(96, innerWidth * .18));
       const step = distance > Math.abs(dy) * 1.35 && (distance >= threshold || (distance >= 28 && distance / elapsed > .45)) ? (dx < 0 ? 1 : -1) : 0;
-      if (step && inner(step, false)) {
+      if (step && g.inner[step]) {
         suppress(g);
-        cancel(false);
-        inner(step, true);
-        if (!reduced.matches) entry = page()?.animate([{ opacity: .6, transform: `translateX(${step * 56}px)` }, { opacity: 1, transform: 'translateX(0)' }], { duration: 220, easing: 'cubic-bezier(.2,.8,.2,1)' });
+        leave(g, step, () => { inner(step, true); enter(g.page, step); });
         return;
       }
       next = Math.max(0, Math.min(views.length - 1, next + step));
+      if (next !== g.index) {
+        suppress(g);
+        moveLens(next);
+        leave(g, step, () => navigate(views[next]));
+        return;
+      }
     }
     suppress(g);
     cancel(next === g.index);
@@ -165,11 +194,7 @@ export function initNavigation({ nav, main, getView, canNavigate, navigate, inne
     sync(view) {
       if (gesture) cancel();
       settleLens();
-      entry?.cancel();
-      if (current !== view && !reduced.matches) {
-        const direction = views.indexOf(view) > views.indexOf(current) ? 1 : -1;
-        entry = page()?.animate([{ opacity: .6, transform: `translateX(${direction * 72}px)` }, { opacity: 1, transform: 'translateX(0)' }], { duration: 240, easing: 'cubic-bezier(.2,.8,.2,1)' });
-      }
+      if (current !== view) enter(page(), views.indexOf(view) > views.indexOf(current) ? 1 : -1);
       current = view;
     },
   };
