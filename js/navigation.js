@@ -11,24 +11,25 @@ export function initNavigation({ nav, main, getView, canNavigate, navigate, inne
   const zoomed = () => (window.visualViewport?.scale || 1) > 1.02;
   const ready = () => canNavigate() && !zoomed();
   const page = () => main.querySelector('.view.on');
-  function metrics() {
-    const rect = nav.getBoundingClientRect();
+  function metrics(rect = nav.getBoundingClientRect()) {
     const scale = rect.width / nav.offsetWidth || 1;
+    const left = nav.clientLeft;
     return links.map(a => {
       const r = a.getBoundingClientRect();
-      return { x: (r.left - rect.left) / scale - nav.clientLeft, width: r.width / scale, center: (r.left + r.right) / 2 };
+      return { x: (r.left - rect.left) / scale - left, width: r.width / scale, center: (r.left + r.right) / 2 };
     });
   }
   function moveLens(index, x = null, ms = metrics()) {
     const m = ms[index];
     if (!m) return;
-    lens.style.width = `${m.width}px`;
+    const width = `${m.width}px`;
+    if (lens.style.width !== width) lens.style.width = width;
     lens.style.transform = `translate3d(${x ?? m.x}px,0,0)`;
   }
-  function settleLens() {
+  function settleLens(index = views.indexOf(getView())) {
     nav.classList.remove('is-dragging');
     delete nav.dataset.preview;
-    moveLens(views.indexOf(getView()));
+    moveLens(index);
   }
   function resetPage(animate = false) {
     const el = gesture?.page;
@@ -66,11 +67,11 @@ export function initNavigation({ nav, main, getView, canNavigate, navigate, inne
     entry = el.animate([{ opacity: 0, transform: `translate3d(${step * 44}px,0,0)` }, { opacity: 1, transform: 'translate3d(0,0,0)' }],
       { duration: 260, easing: 'cubic-bezier(.22,.8,.32,1)' });
   }
-  function cancel(animate = false) {
+  function cancel(animate = false, lensIndex) {
     const old = gesture;
     resetPage(animate);
     gesture = null;
-    settleLens();
+    settleLens(lensIndex);
     if (old?.owner.hasPointerCapture?.(old.id)) old.owner.releasePointerCapture(old.id);
   }
   function suppress(g) {
@@ -106,15 +107,20 @@ export function initNavigation({ nav, main, getView, canNavigate, navigate, inne
       g.active = true;
       g.owner.setPointerCapture(ev.pointerId);
       // 動かしている間に読み直さないよう、ナビの位置と分類の移れる向きは最初に1回だけ測る
-      if (g.kind === 'nav') { nav.classList.add('is-dragging'); g.ms = metrics(); g.rect = nav.getBoundingClientRect(); }
-      else { g.page.style.willChange = 'transform'; g.inner = { 1: inner(1, false), '-1': inner(-1, false) }; }
+      if (g.kind === 'nav') {
+        g.rect = nav.getBoundingClientRect();
+        g.ms = metrics(g.rect);
+        g.scale = g.rect.width / nav.offsetWidth || 1;
+        g.left = nav.clientLeft;
+        nav.classList.add('is-dragging');
+      } else { g.page.style.willChange = 'transform'; g.inner = { 1: inner(1, false), '-1': inner(-1, false) }; }
     }
     if (ev.cancelable) ev.preventDefault();
     if (g.kind === 'nav') {
-      const ms = g.ms, rect = g.rect, scale = rect.width / nav.offsetWidth || 1;
+      const ms = g.ms;
       const index = indexAt(ev.clientX, ms);
       const width = ms[index].width;
-      const x = Math.max(ms[0].x, Math.min(ms.at(-1).x, (ev.clientX - rect.left) / scale - nav.clientLeft - width / 2));
+      const x = Math.max(ms[0].x, Math.min(ms.at(-1).x, (ev.clientX - g.rect.left) / g.scale - g.left - width / 2));
       if (nav.dataset.preview !== views[index]) nav.dataset.preview = views[index];
       moveLens(index, x, ms);
     } else if (!reduced.matches) {
@@ -130,8 +136,16 @@ export function initNavigation({ nav, main, getView, canNavigate, navigate, inne
     const dx = ev.clientX - g.x, dy = ev.clientY - g.y;
     let next = g.index;
     if (g.kind === 'nav') {
-      const rect = nav.getBoundingClientRect();
-      if (ev.clientY >= rect.top - 32 && ev.clientY <= rect.bottom + 32) next = indexAt(ev.clientX);
+      if (ev.clientY >= g.rect.top - 32 && ev.clientY <= g.rect.bottom + 32) {
+        next = indexAt(ev.clientX, g.ms);
+        // 選択中の項目内で指を短く弾いたときも、滑らせた方向の隣の項目へ進む。
+        const distance = Math.abs(dx);
+        const flick = ev.pointerType === 'touch' && distance >= 26 && distance > Math.abs(dy) * 1.6
+          && performance.now() - g.start <= 230;
+        if (flick && next === g.index && indexAt(g.x, g.ms) === g.index) {
+          next = Math.max(0, Math.min(views.length - 1, g.index + Math.sign(dx)));
+        }
+      }
     } else {
       const distance = Math.abs(dx), elapsed = performance.now() - g.start;
       const threshold = Math.max(56, Math.min(96, innerWidth * .18));
@@ -150,7 +164,7 @@ export function initNavigation({ nav, main, getView, canNavigate, navigate, inne
       }
     }
     suppress(g);
-    cancel(next === g.index);
+    cancel(next === g.index, next);
     if (next !== g.index) navigate(views[next]);
   }
   nav.addEventListener('pointerdown', ev => start(ev, 'nav'));

@@ -87,6 +87,7 @@ function hideTerm(restoreFocus = true) {
   syncModalState();
   if (wasOpen && restoreFocus) restoreFocusRef(termReturnFocus);
   termReturnFocus = null;
+  if (wasOpen) markInteraction();
 }
 
 // ---------- 小さな部品 ----------
@@ -249,18 +250,17 @@ function openTheme(i, context = detailContext()) {
 
 // ---------- 予定とシナリオ ----------
 let AGENDA = [];
+const agendaName = name => String(name || "").normalize("NFKC").replace(/\(\d{4}年/g, "(").replace(/\s/g, "");
 function agendaItems(data = D) {
-  const today = todayStr();
-  // 結果が出たあとも、次の日までは残す（シナリオと照らせるように）
+  // 予定は翌日まで残す。結果を確認したかどうかは日付から判断しない。
   const y = new Date(); y.setDate(y.getDate() - 1);
   const since = y.toLocaleDateString("sv");
   const cal = (data.calendar || []).filter(e => e.date >= since);
   const sc = [...(data.scenarios || [])];
   const items = cal.map(e => {
-    // 同じ日の予定にシナリオを合わせる（名前の一部が重なるものを優先）
-    const i = sc.findIndex(s => s.date === e.date && (s.event.includes(e.name.slice(0, 3)) || e.name.includes(s.event.slice(0, 3))));
-    const j = i >= 0 ? i : sc.findIndex(s => s.date === e.date);
-    return { ...e, scenario: j >= 0 ? sc.splice(j, 1)[0] : null };
+    const name = agendaName(e.name);
+    const i = sc.findIndex(s => s.date === e.date && agendaName(s.event) === name);
+    return { ...e, scenario: i >= 0 ? sc.splice(i, 1)[0] : null };
   });
   // 公式の日程にない予定（ニュースから AI が拾ったもの）
   for (const s of sc) if (!s.date || s.date >= since) items.push({ date: s.date, name: s.event, note: s.date ? "" : "日付はニュースから未確定", nodes: [], scenario: s });
@@ -269,7 +269,7 @@ function agendaItems(data = D) {
 function agendaRow(e, i) {
   return `<button class="ag-row" data-agi="${i}">
     <div class="ag-date">${e.date ? `${esc(md(e.date))}<span>${esc(dayLabel(e.date))}</span>` : `<span>日付未定</span>`}</div>
-    <div class="ag-main"><b>${esc(e.name)}</b>${e.date && e.date < todayStr() ? `<span>結果が出ました</span>` : e.scenario?.focus ? `<span class="ag-focus-line">${esc(e.scenario.focus)}</span>` : ""}</div>
+    <div class="ag-main"><b>${esc(e.name)}</b>${e.date && e.date < todayStr() ? `<span>予定日を過ぎました</span>` : e.scenario?.focus ? `<span class="ag-focus-line">${esc(e.scenario.focus)}</span>` : ""}</div>
     <span class="chev" aria-hidden="true">›</span></button>`;
 }
 function agendaRows(limit) {
@@ -288,7 +288,7 @@ function openAgendaItem(i, context = detailContext()) {
     <h2>${esc(e.name)}</h2>
     ${e.note ? `<p class="muted small">${esc(e.note)}</p>` : ""}
     ${(e.nodes || []).length ? `<div class="q-sec"><div class="q-h">動きそうなもの</div><div class="chips">${e.nodes.map(n => chip(n)).join("")}</div></div>` : ""}
-    ${e.date && e.date < todayStr() ? `<p class="muted small">結果が出ました</p>` : ""}
+    ${e.date && e.date < todayStr() ? `<p class="muted small">予定日を過ぎました</p>` : ""}
     ${s ? `<div class="q-sec"><div class="q-h">焦点</div><p>${gl(s.focus, S, context)}</p></div>
       <div class="q-sec"><div class="q-h">結果しだいで、こう広がるかも</div>
       <div class="cases">${s.cases.map((c, k) => `<div class="case c${k}"><div class="case-l">${esc(c.label)}</div>${scenarioPathsHtml(c)}<p>${gl(c.text, S, context)}</p></div>`).join("")}</div></div>` : ""}
@@ -358,6 +358,8 @@ function renderNews() {
     return;
   }
   const filters = newsFilters();
+  const filterAvailable = filters.some(([id]) => id === state.newsCat);
+  if (!filterAvailable) state.newsCat = "all";
   const list = all.filter(n => state.newsCat === "all" ? true : state.newsCat === "top" ? n.level >= 3 : newsCats(n).has(state.newsCat)).sort(newsOrder);
   const selectedName = filters.find(([id]) => id === state.newsCat)?.[1] || "すべて";
   const body = state.newsCat === "all" ? allNewsSections(all) : list.length ? newsSection(`${selectedName}のニュース`, list) : "";
@@ -368,7 +370,7 @@ function renderNews() {
     <div class="chips scroll news-filters" role="group" aria-label="分野で絞り込む">${filters.map(([id, name]) => `<button class="filter ${state.newsCat === id ? "on" : ""}" data-newscat="${esc(id)}" aria-pressed="${state.newsCat === id}">${esc(name)}</button>`).join("")}</div>
     ${body || `<p class="empty">この分野のニュースは、いまはありません。</p>`}
     ${foot()}`;
-  $("#v-news .news-filters").scrollLeft = filtersScroll;
+  $("#v-news .news-filters").scrollLeft = filterAvailable ? filtersScroll : 0;
 }
 function newsFilters() {
   const present = new Set((D.news || []).flatMap(n => [...newsCats(n)]));
@@ -632,7 +634,7 @@ function focusHeading(root) {
 function activeModal() { return !$("#termcard").hidden ? $("#termcard") : sheetOpen ? $("#sheet") : null; }
 function syncModalState() {
   const termOpen = !$("#termcard").hidden;
-  $$('.top,main,.nav,#update').forEach(el => { el.inert = sheetOpen || termOpen; });
+  $$('.top,main,.nav').forEach(el => { el.inert = sheetOpen || termOpen; });
   const sheet = $("#sheet");
   sheet.inert = !sheetOpen || termOpen;
   sheet.setAttribute('aria-hidden', String(!sheetOpen || termOpen));
@@ -739,6 +741,7 @@ function hideSheet(restoreFocus = true) {
     const origin = sheetReturnFocus.get(sheetSession);
     if (origin?.view === state.view && !restoreFocusRef(origin.focus)) focusHeading($("#v-" + state.view));
   }
+  markInteraction();
 }
 function closeSheet() {
   if (!sheetOpen) return;
@@ -914,6 +917,11 @@ window.addEventListener("hashchange", syncNavigation);
 
 // ---------- データの読み込みと、新しい内容・新しい版の確認 ----------
 const getJson = u => fetch(u, { cache: "no-cache" }).then(r => (r.ok ? r.json() : null)).catch(() => null);
+function updateStamp() {
+  const time = fmtTime(D?.updated);
+  const delayed = Date.now() - Date.parse(D?.updated) >= 24 * 3600000;
+  $("#stamp").textContent = time ? `${time} 更新${delayed ? "・更新遅れ" : ""}` : "";
+}
 function setData(d) {
   if (D && sheetOpen) pendingViewRefresh = true;
   D = d || { brief: { themes: [] }, news: [], experts: [], moving: [], markets: {} };
@@ -922,7 +930,7 @@ function setData(d) {
   for (const n of D.news || []) newsById[n.id] = n;
   for (const e of D.experts || []) expertById[e.id] = e;
   setTerms(GLOSSARY, D.terms);
-  $("#stamp").textContent = D.updated ? `${fmtTime(D.updated)} 更新` : "";
+  updateStamp();
 }
 async function loadExtras() {
   const [th, rv, wk] = await Promise.all([getJson("data/threads.json"), getJson("data/reviews.json"), getJson("data/weekly/index.json")]);
@@ -944,6 +952,7 @@ let lastCheck = 0;
 async function checkFresh() {
   if (Date.now() - lastCheck < 3 * 60000) return;
   lastCheck = Date.now();
+  updateStamp();
   // ホーム画面のアプリは開きっぱなしで戻ってくるので、戻るたびに新しい内容があるかを見る
   const d = await getJson("data/latest.json");
   if (d?.updated && D && (d.updated !== D.updated || d.revision !== D.revision)) {
@@ -952,21 +961,134 @@ async function checkFresh() {
     if (!sheetOpen) RENDER[state.view]();
     toast(`${fmtTime(d.updated)} の内容に更新しました`);
   }
-  const vt = await fetch("js/versions.js", { cache: "no-cache" }).then(r => (r.ok ? r.text() : "")).catch(() => "");
-  const v = (vt.match(/v:\s*"(v[\d.]+)"/) || [])[1];
-  if (v && v !== VERSION) {
-    $("#update-v").textContent = v;
-    $("#update").hidden = false;
-  }
 }
-$("#update-btn").addEventListener("click", async () => {
-  try { const r = await navigator.serviceWorker?.getRegistration(); await r?.update(); } catch { /* 更新の確認ができなくても読み直す */ }
+
+// 公開コードの切り替えは、完全な版を保存した Service Worker が有効になってから。
+const RELOAD_IDLE = 1500;
+let workerRegistration, checkedController, lastWorkerCheck = 0;
+let pendingVersion, reloadTimer, reloading = false;
+let lastInteraction = 0, liveTouches = 0;
+const livePointers = new Set();
+
+function newerVersion(candidate, current) {
+  if (!/^v\d+\.\d+\.\d+$/.test(candidate)) return false;
+  const parts = v => v.slice(1).split(".").map(Number);
+  const a = parts(candidate), b = parts(current);
+  const difference = a.findIndex((n, i) => n !== b[i]);
+  return difference !== -1 && a[difference] > b[difference];
+}
+function queueCodeReload() {
+  if (!pendingVersion || reloading || reloadTimer || document.hidden || activeModal() || livePointers.size || liveTouches) return;
+  if ((window.visualViewport?.scale || 1) > 1.02 || window.getSelection()?.isCollapsed === false) return;
+  if (document.activeElement?.matches('input, textarea, select, [contenteditable]:not([contenteditable="false"])')) return;
+  const wait = RELOAD_IDLE - (performance.now() - lastInteraction);
+  if (wait > 0) {
+    reloadTimer = setTimeout(() => { reloadTimer = null; queueCodeReload(); }, wait);
+    return;
+  }
+  const previous = history.state?.kzCodeUpdate;
+  if (previous?.from === VERSION && previous.to === pendingVersion) return;
+  const scroll = { ...state.viewScroll, [state.view]: window.scrollY };
+  const filters = ["#v-news .news-filters", "#v-map .relationship-filters"].map(selector => $(selector)?.scrollLeft ?? 0);
+  try {
+    history.replaceState({ ...history.state, kzCodeUpdate: {
+      from: VERSION, to: pendingVersion, view: state.view, scroll, filters,
+      newsMode: state.newsMode, newsCat: state.newsCat,
+      connectionCat: state.connectionCat, connectionDirections: state.connectionDirections,
+    } }, "");
+  } catch { return; } // 再読込の記録を残せない場合は、次に開くときに新しい版を使う。
+  reloading = true;
   location.reload();
-});
-document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkFresh(); });
-window.addEventListener("pageshow", ev => { if (ev.persisted) checkFresh(); });
-// 開いたまま読んでいるあいだも、15分ごとに新しい内容があるかを見る
-setInterval(() => { if (document.visibilityState === "visible" && loadStatus === "ready") checkFresh(); }, 15 * 60000);
+}
+function markInteraction() {
+  lastInteraction = performance.now();
+  queueCodeReload();
+}
+function inspectController() {
+  const controller = navigator.serviceWorker.controller;
+  if (!controller || controller === checkedController) return;
+  checkedController = controller;
+  const { port1, port2 } = new MessageChannel();
+  const timeout = setTimeout(() => {
+    port1.close();
+    if (checkedController === controller) checkedController = null;
+  }, 2500);
+  port1.onmessage = ev => {
+    clearTimeout(timeout);
+    port1.close();
+    if (navigator.serviceWorker.controller !== controller || !newerVersion(ev.data, VERSION)) return;
+    pendingVersion = ev.data;
+    markInteraction();
+  };
+  try { controller.postMessage("keizai:get-version", [port2]); }
+  catch { /* 同じタイマーで古い Worker への問い合わせを終える。 */ }
+}
+function checkCodeUpdate() {
+  if (!workerRegistration) return;
+  inspectController();
+  if (!navigator.onLine || workerRegistration.installing || Date.now() - lastWorkerCheck < 30000) return;
+  lastWorkerCheck = Date.now();
+  workerRegistration.update().catch(() => {});
+}
+function installCodeUpdates() {
+  const localTest = ["localhost", "127.0.0.1", "[::1]"].includes(location.hostname) && new URLSearchParams(location.search).has("sw");
+  if (!("serviceWorker" in navigator) || (location.protocol !== "https:" && !localTest)) return;
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    pendingVersion = null;
+    inspectController();
+  });
+  navigator.serviceWorker.register("sw.js", { updateViaCache: "none" }).then(registration => {
+    workerRegistration = registration;
+    checkCodeUpdate();
+  }).catch(() => {});
+  const passive = { capture: true, passive: true };
+  document.addEventListener("pointerdown", ev => { livePointers.add(ev.pointerId); markInteraction(); }, passive);
+  for (const type of ["pointerup", "pointercancel"]) {
+    document.addEventListener(type, ev => { livePointers.delete(ev.pointerId); markInteraction(); }, passive);
+  }
+  for (const type of ["touchstart", "touchend", "touchcancel"]) {
+    document.addEventListener(type, ev => { liveTouches = ev.touches.length; markInteraction(); }, passive);
+  }
+  for (const type of ["scroll", "wheel", "keydown", "click", "selectionchange", "focusout"]) {
+    document.addEventListener(type, markInteraction, passive);
+  }
+  window.visualViewport?.addEventListener("resize", markInteraction);
+  window.addEventListener("blur", () => { livePointers.clear(); liveTouches = 0; markInteraction(); });
+  window.addEventListener("online", checkCodeUpdate);
+}
+const codeUpdatePosition = history.state?.kzCodeUpdate;
+function restoreCodeUpdateState() {
+  const saved = codeUpdatePosition;
+  if (!saved || newerVersion(saved.to, VERSION)) return;
+  state.view = viewFromHash();
+  state.viewScroll = saved.scroll;
+  state.newsMode = saved.newsMode;
+  state.newsCat = saved.newsCat;
+  state.connectionCat = saved.connectionCat;
+  state.connectionDirections = saved.connectionDirections;
+}
+function restoreCodeUpdateFilters() {
+  if (!codeUpdatePosition || newerVersion(codeUpdatePosition.to, VERSION) || !history.state?.kzCodeUpdate) return;
+  ["#v-news .news-filters", "#v-map .relationship-filters"].forEach((selector, index) => {
+    const bar = $(selector);
+    if (bar) bar.scrollLeft = codeUpdatePosition.filters[index];
+  });
+  const { kzCodeUpdate, ...base } = history.state;
+  history.replaceState(base, "");
+}
+function checkOnReturn() {
+  markInteraction();
+  checkCodeUpdate();
+  if (loadStatus === "ready") checkFresh();
+}
+document.addEventListener("visibilitychange", () => { if (!document.hidden) checkOnReturn(); });
+window.addEventListener("pageshow", ev => { if (ev.persisted) checkOnReturn(); });
+// 開いたままでも、内容とアプリの版を独立に確認する。
+setInterval(() => {
+  if (document.hidden) return;
+  checkCodeUpdate();
+  if (loadStatus === "ready") checkFresh();
+}, 15 * 60000);
 
 async function load() {
   loadStatus = "loading";
@@ -980,11 +1102,13 @@ async function load() {
     loadStatus = "ready";
     lastCheck = Date.now();
     route();
+    restoreCodeUpdateFilters();
     setTimeout(() => { lastCheck = 0; checkFresh(); }, 4000);
   } catch {
     loadStatus = "error";
     route();
   }
 }
+restoreCodeUpdateState();
+installCodeUpdates();
 load();
-if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {});
