@@ -1,175 +1,192 @@
 {
- "updated": "2026-11-19T14:13:53+09:00",
- "collected": "2026-11-19T05:19:37+09:00",
+ "updated": "2026-11-19T17:06:06+09:00",
+ "collected": "2026-11-19T17:05:06+09:00",
  "ai": {
   "model": "sonnet",
-  "cost_usd": 0.47141600000000006,
-  "ms": 159199
+  "cost_usd": 0.257656,
+  "ms": 32072
  },
  "brief": {
-  "headline": "FRBの利上げ観測が強まり、円安と米金利高が続く",
+  "headline": "米利上げ観測で円安が進み、AI期待で日本株は続伸",
   "themes": [
    {
     "title": "FRB利上げ観測と円安",
-    "point": "米の利上げ観測で円安圧力",
+    "point": "米の利上げ観測で円安が続く",
     "thread": "日米の金融政策",
-    "story": "これまでは米長期金利5%台と円安が焦点だった。今日は議事要旨とウォラー理事の発言で、FRBの追加利上げ観測が強まった。",
-    "what": "FRBの議事要旨で、ほぼ全員が追加利上げの可能性に言及した。ウォラー理事は12月に0.5ポイントの利上げを推奨した。ドル円は159.42円、米10年債利回りは5.07%だった。",
+    "story": "前日は米長期金利5%と円安が焦点だった。今日は議事要旨で追加利上げ論が広がり、12月の利上げが焦点になった。",
+    "what": "FRBの10月会合の議事要旨で、大半が数カ月内の追加利上げを適切とした。米10年債利回りは5.07%、ドル円は159.42円だった。",
     "chain": [
      {
-      "node": "us_cpi",
-      "dir": "up"
-     },
-     {
       "node": "ust10",
-      "dir": "up",
-      "known": false
+      "dir": "up"
      },
      {
       "node": "usdjpy",
       "dir": "up",
       "known": true
+     },
+     {
+      "node": "import_prices",
+      "dir": "up",
+      "known": true
      }
     ],
-    "chain_text": "米国の物価への不安が強まると、FRBが利上げに傾く。すると米国の長期金利が上がり、日米の金利差からドル円は円安に傾きやすい。",
+    "chain_text": "米国で利上げ観測が強まると、米国の長期金利が高止まりし、日米の金利差からドル高・円安になりやすい。円安は輸入品の円建て価格を押し上げる。",
     "outlook": [
-     "米の利上げが現実になれば、ドル円が160円を超えて円安が進むかもしれない",
-     "円安が行き過ぎれば、日本政府の為替介入への警戒が強まる可能性がある",
-     "植田総裁の国会発言しだいで、日銀の利上げ観測が動くかもしれない"
+     "円安が160円に近づくと、日銀の対応への注目が強まるかもしれない",
+     "米の利上げが続けば、世界の株や金が重くなる可能性がある"
     ],
-    "watch": "19日の植田総裁の参院財金委での発言、米の物価指標",
+    "watch": "植田総裁の参院財政金融委員会での発言と、12月の米FOMC",
     "news": [
-     "n0",
-     "n32",
-     "n108",
-     "n129",
-     "n77",
-     "n48",
-     "n152"
+     "n244",
+     "n300",
+     "n271",
+     "n24",
+     "n213"
     ],
     "experts": [
-     "e15",
-     "e6"
+     "e0"
     ]
    },
    {
-    "title": "米半導体規制とエヌビディア",
-    "point": "AI株は規制と経営不安で不安定",
+    "title": "アンソロピック上場とAI株",
+    "point": "AI期待が日本株を支えた",
     "thread": "AI相場",
-    "story": "好決算でいったん持ち直したが、フアン氏の不在と規制強化で不安が残る。焦点は、AI投資のお金の流れが続くかどうかに移っている。",
-    "what": "エヌビディアはフアン氏を復帰させない方針を示した。米は先端半導体の第三国経由の輸出にも許可を求める方針だ。ダウは続落で始まり、一時500ドル安となった。",
+    "story": "前日はエヌビディア決算と規制の動きで揺れていた。今日は米アンソロピックの大型上場への期待が株を支えた。",
+    "what": "アンソロピックの公開価格は83ドル、評価額は1.5兆ドルとなった。日経平均は419円高の5万9444円で続伸した。",
     "chain": [
      {
       "node": "ai_semis",
-      "dir": "down"
+      "dir": "up"
      },
      {
       "node": "us_stocks",
-      "dir": "down",
+      "dir": "up",
       "known": true
      },
      {
       "node": "nikkei",
-      "dir": "down",
+      "dir": "up",
       "known": true
      }
     ],
-    "chain_text": "規制でAI向け半導体への投資が細るとの不安が出ると、米国株が下がりやすい。米国株の下げは日本株にも波及しやすい。まだ確定した流れではない。",
+    "chain_text": "AI企業の上場への期待でAI・半導体関連株が買われ、米株先物も上がった。日本株もつられて上がった。",
     "outlook": [
-     "中国が対抗措置を取れば、米中の対立が強まるかもしれない",
-     "AI向けの借入への警戒が広がれば、株の値動きが荒くなる可能性がある"
+     "上場後の値動き次第で、AI株の熱が強まるか冷めるかが分かれるかもしれない",
+     "AIへの懸念が出れば、関連株が急に下がる可能性がある"
     ],
-    "watch": "エヌビディアの後継CEO人事と、米中首脳会談の結果",
+    "watch": "アンソロピックの上場初日の株価",
     "news": [
-     "n14",
-     "n41",
-     "n91",
-     "n102",
-     "n64",
-     "n218",
-     "n354"
+     "n26",
+     "n230",
+     "n51",
+     "n23",
+     "n18",
+     "n143"
     ],
     "experts": [
-     "e0",
-     "e1",
-     "e10"
+     "e0"
     ]
    },
    {
-    "title": "原油安と米中ロ外交",
-    "point": "緊張緩和期待で原油は下落",
+    "title": "米中ロ首脳外交と半導体規制",
+    "point": "外交の裏で半導体規制が続く",
+    "thread": "米中ロ外交",
+    "story": "前日はAPEC開幕での握手が中心だった。今日は3首脳会談と、半導体規制の緊張が焦点になった。",
+    "what": "深圳のAPECで米ロ首脳が会談した。日中首脳会談は見送られた。習主席はトランプ氏との協力を表明した。",
+    "chain": [
+     {
+      "node": "tariffs",
+      "dir": "up"
+     },
+     {
+      "node": "ai_semis",
+      "dir": "down",
+      "known": false
+     }
+    ],
+    "chain_text": "米国が先端半導体の第三国向け輸出にも許可を求めると、AI半導体の供給に制約が出る可能性がある。ただし米中の協調姿勢も示された。",
+    "outlook": [
+     "米中が協調すれば、規制の緊張が和らぐかもしれない",
+     "日中関係の改善が進まず、企業活動に響く可能性がある"
+    ],
+    "watch": "3首脳会談の結果と米の半導体規制の運用",
+    "news": [
+     "n14",
+     "n62",
+     "n12",
+     "n307",
+     "n69"
+    ],
+    "experts": []
+   },
+   {
+    "title": "原油安と中東情勢",
+    "point": "原油は下げても中東は不安定",
     "thread": "原油と地政学",
-    "story": "前日は原油高と貿易赤字が焦点だった。今日は中東の緊張緩和期待で原油が下がり、焦点は首脳外交の行方に移った。",
-    "what": "米国産原油は10月の110ドル超から85ドル前後へ下落した。北海ブレントも92ドルを割った。トランプ氏はプーチン氏と19日に個別会談する。",
+    "story": "前日は原油高による貿易赤字が焦点だった。今日は原油安が進む一方、中東の緊張が残る。",
+    "what": "原油は小動きだった。トランプ氏がイランへの新たな攻撃を検討と報じられた。イランはクウェートの基地を狙った。",
     "chain": [
      {
       "node": "geopolitics",
-      "dir": "down"
+      "dir": "up"
      },
      {
       "node": "oil",
-      "dir": "down",
+      "dir": "up",
       "known": true
      },
      {
       "node": "import_prices",
-      "dir": "down",
+      "dir": "up",
       "known": true
      }
     ],
-    "chain_text": "緊張が和らぐと原油が下がり、日本が買う輸入品の値段の重さも軽くなりうる。",
+    "chain_text": "中東の緊張が高まれば原油が上がり、日本の輸入物価を押し上げる可能性がある。ただ今日は供給過剰観測が重しだった。",
     "outlook": [
-     "原油安が続けば、日本の貿易赤字が縮むかもしれない",
-     "会談が不調なら、再び原油が上がる可能性がある"
+     "攻撃が広がれば原油が再び上がるかもしれない",
+     "原油安が続けば貿易赤字が縮む可能性がある"
     ],
-    "watch": "19日の米ロ会談とAPEC宣言",
+    "watch": "イラン情勢と原油価格",
     "news": [
-     "n33",
-     "n70",
-     "n55",
-     "n217",
-     "n86"
+     "n86",
+     "n159",
+     "n144",
+     "n358"
     ],
-    "experts": [
-     "e17"
-    ]
+    "experts": []
    },
    {
-    "title": "景気減速と米住宅の悪化",
-    "point": "高金利が住宅と消費を圧迫",
+    "title": "JTのロシア損失と景気減速",
+    "point": "企業と家計に重い材料が出た",
     "thread": "物価と金利",
-    "story": "日本は景気減速と物価高が続く。米国でも高い金利が住宅の重しになり、金利高の副作用が目立ってきた。",
-    "what": "米の10月の住宅建設許可は約6年半ぶりの低水準だった。中古住宅の仮契約指数も調査開始以来の最低だった。日本の実質賃金は9カ月連続プラスでも支出の抑制が広がる。",
+    "story": "景気減速と物価高の流れに、米住宅の悪化が加わっていた。今日はJTの巨額損失が企業面の焦点になった。",
+    "what": "JTはロシア子会社の支配を失い、約1兆3770億円の損失を計上する。配当を減らす。",
     "chain": [
      {
-      "node": "ust10",
+      "node": "geopolitics",
       "dir": "up"
      },
      {
-      "node": "mortgage",
+      "node": "risk_off",
       "dir": "up",
-      "known": false
-     },
-     {
-      "node": "realestate",
-      "dir": "down",
       "known": true
      }
     ],
-    "chain_text": "長期金利が高いと住宅ローン金利も上がり、住宅の売れ行きが落ちやすい。",
+    "chain_text": "地政学の影響で海外資産を失う例が出た。海外投資のリスクが意識されるかもしれない。",
     "outlook": [
-     "高金利が続けば、住宅関連の景気がさらに弱まるかもしれない",
-     "日本の消費の弱さが続けば、日銀の判断が難しくなる可能性がある"
+     "海外事業を持つ企業で、リスクの見直しが進むかもしれない",
+     "景気減速が続けば消費が弱まる可能性がある"
     ],
-    "watch": "米の物価指標と日本の消費関連の統計",
+    "watch": "JTの株価反応と他社の海外事業への影響",
     "news": [
-     "n84",
-     "n90",
-     "n114",
-     "n310"
+     "n21",
+     "n44",
+     "n38",
+     "n237"
     ],
     "experts": [
-     "e18",
+     "e7",
      "e6"
     ]
    }
@@ -177,143 +194,279 @@
  },
  "moving": [
   {
-   "node": "ust10",
-   "dir": "up",
-   "why": "利上げ観測で米10年債利回りは5.07%と高い"
-  },
-  {
    "node": "usdjpy",
    "dir": "up",
-   "why": "日米の金利差が意識され159円台後半で推移"
+   "why": "日米の金利差で159円台の円安が続く"
+  },
+  {
+   "node": "nikkei",
+   "dir": "up",
+   "why": "AI関連株への買いで続伸した"
+  },
+  {
+   "node": "ai_semis",
+   "dir": "up",
+   "why": "アンソロピック上場への期待が強い"
   },
   {
    "node": "oil",
    "dir": "down",
-   "why": "中東の緊張緩和期待でWTIは85ドル前後に下落"
+   "why": "供給過剰観測で原油が下がった"
   },
   {
-   "node": "ai_semis",
+   "node": "gold",
    "dir": "down",
-   "why": "米の半導体規制とエヌビディアの経営不安"
+   "why": "利上げ観測とドル高で売られた"
   },
   {
-   "node": "realestate",
-   "dir": "down",
-   "why": "米の住宅指標が悪化し、日本もマンション値下がり"
+   "node": "geopolitics",
+   "dir": "up",
+   "why": "中東と米中ロ外交の緊張が続く"
   }
  ],
  "news": [
   {
-   "id": "n0",
-   "title": "Fed minutes show growing unease about the outlook for inflation",
-   "link": "https://www.marketwatch.com/story/fed-minutes-show-growing-unease-about-the-outlook-for-inflation-59e3c13d?mod=mw_rss_topstories",
-   "source": "MarketWatch",
-   "time": "2026-11-19T05:51:00+09:00",
-   "group": "海外（英語）",
-   "title_ja": "FRB議事要旨、物価見通しへの不安が拡大",
-   "plain": "政策金利は据え置いた。だが、物価の先行きに不安を強める声が増えていた。",
-   "context": "議事要旨は、会合で出た意見を後から公表する記録だ。決定は据え置きでも、中身で次の一手のヒントが読める。物価が下がりにくいと見る人が増えれば、利上げ寄りの空気になりやすい。",
-   "impact": "物価への警戒が強いままなら、米国の長期金利が高止まりするかもしれない。現在は5.07%だ。日米金利差が大きいと、ドル円は159円台の円安が続く可能性がある。輸入品の値上がりを通じて家計にも響く。",
-   "watch": "次の米国の物価指標と、FRB高官の発言を確認したい。利上げ時期の見方が変わるかが決め手だ。",
-   "next": "追加利上げ観測が強まり、米金利とドル円に響く。",
-   "tags": [
-    {
-     "node": "us_cpi",
-     "dir": "up"
-    }
-   ],
+   "id": "n244",
+   "title": "FRBが10月会合の議事録公表 ほぼ全員が「追加利上げ適切」",
+   "link": "https://news.google.com/rss/articles/CBMiX0FVX3lxTFBXVlBlVnBGZ0xQeFN4eENhWVJndFJobnA0VHFDY2FDajJJUHpUaU1fR0dlZGprd0RMV2VYRzZvYzhBXy1zNkI3aW5fYjNacVZaalRHWlJia3NkdFo5Y1JF?oc=5",
+   "source": "NHKニュース",
+   "time": "2026-11-19T08:36:40+09:00",
+   "group": "ニュースのまとめ",
+   "plain": "NHKによると、FRB（米連邦準備制度理事会）が10月会合の議事録を公表した。ほぼ全員が追加利上げを適切だと考えていた。利上げに前向きな空気が強いとわかる内容だ。",
+   "context": "議事録は、会合で出た意見を後から公開する記録だ。市場は次の金利の動きを読む手がかりにする。利上げは、物価の上昇を抑えるために政策金利を上げることだ。",
+   "impact": "米国の利上げ観測が強まれば、米国の長期金利は高止まりしやすい。日米金利差が開いた状態が続くと、159円台のドル円は円安に傾くかもしれない。輸入品の値上がりを通じて、家計の負担が増える可能性がある。",
+   "watch": "次のFOMCの日程と、米国の物価や雇用の指標を見る。米国の10年国債利回りが5%台を保つかも確かめたい。",
+   "next": "米の利上げ観測が円安と米長期金利の高止まりに響く。",
+   "tags": [],
    "cat": "policy",
+   "level": 3,
+   "related": []
+  },
+  {
+   "id": "n300",
+   "title": "10月のFOMC、大半が「数カ月内の利上げ適切」 大幅上げの声も",
+   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTFBWRk5QZDlOYUt4MVhBU212NVFhQ1ZvNlNxeGdCdG1KY3B3bXpEYjlNVUdkQlRoOWExaFlneWgzRFRXM3hHWlVxbDZ0N1lPdzRvMGc1bmJzY0FsVldhZndTLU9PTWNaUjl2RWNFZQ?oc=5",
+   "source": "日本経済新聞",
+   "time": "2026-11-19T05:43:10+09:00",
+   "group": "新聞・放送・通信",
+   "plain": "大幅な利上げを求める声もあった。",
+   "context": "FOMCは米国の政策金利を決める会合だ。「数カ月内」という言い方は、利上げの時期が近いという合図になる。市場は会合の結果だけでなく、参加者の見方も織り込む。",
+   "impact": "利上げが早く大きくなるとの見方が広がれば、米国の金利は上がりやすい。そうなれば日米金利差が広がり、円安が進むかもしれない。日本企業の輸入コストや、株式市場の値動きにも響く可能性がある。",
+   "watch": "FRB高官の発言や、米国の物価指標を見る。利上げ幅について見方がそろうかどうかが決め手になる。",
+   "next": "利上げが早く大きくなるとの見方が広がれば、米国の金利は上がりやすい。そうなれば日米金利差が広がり、円安が進むかもしれない。日本企業の輸入コストや、株式市場の値動きにも響く可能性がある。",
+   "tags": [],
+   "cat": "policy",
+   "level": 3,
+   "related": []
+  },
+  {
+   "id": "n271",
+   "title": "NY債券、長期債続伸 10年債利回り5.07% 原油安が支え",
+   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE8tVEFZQjdXbGxkeEFLT0l6X2pkRHlJc0lxSVp4WU5hb2g1SEZTbGhZb3NER2hKZXl4NHRHRU1DeERxSVhBMHcydzdybjNDa3VUdTJWYkRYaXRUZ3QwdHEwMU1sa3gtQXFSWHhjUQ?oc=5",
+   "source": "日本経済新聞",
+   "time": "2026-11-19T07:08:09+09:00",
+   "group": "新聞・放送・通信",
+   "plain": "10年債利回りは5.07%だった。原油安が債券の買いを支えた。",
+   "context": "債券は、価格が上がると利回りが下がる。原油が安くなると、物価が上がりにくくなるとの見方が出て、債券が買われやすい。ただ今回は利回りがまだ5%台の高い水準だ。",
+   "impact": "原油安が続けば、米国の長期金利の上昇は抑えられるかもしれない。ただ利上げ観測が強いままなら、下がり方は限られる可能性がある。米国の金利が高いと、円安が続きやすい。",
+   "watch": "原油価格の動きと、米国の10年国債利回りが5%を割るかを見る。",
+   "next": "原油安が米長期債の支えになった。",
+   "tags": [],
+   "cat": "rates",
+   "level": 2,
+   "related": []
+  },
+  {
+   "id": "n26",
+   "title": "Anthropic raises $81bn in record IPO",
+   "link": "https://www.ft.com/content/62c0510b-ca65-441e-9baf-675b93903b9e?syn-25a6b1a6=1",
+   "source": "Financial Times",
+   "time": "2026-11-19T16:04:26+09:00",
+   "group": "海外（英語）",
+   "title_ja": "アンソロピック、記録的IPOで81億ドル調達",
+   "plain": "英フィナンシャル・タイムズによると、AI大手のアンソロピックが過去最高規模の新規株式公開（IPO）で810億ドルを調達した。",
+   "context": "IPOは、会社が株を初めて市場で売り出し、資金を集める仕組みだ。評価額は、市場がその会社にいくらの価値があるとみるかを示す。巨額の上場は、投資家の資金の流れを変えることがある。",
+   "impact": "人気が続けば、AI関連株全体への期待が高まるかもしれない。一方、巨額の資金がこの株に向かうと、他の株が売られる可能性もある。日本の半導体関連株にも波及しうる。",
+   "watch": "取引初日の値動きと、AI・半導体株が一緒に上がるかを見る。",
+   "next": "AI株全体の需給と期待に響く。",
+   "tags": [],
+   "cat": "market",
    "level": 3,
    "related": [],
    "lang": "en"
   },
   {
-   "id": "n32",
-   "title": "FOMC議事要旨、ほぼ全員が追加利上げ必要になる可能性高いと指摘",
-   "link": "https://news.google.com/rss/articles/CBMijgFBVV95cUxOUTdKbi1GY0R4VHFEd2t0ZEdVMXJSTFdrQWJJZDBKcS1mczFHZTh0Z2cyUW1kbzU2QVl0dklzSnUtejlTeElzU2xxYUZoemQ4U294NlVPd283RmNWcUxCUm53QnQxRzlHZG9ZcVhlYTBEZUVnZUhvemkzMHFOMDk3X050TW5pLUhFYzZDY3l3?oc=5",
-   "source": "Bloomberg.com",
-   "time": "2026-11-19T04:26:05+09:00",
+   "id": "n230",
+   "title": "アンソロピックIPO、公開価格は83ドル　評価額240兆円企業に",
+   "link": "https://www.asahi.com/articles/ASVCL7X1YVCLUHBI002M.html?ref=rss",
+   "source": "朝日新聞",
+   "time": "2026-11-19T09:15:41+09:00",
    "group": "新聞・放送・通信",
-   "plain": "FOMCの議事要旨で、ほぼ全員が追加利上げが必要になる可能性は高いと指摘したことがわかった。会合では据え置いたが、参加者は先の利上げを意識している。",
-   "context": "FOMCは米国の金融政策を決める会合だ。利上げは、物価の上昇を抑えるために金利を上げる政策だ。参加者がほぼそろって必要性に触れるのは、方向感が引き締めに傾いている目印になる。",
-   "impact": "追加利上げの見方が強まると、米国の長期金利が上がりやすい。日米金利差が広がれば、ドル円は円安に向かうかもしれない。159.42円からさらに円安が進めば、輸入物価が上がり、家計の負担が増える可能性がある。",
-   "watch": "",
-   "next": "利上げ観測が強まり、米金利高と円安につながりやすい。",
+   "plain": "朝日新聞によると、アンソロピックのIPOで公開価格は83ドルに決まった。評価額は約240兆円の企業になる。",
+   "context": "公開価格は、上場時に投資家へ売る株の値段だ。上場後は市場の需要で値段が動く。大型上場は、市場がその分野にどれだけ期待しているかを映す。",
+   "impact": "初値が公開価格を大きく上回れば、AI関連への期待がさらに強まるかもしれない。逆に下回れば、期待が冷めて関連株が売られる可能性がある。日本のAI・半導体関連株も影響を受けうる。",
+   "watch": "上場後の初値と、その後数日の値動きを見る。",
+   "next": "公開価格83ドルで、AI関連株の期待に響く。",
    "tags": [],
-   "cat": "policy",
-   "level": 3,
-   "related": []
-  },
-  {
-   "id": "n108",
-   "title": "ＦＲＢ、積極的な物価対応必要 来月0.5％利上げも＝ウォラー理事",
-   "link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxQRUtWS0pmeXg1U2hnM0pKcjBFTl80dVg0WTFyMWRiQmoyVzhsNWFEOXIzZ0Q4SUdXa1NGNFZod3RLdl9UT0hwRlBscEhZeW9GVV9LVjV4UWgzU2p6dHRKeDYzeGYwSkNEVXhyZGZabmN3d0hNVWc3WlE2Yl8zWUxxOGlnRjc3M1BBaFVIUTB6bUhBbUJLeV9fU3EtSQ?oc=5",
-   "source": "Reuters",
-   "time": "2026-11-18T23:46:15+09:00",
-   "group": "新聞・放送・通信",
-   "plain": "FRBのウォラー理事が、物価に積極的に対応する必要があると述べた。来月に0.5%の利上げもあり得るとした。ふつうより大きな引き上げを示した形だ。",
-   "context": "利上げ幅は通常、小さな刻みで決まることが多い。0.5%はそれより大きく、物価を急いで抑える意思が強いときに選ばれやすい。理事の発言は、会合の議論を映すことがある。",
-   "impact": "大幅利上げの見方が広がれば、米金利とドルが支えられるかもしれない。円は売られやすくなり、ドル円が159円台で高止まりする可能性がある。日本の企業は輸入コストが増え、輸出企業には追い風になりうる。",
-   "watch": "",
-   "next": "来月の大幅利上げ観測が米金利とドルを支える。",
-   "tags": [],
-   "cat": "policy",
-   "level": 3,
-   "related": []
-  },
-  {
-   "id": "n129",
-   "title": "FRBは12月の0.5ポイント利上げを検討すべき－ウォラー理事",
-   "link": "https://news.google.com/rss/articles/CBMijgFBVV95cUxONEkwNnUyOWFXcDdRTXYxdUNKWHJleXhmamdfVTdTWERiRmphTVFWa1RxZ1JFME8xYzVxekN5SWM4akRuWE1nSXZpVktxSVBaLVJuT1p3Wm1RRzhQRjdqYXhyZTZ4SkNuam1aZVRsTlFnYkg3WXdKd1pqRkFSRDhzWG1VaHFSXzBwby1OWnRB?oc=5",
-   "source": "Bloomberg.com",
-   "time": "2026-11-18T22:11:25+09:00",
-   "group": "新聞・放送・通信",
-   "plain": "FRBのウォラー理事が、12月に0.5ポイントの利上げを検討すべきだと述べた。大きな利上げ幅を選択肢に入れるよう促した発言だ。",
-   "context": "市場は、会合前の高官発言から次の決定を予想する。これを織り込むと言う。予想が変わると、会合の前から金利や為替が動くことがある。",
-   "impact": "0.5ポイントの利上げ論が強まれば、米国の長期金利は高い水準を保つかもしれない。そのとき日米金利差が広がり、円安が進みやすい。日本の住宅ローンの金利にも、長い目で上昇圧力がかかる可能性がある。",
-   "watch": "市場が12月に0.5ポイントの利上げをどこまで織り込むか。金利の先物や米10年債利回りの動きで確かめたい。",
-   "next": "12月の0.5ポイント利上げ論が市場の焦点になる。",
-   "tags": [],
-   "cat": "policy",
+   "cat": "market",
    "level": 2,
    "related": []
   },
   {
-   "id": "n48",
-   "title": "サンフランシスコ連銀総裁、米利上げには慎重なアプローチ必要",
-   "link": "https://news.google.com/rss/articles/CBMijgFBVV95cUxQWUxJMzZVcmtYOFgxU09sdXV4YVFRQjR5RHAyaFdjaGI4dWJKbk84bzNoV19iU25YM3lobVJJcl9MWjItRkQ0Vmx2Z2RyTWFEVXBieXFabWR2T0NFbXVXcnY3SWRHdXloWERjZXdrWDdncGpKV0JsMS1qdldnT3RfOXY1eEhWNExPYUdmLU13?oc=5",
-   "source": "Bloomberg.com",
-   "time": "2026-11-19T03:59:33+09:00",
+   "id": "n51",
+   "title": "日経平均大引け 続伸 419円高の5万9444円",
+   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE5zQkNZMWRXSTZQX3lNc2c2X3p0MU9BQm1QQldNMjhDWEZPR1VjcmRRWDZEeVlQaVVHU2swRGVXQ2REVEVmX2JmMFJlYW9xSlpJeUUyYTA5RlpQVGNsTEFZYXJCcTNGRkowX05WcQ?oc=5",
+   "source": "日本経済新聞",
+   "time": "2026-11-19T15:35:53+09:00",
    "group": "新聞・放送・通信",
-   "plain": "サンフランシスコ連銀の総裁が、米国の利上げには慎重なアプローチが必要だと述べた。利上げを急ぐ声がある中で、慎重さを求めた。",
-   "context": "FRBは複数の高官の議論で方針を決める。強く利上げを求める人と、慎重な人が混在することは珍しくない。意見の差が大きいと、次の決定が読みにくくなる。",
-   "impact": "慎重派が力を持てば、利上げ幅が小さくなるかもしれない。その場合、米金利の上昇が一服し、円安に歯止めがかかる可能性がある。ただ、利上げ派が優勢なら逆の動きになる。",
-   "watch": "",
-   "next": "利上げには慎重さを求める声もあり、FRB内の温度差が見える。",
-   "tags": [],
-   "cat": "policy",
+   "plain": "日本経済新聞によると、19日の日経平均は続伸した。419円高の5万9444円で取引を終えた。AI関連への買いが支えた。",
+   "context": "日経平均は、東証の代表的な225銘柄の平均だ。AI関連株は値動きが大きく、指数を左右しやすい。海外のAI関連の話題が、日本株に波及することがある。",
+   "impact": "米国のAI株が堅調なら、日本の株高も続くかもしれない。ただ、買いが一部の銘柄に偏ると、反落もしやすい。円安は輸出企業の利益を押し上げうるが、輸入物価の上昇も招く。",
+   "watch": "半導体関連株が上がり続けるかも確かめたい。",
+   "next": "日本株が続伸した。AI関連への買いが支えた。",
+   "tags": [
+    {
+     "node": "nikkei",
+     "dir": "up"
+    }
+   ],
+   "cat": "market",
+   "level": 3,
+   "related": []
+  },
+  {
+   "id": "n23",
+   "title": "日経平均株価値上がり AI・半導体関連銘柄 期待感から買う動き",
+   "link": "https://news.web.nhk/newsweb/na/nd-20261119de78267",
+   "source": "NHK",
+   "time": "2026-11-19T16:15:34+09:00",
+   "group": "新聞・放送・通信",
+   "plain": "NHKによると、19日の東京株式市場でAI・半導体関連の銘柄を買う動きが出た。アンソロピックの上場を前に期待感が高まり、日経平均は値上がりした。",
+   "context": "AI企業が成長すると、半導体など関連企業の注文が増えるとの期待が生まれる。上場前は期待で買われ、上場後に材料出尽くしで売られることもある。",
+   "impact": "上場後の人気が続けば、AI・半導体株の上昇が続くかもしれない。反対に初日の値動きが弱ければ、期待が冷めて売りが出る可能性がある。日経平均の上下に大きく響きうる。",
+   "watch": "アンソロピック上場後の評価と、東京市場の半導体株の動きを見る。",
+   "next": "AI・半導体関連株が日本株を支えた。",
+   "tags": [
+    {
+     "node": "nikkei",
+     "dir": "up"
+    }
+   ],
+   "cat": "market",
    "level": 2,
    "related": []
   },
   {
-   "id": "n152",
-   "title": "植田日銀総裁、19日の参院財金委に出席 半期報告で＝国会筋",
-   "link": "https://news.google.com/rss/articles/CBMif0FVX3lxTE93QVl5TUgycFM2VEVTUXNzRmlhRmpIOFRwU0F5b0lmT0pzYnFYRkREWDlwdHItemRwVjJlSUEyeHo0UThPWGdLWHdhM09saFhYVFU5RTNPUkRFc1h1aGlOcjBtdkg0MXBaVHFnWnJCMWZTYnpONTBja2IwMGZoSEE?oc=5",
-   "source": "Reuters",
-   "time": "2026-11-18T21:09:43+09:00",
+   "id": "n18",
+   "title": "米株価指数先物が大幅上昇－アンソロピックIPOへの旺盛な需要で",
+   "link": "https://news.google.com/rss/articles/CBMijAFBVV95cUxQWVNkbnN3aGswOHZ1S0o1RW10U1VqUDJWN2p0dUxDci16SF9Dcm5JclFud0xiMVE4WVVBeEJ3ZnFZNHE4ZGJDSGp6M3Q2QVJvbkMxR2xRdGNmdFE1V2QxTHNGR2xMV3RpZW9HZjROQlZYWThncjN1dXdhNFdFTWZaeF82ZDlyUWdqOEg1Zw?oc=5",
+   "source": "Bloomberg.com",
+   "time": "2026-11-19T16:31:00+09:00",
    "group": "新聞・放送・通信",
-   "plain": "植田日銀総裁が19日、参議院の財政金融委員会に出席する。半期ごとの報告のためだと、国会筋の話としてロイターが伝えた。",
-   "context": "日銀は年に2回、金融政策の状況を国会に報告する。総裁が議員の質問に答える場なので、今後の利上げへの考え方が語られることがある。日本の10年国債利回りは2.925%まで上がっている。",
-   "impact": "利上げに前向きな発言が出れば、金利が上がり円高に傾くかもしれない。逆に慎重なら、ドル円が159円台で円安のまま進む可能性がある。住宅ローンの変動金利にも影響が及びうる。",
-   "watch": "19日の答弁で、利上げの時期や物価・円安への認識にどんな言葉が出るかを見る。",
-   "next": "国会での発言が日銀の利上げ観測に響く。",
+   "plain": "ブルームバーグによると、米株価指数先物が大幅に上昇した。アンソロピックのIPOへの旺盛な需要が背景だ。",
+   "context": "株価指数先物は、将来の指数の値段を売買する取引だ。現物市場が閉まっている間も、市場の気分を映す。米国の株の動きは、翌日の日本株にも影響しやすい。",
+   "impact": "米国の株高が続けば、日本のAI・半導体株にも買いが入るかもしれない。ただ、米国の長期金利が5%台と高いままだと、株の重しになる可能性がある。",
+   "watch": "米国の株式市場で、先物の上昇が実際の株高につながるかを見る。米国の長期金利の動きも確かめたい。",
+   "next": "米株先物が上がり、日本株にも波及しうる。",
+   "tags": [
+    {
+     "node": "us_stocks",
+     "dir": "up"
+    }
+   ],
+   "cat": "market",
+   "level": 2,
+   "related": []
+  },
+  {
+   "id": "n143",
+   "title": "「AIバブル」懸念よそに機械受注好調 半導体関連、7〜9月7割増",
+   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTFBWckNCMGtDeTNqN2lYaS14S1MyTnN5VS1VRDUtdTBqelR4Q3otcTIwNVRrN2VMcnZJajR2V2ptckRWdXZmU0p6MmlrUkwxcVQyb094ZTRkbngwdG9tNUVxU0ZOSGloVC04WmFKbg?oc=5",
+   "source": "日本経済新聞",
+   "time": "2026-11-19T12:58:16+09:00",
+   "group": "新聞・放送・通信",
+   "plain": "半導体関連の受注は7〜9月に7割増えた。",
+   "context": "機械受注は、企業が機械の購入を注文した額だ。数か月先の設備投資の動きを先に映す。AIバブルとは、期待だけで株価などが上がりすぎる状態を指す。",
+   "impact": "半導体関連の設備投資が続けば、日本の製造業の業績を支えるかもしれない。ただ受注が一部の分野に偏ると、AIの期待がしぼんだときの影響が大きい可能性がある。",
+   "watch": "次の機械受注の統計で、半導体以外の分野にも回復が広がるかを見る。",
+   "next": "半導体関連の機械受注が強く、設備投資の動きに響く。",
    "tags": [],
-   "cat": "policy",
+   "cat": "economy",
+   "level": 2,
+   "related": []
+  },
+  {
+   "id": "n237",
+   "title": "機械受注7〜9月1.2%増、4四半期連続プラス 9月単月は0.3%減",
+   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE1JZmc0WDlPUlhwSXBoLTdleUk4d2V3blNoSWpyM3R1SkxaZW9lU3RLV0IwV2hSNlVwSGl6QUhVSFNQV1hqMkVVWWg3dTFpMHNJYnd6V0dYcHJiQXNIYVU2a2FOR01OZGxTVXBGTQ?oc=5",
+   "source": "日本経済新聞",
+   "time": "2026-11-19T08:53:52+09:00",
+   "group": "新聞・放送・通信",
+   "plain": "9月単月は0.3%減だった。",
+   "context": "機械受注は、設備投資の先行きを見る指標だ。単月は上下が大きいため、数か月まとめた動きで見ることが多い。四半期の増加が続くのは、企業の投資意欲が底堅い印象を与える。",
+   "impact": "設備投資が続けば、日本の景気を下支えするかもしれない。ただ9月が減っており、勢いが弱まる可能性もある。景気が強ければ、日銀の利上げ判断にも影響しうる。",
+   "watch": "日銀の次の会合での判断材料にもなる。",
+   "next": "機械受注は4四半期連続プラスで、設備投資の底堅さを示す。",
+   "tags": [],
+   "cat": "economy",
    "level": 2,
    "related": []
   },
   {
    "id": "n14",
+   "title": "Trump greets ‘my friend’ Putin ahead of historic trilateral with Xi",
+   "link": "https://www.ft.com/content/fcf6d27b-a04c-4cef-8b03-ce2423566f1f",
+   "source": "Financial Times",
+   "time": "2026-11-19T16:43:13+09:00",
+   "group": "海外（英語）",
+   "title_ja": "トランプ氏がプーチン氏を歓迎、習氏と3者会談へ",
+   "plain": "英フィナンシャル・タイムズによると、トランプ氏がプーチン氏を「my friend」と呼んで迎えた。",
+   "context": "首脳が集まる会談は、対立が和らぐ期待と、予想外の決定への不安の両方を生む。",
+   "impact": "関係が落ち着くとの見方が広がれば、市場の不安は和らぐかもしれない。逆に決裂や新たな制裁が出れば、原油や為替が動く可能性がある。日本企業の貿易や資源の価格にも響きうる。",
+   "watch": "3首脳会談の結果と、その後の各国の発表を見る。原油や円相場に反応が出るかも確かめたい。",
+   "next": "米中ロ関係と市場の不安に響く。",
+   "tags": [],
+   "cat": "politics",
+   "level": 3,
+   "related": [],
+   "lang": "en"
+  },
+  {
+   "id": "n62",
+   "title": "トランプ氏と協力する方針、習主席が表明－新たな半導体規制で緊張",
+   "link": "https://news.google.com/rss/articles/CBMijgFBVV95cUxNZjZOVnVJYWx6Rmw3QXVDSllORzNZaGFTODNhcm4tSnE0WFJQSXJhNkJIdkh1SEVMNDRXWi12ODFmTUJtbDNBNkNUeFE1ZkRVZDJQdFJ0UGRjaE5JN09POU9qTFJRMERYNlFkQmZfVkhXY3BBaGd6NUNUOWRhX1hrSjZ6SlBLVnZlY1V5a0pn?oc=5",
+   "source": "Bloomberg.com",
+   "time": "2026-11-19T15:22:00+09:00",
+   "group": "新聞・放送・通信",
+   "plain": "ブルームバーグによると、習主席がトランプ氏と協力する方針を表明した。一方で、新たな半導体規制をめぐり緊張もある。",
+   "context": "半導体は、AIや製造業に欠かせない部品だ。協調と規制が同時に進むと、企業は先が読みにくくなる。",
+   "impact": "協調が進めば、半導体関連株には追い風になるかもしれない。規制が強まれば、日本の半導体関連企業の取引や業績に影響する可能性もある。AI関連株の値動きが荒くなることも考えられる。",
+   "watch": "新たな半導体規制の具体的な内容と、米中首脳の会談後の発言を見る。",
+   "next": "米中の協調姿勢が半導体規制の緊張に響く。",
+   "tags": [],
+   "cat": "global",
+   "level": 2,
+   "related": []
+  },
+  {
+   "id": "n12",
+   "title": "【速報】日中首脳会談は開かれずと官房長官",
+   "link": "https://news.google.com/rss/articles/CBMiS0FVX3lxTE5RUExhMnNtNjBNWlBrdW84ZnZOQ294RFRNRFVaRWQyQ1lWNHdOZUFzSWRaRFItZEhZZ21GTmhYN2M5aEZsMWgtYmJMQQ?oc=5",
+   "source": "47NEWS",
+   "time": "2026-11-19T16:45:22+09:00",
+   "group": "新聞・放送・通信",
+   "plain": "官房長官が、日中首脳会談は開かれないと明らかにした。会談が実現しない形になったことが、速報として伝えられた。理由は見出しからはわからない。",
+   "context": "首脳会談は、国どうしが貿易や安全保障の問題を直接話し合う場だ。開かれないと、対話の機会が一つ減る。経済でも、輸出や投資の話し合いが進みにくくなることがある。",
+   "impact": "輸出や観光、部品の調達に影響が出る場合は、関連株の値動きにも響く可能性がある。ただし今回の材料だけでは、影響の大きさは判断できない。",
+   "watch": "貿易や渡航の規制に変化が出るかを見る。",
+   "next": "日中関係の改善の遅れに響く。",
+   "tags": [],
+   "cat": "politics",
+   "level": 2,
+   "related": []
+  },
+  {
+   "id": "n307",
    "title": "米、先端半導体「抜け道」監視網　NVIDIA騒動で米中覇権争いが第三国に拡大 (AIデータセンター・エフェクト)",
    "link": "https://business.nikkei.com/atcl/gen/19/00887/111700014/",
    "source": "日経ビジネス",
@@ -323,278 +476,92 @@
    "context": "米国は、先端半導体が中国に渡るのを防ぎたい。だが第三国を経由すれば、規制をすり抜けられる。そこで、周辺の国まで網をかける形に広げた。米中の競争が、2国間の枠を超えたといえる。",
    "impact": "許可が必要な国が増えると、半導体メーカーの販売や納期に不確実さが出るかもしれない。日本の装置・素材メーカーも、取引先の見直しを迫られる可能性がある。供給網が乱れれば、電子機器の価格にも響きうる。",
    "watch": "対象の5カ国の反応と、規制の細かい運用ルールを確かめたい。日本企業への影響が出るかも見たい。",
-   "next": "米中の対立が第三国に広がり、半導体の供給網に響く。",
+   "next": "AI半導体の供給と各国の調達に響く。",
    "tags": [],
-   "cat": "global",
+   "cat": "policy",
    "level": 3,
    "related": []
   },
   {
-   "id": "n354",
-   "title": "中国外務省 米の先端半導体輸出新規則に反発",
-   "link": "https://news.web.nhk/newsweb/na/nd-20261117de77425",
-   "source": "NHK",
-   "time": "2026-11-17T22:42:00+09:00",
+   "id": "n69",
+   "title": "トランプ氏、エヌビディアの「ブラックウェル」中国販売を将来容認も",
+   "link": "https://news.google.com/rss/articles/CBMijgFBVV95cUxQZ0lVN2RyRHExZnJ3T3kwVGRXR2UwaG92Zk9yaVZhc01sWktyYi1vcWhsdXpCblhja3lkOUlUVnczNXVhWDVKbmtNT04tOXFySXZqUWt0N09lVlFVRUpqVGlUbzJIcHE3alQyUjYyb3BFV2RYWmx2NFlCZjNaSlFKU09nV3IzdncyZGZkdmpn?oc=5",
+   "source": "Bloomberg.com",
+   "time": "2026-11-19T15:10:00+09:00",
    "group": "新聞・放送・通信",
-   "plain": "米商務省が先端半導体などの輸出に関する新しい規則を公表した。中国外務省の報道官は「ハイテク産業の発展を不当に抑圧している」と反発し、必要な措置を講じる姿勢を示した。",
-   "context": "米国は安全保障を理由に、先端半導体の中国向け輸出を制限してきた。中国は対抗して、自国が強い資源や製品の規制で応じることがある。半導体は世界の供給網でつながっている。",
-   "impact": "中国が具体的な対抗措置を取れば、半導体関連の日本企業の売上や調達に影響するかもしれない。市場では半導体株が売られ、日経平均が下がる可能性もある。",
-   "watch": "中国がどんな措置を実際に発表するか、米国の規則の詳しい中身を確かめたい。",
-   "next": "中国が対抗措置を取れば米中摩擦が強まる。",
+   "plain": "トランプ氏が、エヌビディアのAI半導体「ブラックウェル」の中国販売を、将来は認める可能性に触れた。今すぐの解禁ではなく、将来の容認という話だ。",
+   "context": "販売できるかどうかは、半導体企業の売上に大きく関わる。政策は政治の判断で変わりやすい。",
+   "impact": "容認が現実になれば、半導体関連の企業には追い風になるかもしれない。日本の製造装置や部品の会社にも、需要増の期待が出る可能性がある。一方、発言だけで終われば、株価の期待が元に戻ることもある。",
+   "watch": "米政府が正式な輸出ルールを変えるかどうか。SOX指数など半導体株の動きも見る。",
+   "next": "対中のAI半導体販売の見通しに響く。",
    "tags": [],
    "cat": "global",
-   "level": 2,
-   "related": []
-  },
-  {
-   "id": "n91",
-   "title": "NYダウは続落で始まる、一時500ドル安 NVIDIAは買い先行後に下落",
-   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE5PQU9rclFGZkNFZm9TclBHVkY5dDJqaEhBazNqTl90V3F6U3NzanNKRmg4cjRZUjA4aFpHcEp0T29JWFRXR05GUXpiOUxhRm10VFZPM1g5dWhuang1Y0tqZzZyWERLVzdjWS1SUw?oc=5",
-   "source": "日本経済新聞",
-   "time": "2026-11-19T00:39:52+09:00",
-   "group": "新聞・放送・通信",
-   "plain": "NYダウは続落で始まり、一時500ドル安となった。NVIDIAは買いが先行したあと、下落に転じた。",
-   "context": "米国株が下がると、投資家がリスクを避けて、日本株にも売りが広がりやすい。とくにAI関連の大型株は、市場全体の動きを左右しやすい。",
-   "impact": "米株安が続けば、日経平均も下がりやすい。AI・半導体関連が重しになる可能性がある。一方、株安で米金利が下がれば、円高に振れる場面もあるかもしれない。",
-   "watch": "NYダウが終値で下げ幅を保つか。日本の取引開始後に日経平均が追随するかを見たい。",
-   "next": "米株の下げが日本株にも波及しやすい。",
-   "tags": [
-    {
-     "node": "us_stocks",
-     "dir": "down"
-    }
-   ],
-   "cat": "market",
-   "level": 2,
-   "related": []
-  },
-  {
-   "id": "n102",
-   "title": "米国株は荒い値動き、エヌビディアも上げを消す－国債は小幅高",
-   "link": "https://news.google.com/rss/articles/CBMijAFBVV95cUxOSXlGS0puaFd6N0h0cHc1UXBxOG4xcG5HNTlENjFnMm1oXzZuYnZmRkdhUy1SODl3Uy1JMWpyTGR1QjdmQnhWakx2Wm0tMGZZdDRIQlg0cEQ4TmpYcVE4OEtwVVN5OVU5Wm1qcHR0emVQalJhZUMwTUc0WDZHODVwN2VuUHpwTmFIdkYwdQ?oc=5",
-   "source": "Bloomberg.com",
-   "time": "2026-11-19T00:03:47+09:00",
-   "group": "新聞・放送・通信",
-   "plain": "米国株は荒い値動きになった。エヌビディアも、いったん上げた分を消した。国債は小幅に買われた。",
-   "context": "株が不安定なときは、比較的安全とされる国債に資金が移ることがある。債券が買われると利回りは下がる。AI関連株は期待が大きいぶん、値動きも大きくなりやすい。",
-   "impact": "荒い値動きが続けば、日本の半導体関連株にも不安定さが及ぶかもしれない。米国債が買われて金利が下がれば、円高方向の力になる可能性がある。ただ、利上げ観測が強ければ打ち消されうる。",
-   "watch": "米国の10年債利回りが5%を上回るか下回るか。AI関連株の値動きが落ち着くかを見たい。",
-   "next": "AI株の値動きが荒く、市場の不安定さが続く。",
-   "tags": [],
-   "cat": "market",
-   "level": 2,
-   "related": []
-  },
-  {
-   "id": "n41",
-   "title": "アームのハースCEO、エヌビディア次期CEO候補として人材会社が打診",
-   "link": "https://news.google.com/rss/articles/CBMijgFBVV95cUxOcTlwSTZ4c2JCNndDOXNZcVlzTUN5ZFpQV0RhT2xQWE1BajhhT3Fad25LWlFidXltV0ZZX05HbzdpNm03LTJRMWlNNTJUNi1KRG5xMzVZaEZpMk9zQ0JpUVI4SHhJMG1DdXFwaDVYNTNqdk80YS1SS0RRRDZjelo1a2Z6clZPcy05Rld2TmFn?oc=5",
-   "source": "Bloomberg.com",
-   "time": "2026-11-19T04:00:48+09:00",
-   "group": "新聞・放送・通信",
-   "plain": "英アームのハースCEOに、人材会社がエヌビディアの次期CEO候補として打診した。経営の後継を巡る動きが報じられた。",
-   "context": "CEOは企業の戦略を決める役割だ。AI半導体の中心にいる企業では、トップが誰かが投資家の見方に影響しうる。後継の話が出るだけで、先行きへの不安が生まれる場合がある。",
-   "impact": "経営体制が見えにくい状態が長引くと、エヌビディアの株が不安定になるかもしれない。取引の多い日本の半導体関連企業の株にも、気迷いが広がる可能性がある。",
-   "watch": "エヌビディア自身の発表と、後継を巡る追加の報道が出るかを確かめたい。",
-   "next": "エヌビディアの経営体制の不透明感が続く。",
-   "tags": [],
-   "cat": "industry",
-   "level": 2,
-   "related": []
-  },
-  {
-   "id": "n64",
-   "title": "ネオクラウド株、NVIDIA「支援継続」も売り 資金繰り懸念やまず",
-   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE5XZ3p0R2NmZDkzalA5MDAtVnFwZHVnQ3U5dDhrbG04STY0VFFYaWNXa0VmSFc5V3AxbVFFemtfZ0REYWY1Y1AzVnFOVXcxN1BQTno0Q2FyQ1FtaTB1Y3NxU2hPOExMUnBRYXUtXw?oc=5",
-   "source": "日本経済新聞",
-   "time": "2026-11-19T02:31:19+09:00",
-   "group": "新聞・放送・通信",
-   "plain": "ネオクラウド株が売られた。NVIDIAが支援を続ける姿勢を示したが、資金繰りへの懸念は消えていない。",
-   "context": "ネオクラウドは、AI向けの計算能力を貸す新しい事業者だ。高価な半導体を借り入れで買うことが多い。資金繰りが苦しくなると、返済や投資が滞りかねない。",
-   "impact": "資金繰り不安が広がれば、AI関連株の重しになるかもしれない。半導体を売る側の業績見通しも、慎重になる可能性がある。日本の関連企業の株にも波及しうる。",
-   "watch": "ネオクラウド各社の資金調達の動きと、AI向け投資が続くかを示す発表を確認したい。",
-   "next": "AI関連の資金繰り不安が株の重しになる。",
-   "tags": [],
-   "cat": "market",
-   "level": 2,
-   "related": []
-  },
-  {
-   "id": "n218",
-   "title": "AI borrowing binge has ‘historic parallels’ with subprime bubble, says ECB",
-   "link": "https://www.ft.com/content/d16475ce-efce-4dc1-b5a3-2f7c79e9dea9?syn-25a6b1a6=1",
-   "source": "Financial Times",
-   "time": "2026-11-18T18:00:07+09:00",
-   "group": "海外（英語）",
-   "title_ja": "AI向け借入の急増、サブプライム期と類似とECB",
-   "plain": "英フィナンシャル・タイムズによると、ECB(欧州中央銀行)は、AIへの借り入れの急増にサブプライム(低所得層向け住宅ローン)バブルとの歴史的な類似点があると指摘した。巨大IT企業が、他のIT企業との契約を通じて、帳簿に載らない数兆ドルの支払い約束を積み上げていることへの懸念だ。",
-   "context": "帳簿に載らない約束は、財務諸表だけでは負担が見えにくい。今回は中央銀行が警戒を示した段階で、危機が起きたという話ではない。",
-   "impact": "AI投資への不安が強まれば、AI関連株が売られ、日本株にも波及するかもしれない。金融機関の貸し出しが慎重になる可能性もある。リスク回避で円が買われる場面もありうる。",
-   "watch": "他の中央銀行や規制当局が同じ警告を出すかと、AI企業の社債発行や資金調達の動きを見る。",
-   "next": "AI向け借入の膨らみが金融の安定への懸念になる。",
-   "tags": [],
-   "cat": "global",
-   "level": 2,
-   "related": [],
-   "lang": "en"
-  },
-  {
-   "id": "n33",
-   "title": "原油価格は110ドル超から「85ドル前後」へ下落、今後どうなる？米中間選挙後のイラン再攻撃懸念後退と供給不安の行方",
-   "link": "https://diamond.jp/articles/-/403648",
-   "source": "ダイヤモンド・オンライン",
-   "time": "2026-11-19T04:25:00+09:00",
-   "group": "経済誌・ネットメディア",
-   "plain": "米国産原油のWTIは、10月に一時1バレル110ドルを超えたが、足元では85ドル前後に下がった。米中間選挙で共和党が大敗し、イラン再攻撃への懸念が後退した。ただ、和平交渉の行方や石油施設への攻撃には不安が残る。",
-   "context": "原油は中東の緊張で上がりやすい。供給が止まる心配が増えるためだ。逆に緊張が和らぐと、その上乗せ分が下がる。日本は原油を輸入に頼るので、価格が家計や企業に直結する。",
-   "impact": "原油安が続けば、ガソリンや電気代など物価高の重さが和らぐかもしれない。輸入額が減れば、円売り圧力も弱まる可能性がある。ただ、再び緊張が高まれば、値上がりに戻ることもある。",
-   "watch": "和平交渉の進み具合と、石油施設への攻撃の有無を見たい。WTIが85ドル前後を保つかも確かめたい。",
-   "next": "原油安は輸入物価や物価高の重さを和らげうる。",
-   "tags": [
-    {
-     "node": "oil",
-     "dir": "down"
-    },
-    {
-     "node": "geopolitics",
-     "dir": "down"
-    }
-   ],
-   "cat": "global",
-   "level": 3,
-   "related": []
-  },
-  {
-   "id": "n70",
-   "title": "原油下落、北海ブレント92ドル割れ－利益確定売りやリスク回避強まる",
-   "link": "https://news.google.com/rss/articles/CBMijgFBVV95cUxPdmZsRG5ITGRVc0puN0JOa2R1bENnYXNIeXhKZld1Ym04anNGYmp0SGVKUEhoWjBDRGE2bDZJZmlYWnEzcGZ1ZVdFbHNpV1VzQkxzMVlISk9GZVZ5OGxwZnR1bVI5c2Uyd2pwRUVydGo4dUVaWVk2NW1wa3E1MEVNRUIwUWphaEdTZFdHV0ZR?oc=5",
-   "source": "Bloomberg.com",
-   "time": "2026-11-19T01:59:55+09:00",
-   "group": "新聞・放送・通信",
-   "plain": "原油が下落し、北海ブレントは92ドルを割り込んだ。利益確定の売りと、リスクを避ける動きが強まった。",
-   "context": "原油の値下がりには、これまでの上昇で得た利益を確定する売りが重なる。日本は原油を輸入するので、価格が下がれば支払いが減り、貿易赤字が縮みやすい。",
-   "impact": "原油安が続けば、貿易赤字が縮み、円を売る需要が減るかもしれない。ガソリンなどの値上がりも落ち着く可能性がある。ただ、ドル円が159円台なので、円安が続くと効果は薄まる。",
-   "watch": "ブレントが92ドルを下回ったまま推移するか。日本の貿易統計で輸入額が減るかを見たい。",
-   "next": "原油安が続けば貿易赤字の縮小に働く。",
-   "tags": [
-    {
-     "node": "oil",
-     "dir": "down"
-    }
-   ],
-   "cat": "market",
-   "level": 2,
-   "related": []
-  },
-  {
-   "id": "n217",
-   "title": "ガソリン全国平均価格1L＝170円 アメリカ・イラン大規模戦闘の懸念後退で原油価格下落 補助金額も明日から1L＝29円60銭に縮小へ（TBS NEWS DIG Powered by JNN）",
-   "link": "https://news.google.com/rss/articles/CBMif0FVX3lxTE9CMG5FNk1wbTROWWpibzdUMFhPN20yQ1p4LVJUZnBmOEhqU05XcTZnU3h1bGN5OURHYlJ4SzhKcXE4UkY1dVNQTG9TSEpzeDhDcE9PVVZ4LW9CWmJZSXpkWDlRR0VoYnJDb3ZVQnNiQURfbGJuZ0c1RTJnU3prVkk?oc=5",
-   "source": "Yahoo!ニュース",
-   "time": "2026-11-18T18:00:29+09:00",
-   "group": "ニュースのまとめ",
-   "plain": "ガソリンの全国平均価格は1L＝170円になった。アメリカとイランの大規模戦闘への懸念が後退し、原油価格が下がった。ガソリン補助金は明日から1L＝29円60銭に縮小する。",
-   "context": "ガソリン補助金は、店頭価格が上がりすぎないよう国が石油元売りなどに出すお金だ。補助が減ると、そのぶん価格を押し上げる力が働く。一方、原油が安くなれば仕入れ価格が下がり、価格を押し下げる。",
-   "impact": "補助の縮小と原油安が重なれば、店頭価格の上がり方は小さく済むかもしれない。ただ原油が再び上がれば、補助が減ったぶん負担が目立つ可能性がある。ガソリン代は家計や物流費に響く。円安が続くと輸入コストも上がりやすい。",
-   "watch": "縮小後の全国平均価格と、原油価格の動きを確かめたい。中東情勢の変化も決め手になる。",
-   "next": "ガソリンは補助が縮小しても、原油安が負担を和らげる。",
-   "tags": [
-    {
-     "node": "oil",
-     "dir": "down"
-    }
-   ],
-   "cat": "life",
-   "level": 2,
-   "related": []
-  },
-  {
-   "id": "n55",
-   "title": "トランプ氏、プーチン氏と19日個別会談 ＡＰＥＣ開催中＝当局者",
-   "link": "https://news.google.com/rss/articles/CBMihgFBVV95cUxPNjlvaVNYX2tBcHBVRWlJdG03TU9mSXJtemEwTFN6ZUs3em04Ymh1U2NQNTN5dW0tUnUxSkhoam1Oa3huWGR1R3lVOG9SVDZmSWhQNlBwbWI4aHNKd0xaWG5TSWV3UVhydnQwWVQwbmNzUmFmWGFWTGtyZk84bjRVc2NZdkVUQQ?oc=5",
-   "source": "Reuters",
-   "time": "2026-11-19T03:14:51+09:00",
-   "group": "新聞・放送・通信",
-   "plain": "会談の中身はまだ示されていない。",
-   "context": "ロシアは産油国で、米ロの関係は制裁やエネルギー供給の見方に影響する。そのため首脳会談は、世界の地政学リスク（国際情勢の不安）や原油価格の材料になりやすい。",
-   "impact": "関係改善への期待が強まれば、原油の先行き不安が和らぐかもしれない。逆に決裂すれば、原油が上がる可能性がある。原油高は日本のガソリンや電気代を押し上げやすい。円安が重なると負担が増す。",
-   "watch": "会談後の両首脳の発言と、原油価格の反応を見たい。",
-   "next": "米ロ会談の中身が地政学リスクと原油に響く。",
-   "tags": [],
-   "cat": "politics",
    "level": 2,
    "related": []
   },
   {
    "id": "n86",
-   "title": "高市首相初訪中、習近平氏と握手 APEC、ロシア大統領とも対話",
-   "link": "https://news.google.com/rss/articles/CBMiS0FVX3lxTE56cGoxaThOUW95eGc2OFVtZTl5U1lOWWtGbUh0blJmVkJTSmlhSERWSWx5ajBRUWVBbDVrbll1SUNvaUV6QUZRQm1Dbw?oc=5",
-   "source": "47NEWS",
-   "time": "2026-11-19T00:50:00+09:00",
+   "title": "原油は小動き、トランプ氏がイランへの新たな攻撃を検討とNYT－中東の供給回復と緊張を見極め",
+   "link": "https://news.google.com/rss/articles/CBMid0FVX3lxTE51Y0lTOXpGaVF0RnFqVWdHbFFCRF9EMkh3NFFuUFBUVEhITElnajNmQnY4S0hjTkFYcUpfTmpMd0ZVRG9Mb1VDcm92cXNXTklNaENJUU53NTJMZE5MRHNxOURGdUpCZUp3Y1pweWlEUnZPZFlZQW40?oc=5",
+   "source": "Bloomberg.com",
+   "time": "2026-11-19T14:49:00+09:00",
    "group": "新聞・放送・通信",
-   "plain": "APECの場でロシア大統領とも対話した。",
-   "context": "政治の関係がぎくしゃくすると、企業の取引や観光に影響が出やすい。首脳が直接会うことは、関係を動かす第一歩になる。",
-   "impact": "ただ握手だけでは具体的な成果は分からない。具体的な合意が出なければ、市場への影響は小さい可能性がある。",
-   "watch": "日中間で具体的な合意や、今後の会談の予定が示されるかを見たい。",
-   "next": "日中関係の改善の糸口になるかが焦点。",
-   "tags": [],
-   "cat": "politics",
-   "level": 2,
+   "plain": "原油価格は小動きだった。トランプ氏がイランへの新たな攻撃を検討していると、米紙ニューヨーク・タイムズが伝えた。市場は中東の供給回復と緊張の行方を見極めている。",
+   "context": "中東は世界の原油の主な産地で、輸送の要所でもある。戦闘が広がると供給が減るとの不安から、原油が上がりやすい。ただ、供給が戻る期待があると、値動きは打ち消し合う。",
+   "impact": "攻撃が実際に行われて供給が滞るなら、原油高になるかもしれない。ガソリンや電気代、輸送費が上がれば、家計や企業の負担が増える。円安の159円台と重なると、輸入物価をさらに押し上げる可能性がある。",
+   "watch": "米国によるイラン攻撃の有無と、中東からの原油供給の回復の様子。原油先物の値動きを確かめる。",
+   "next": "イラン情勢次第で原油価格に響く。",
+   "tags": [
+    {
+     "node": "geopolitics",
+     "dir": "up"
+    }
+   ],
+   "cat": "global",
+   "level": 3,
    "related": []
   },
   {
-   "id": "n24",
-   "title": "米中首脳が会談へ 今年３回目、ＡＩ協調",
-   "link": "https://news.google.com/rss/articles/CBMiY0FVX3lxTE1kNUt1QVRsQ0s4M2JKM2JaMkx1WGpRRnpnTVhTdEVuZmJIU2lIWGYtVXFFbERhZXFsOUxwWDBhZXYwZkE2SFFUd3dZNG5rWnlKR24zOEpQU1NSS2d6R2pScEVJcw?oc=5",
-   "source": "時事ドットコム",
-   "time": "2026-11-19T04:43:00+09:00",
-   "group": "新聞・放送・通信",
-   "plain": "米中の首脳が会談する見通しだ。今年3回目で、AIでの協調が議題になる。",
-   "context": "AIは半導体の需要と深く結びつくため、米中の関係は半導体企業の業績や株価に影響しやすい。",
-   "impact": "AI協調が進み規制が緩む方向なら、半導体関連の株には追い風になるかもしれない。ただ中身が乏しければ材料にならない可能性がある。日本の半導体関連企業にも波及しうる。",
-   "watch": "会談後に半導体規制の見直しへ触れた発言があるかを確かめたい。",
-   "next": "米中のAIをめぐる協調が半導体規制に響く可能性がある。",
-   "tags": [],
-   "cat": "politics",
-   "level": 2,
-   "related": []
-  },
-  {
-   "id": "n84",
-   "title": "10月の米住宅建設許可、約6年半ぶり低水準 金利・コスト高が圧迫",
-   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE92LUpsdXJ1clNqUTJla0d2Q1pLSXBhR0daTkc3UEtzUGJBVTVSQmstNURVYzcwcmhzZUc4YmhrU0lrWjZRak40aHd5b0RjSzlDUy1yRDdJaDRxY1ZwcUtPcndVbnlwT29adnJHSA?oc=5",
-   "source": "日本経済新聞",
-   "time": "2026-11-19T00:52:21+09:00",
-   "group": "新聞・放送・通信",
-   "plain": "10月の米住宅建設許可は約6年半ぶりの低水準になった。金利とコストの高さが重しになっている。",
-   "context": "住宅ローン金利が高いと、買う人の負担が増えて需要が減る。建築費も高いと、建てる側も着工をためらう。",
-   "impact": "住宅の弱さが続けば、米景気の減速懸念が強まるかもしれない。そうなれば利下げ期待が高まり、日米金利差が縮んで円高に働く可能性がある。ただ長期金利が高止まりすれば、住宅の重しは残る。",
-   "watch": "次の米住宅関連の指標と、米国の長期金利が下がるかを見たい。",
-   "next": "高金利と費用高が米の住宅を圧迫している。",
-   "tags": [],
-   "cat": "economy",
-   "level": 2,
-   "related": []
-  },
-  {
-   "id": "n90",
-   "title": "米中古住宅仮契約指数、10月は調査開始以来最低 金利上昇重し",
-   "link": "https://news.google.com/rss/articles/CBMihgFBVV95cUxNN3VkNERXZ29fMVhoTTFxbWU1enJSSUlXcWJVLWtzZktyeGVXTFlUaFI0eHlaMGZSajRVRFFXSWNxNDNzaUVhZlRhbU12SkptMG5WUVI4MHR0N0w3NURFaU9GRnFHc2tHdWlXeXBnRDFyQVExS1czLVdaamVZdWFnY204aV80QQ?oc=5",
+   "id": "n159",
+   "title": "原油先物小動き、供給過剰と米利上げ観測が重し",
+   "link": "https://news.google.com/rss/articles/CBMif0FVX3lxTE1jdkhHaTBnanE4M255d0NJUHZLVXRkNFotb3gzN3NuVWZWNEo4UDR3cEVSUnhKQ0xfWXNBRHBKVEExeGRJQmNDOE9Qc2R0VkEwcGNRcnNXdXBkbkFiR2hKcm9WNzNkTTZpLWEyaXhTUFdJNndYR2FxaVdrTGE0NnM?oc=5",
    "source": "Reuters",
-   "time": "2026-11-19T00:41:45+09:00",
+   "time": "2026-11-19T12:03:00+09:00",
    "group": "新聞・放送・通信",
-   "plain": "10月の米中古住宅仮契約指数は、調査開始以来で最低になった。金利の上昇が重しだ。",
-   "context": "仮契約指数は、住宅売買の契約が結ばれた段階の件数を示す。これから実際の販売に反映されるため、住宅市場の先行きを見る手がかりになる。金利が上がると、住宅ローンの返済額が増えて買い控えが起きやすい。",
-   "impact": "米国の長期金利が高い状態が続けば、住宅需要の弱さが長引くかもしれない。米消費の鈍りにつながれば、日本の輸出企業の業績に響く可能性がある。一方、金利が下がれば需要が戻るかもしれない。",
-   "watch": "米国の10年国債利回りが5%を下回るかと、次の住宅指標を見たい。",
-   "next": "金利上昇が米の住宅需要を冷やしている。",
+   "plain": "原油先物は小動きだった。供給が多すぎるとの見方と、米国の利上げ観測が価格の重しになった。",
+   "context": "原油は、供給が需要を上回ると値下がりしやすい。米国の利上げは、景気を冷やして原油の需要が減るとの見方につながる。さらに利上げはドル高を招き、ドルで取引される原油は他の通貨で割高になる。米国の10年国債利回りは5.07%と高い。",
+   "impact": "供給過剰と利上げ観測が続けば、原油は上がりにくいかもしれない。日本ではガソリンなどの値上がりが落ち着く助けになる可能性がある。ただ、中東の緊張が強まれば、この下押しは打ち消される。",
+   "watch": "米国の利上げをめぐる発言や指標、産油国の供給の動き。原油価格がどちらの要因に反応するかを見る。",
+   "next": "供給過剰観測と米の利上げ観測が原油の重しになった。",
    "tags": [],
-   "cat": "economy",
+   "cat": "market",
    "level": 2,
    "related": []
   },
   {
-   "id": "n310",
+   "id": "n144",
+   "title": "イラン、湾岸地域での攻撃範囲拡大　米軍によるミサイル発射施設への攻撃受け",
+   "link": "https://www.cnn.co.jp/world/35255135.html?ref=rss",
+   "source": "CNN.co.jp",
+   "time": "2026-11-19T12:46:00+09:00",
+   "group": "海外（日本語）",
+   "plain": "イランは18日、米軍が駐留するクウェートの空軍基地をドローンで狙った。米軍がイラン国内のミサイル発射施設とみられる場所を攻撃したことを受け、攻撃範囲を広げたとみられる。クウェート軍は、防空システムが飛来した攻撃を迎撃したと説明した。",
+   "context": "湾岸地域は、世界のエネルギー供給の中心地の一つだ。軍事的な衝突が広がると、供給が止まる不安から原油が上がりやすい。リスクを避ける動きで、為替や株も動くことがある。",
+   "impact": "衝突が拡大して原油が上がるなら、日本のガソリンや電気代、輸送費の上昇につながるかもしれない。円は安全通貨として買われる場合もあるが、原油高は日本の貿易赤字を通じて円安に働く可能性もある。",
+   "watch": "湾岸の他の国への攻撃の広がりと、米国の追加の対応。原油先物の動きも確かめる。",
+   "next": "湾岸の緊張が原油の上振れ要因になりうる。",
+   "tags": [
+    {
+     "node": "geopolitics",
+     "dir": "up"
+    }
+   ],
+   "cat": "global",
+   "level": 2,
+   "related": []
+  },
+  {
+   "id": "n358",
    "title": "10月の貿易収支4765億円の赤字 赤字は6か月連続",
    "link": "https://news.web.nhk/newsweb/na/nd-20261118de77503",
    "source": "NHK",
@@ -604,7 +571,7 @@
    "context": "貿易収支は輸出額から輸入額を引いた差だ。赤字だと、輸入代金のために円を売ってドルを買う動きが増えやすい。資源を輸入に頼る日本は、原油高と円安が重なると赤字が膨らみやすい。",
    "impact": "赤字が続くと円売り要因になり、ドル円が159円台と高い水準から下がりにくいかもしれない。円安で輸入品の値上がりが続けば、食料や光熱費など家計の負担が増える可能性がある。",
    "watch": "",
-   "next": "原油高と円安で赤字が続き、円売り圧力になりうる。",
+   "next": "原油高と円安が貿易赤字を広げ、円の売りに響く。",
    "tags": [
     {
      "node": "trade_balance",
@@ -620,119 +587,102 @@
    "related": []
   },
   {
-   "id": "n251",
-   "title": "英ＣＰＩ、10月上昇率が1年ぶり高水準 来月の利上げ期待は後退",
-   "link": "https://news.google.com/rss/articles/CBMifkFVX3lxTFBlSWZFaDdHYVU2czU1U2FuYjhyT2U4SDItTlYtbzcxelNEdkttZTZtdlBjNGZyaXJFcnFXTWhrS1BIUG1CWmt4bncwZFZPeWlBRjN0eVpuaFluNzJkSktrNmg5Slo4YTJWQjJRdHlGWkhOQW84NTg3VWtYa3AwZw?oc=5",
-   "source": "Reuters",
-   "time": "2026-11-18T16:58:00+09:00",
+   "id": "n21",
+   "title": "JTが1兆3770億円の損失計上へ ロシア管理の子会社を連結除外",
+   "link": "https://www.asahi.com/articles/ASVCM25KRVCMULFA013M.html?ref=rss",
+   "source": "朝日新聞",
+   "time": "2026-11-19T16:19:04+09:00",
    "group": "新聞・放送・通信",
-   "plain": "一方で、来月の利上げ期待は後退した。",
-   "context": "物価が上がると中央銀行は利上げを考えやすい。ただ今回は、物価が上がっても利上げ期待が後退した。市場が景気の弱さなど別の事情を見ている可能性がある。ここから理由は読み取れない。",
-   "impact": "世界の金利の見方が変わると、日本の長期金利にも波及する可能性がある。ただ影響の大きさは、他国の動き次第だ。",
-   "watch": "",
-   "next": "世界の金利の見方が変わると、日本の長期金利にも波及する可能性がある。ただ影響の大きさは、他国の動き次第だ。",
+   "plain": "JTが、ロシアの管理下にある子会社を連結の対象から外す。これにより、約1兆3770億円の損失を計上する見通しだ。",
+   "context": "連結とは、子会社の業績を親会社の決算に合算することだ。実質的に管理できなくなると、連結から外し、資産の価値を損失として処理することがある。損失は実際の現金の流出とは限らず、会計上の処理の面もある。",
+   "impact": "JTの利益は大きく押し下げられ、海外事業の不安が意識されるかもしれない。ロシアなど管理の難しい地域に事業を持つ他の日本企業にも、同じ見方が広がる可能性がある。",
+   "watch": "JTの決算での利益の見通しと、今後の海外事業の方針。投資家の評価が株価にどう出るかを見る。",
+   "next": "JTの利益と配当に響き、海外事業のリスクが意識される。",
    "tags": [],
-   "cat": "global",
-   "level": 2,
+   "cat": "industry",
+   "level": 3,
    "related": []
   },
   {
-   "id": "n119",
-   "title": "ECB副総裁、12月利上げの可能性高い－来年の追加利上げもあり得る",
-   "link": "https://news.google.com/rss/articles/CBMijgFBVV95cUxNejR0Wkk0UW1VVTNJdEpmS2RrVHQxLTR6ZHc1OV91ZnFMY2hmMm5xNWtkcG96RDVoN3hWb3ZPYnR6YUdZT1Z4cGVKZ3ZjN0lQaFcwY0Q1Y2JYd1BpY3FJSGlmS2FWY2ItT0ptYVBiYmpzS3Zncm5OdlJZUEFWVUQzU1VhanBMRHVDbDBpbU5R?oc=5",
+   "id": "n44",
+   "title": "JT、ロシア子会社を連結除外で損失約1兆3770億円計上へ－配当25%減額",
+   "link": "https://news.google.com/rss/articles/CBMijgFBVV95cUxORlZRX3NQVF9iQ0RSd210VjVTM05NcTBXRE8yV040YXFDZmxNTGhUaXFhY1VWMC1kS3hIQUFaSHlYQmQzQ3kyd1lRTFVoWUQyMS1Wd0lqSEc4OEFGdG10RWgxaXRBUExJNzVjSVk3OG0tRjRHZTdYeFNoaHNlVnZXTkhteElXNVlkUGNtbEdB?oc=5",
    "source": "Bloomberg.com",
-   "time": "2026-11-18T22:42:10+09:00",
+   "time": "2026-11-19T15:48:00+09:00",
    "group": "新聞・放送・通信",
-   "plain": "来年の追加利上げもあり得るとした。",
-   "context": "利上げは物価の上昇を抑えるために金利を上げる政策だ。日本の日銀は金利を上げる途上で、日本の10年国債利回りは2.925%だ。",
-   "impact": "ドル円は159.42円で円安が続いており、海外の利上げが続くと円が売られやすい状況は変わりにくい可能性がある。日銀の判断も注目されやすくなる。",
-   "watch": "12月のECBの会合の結果と、日銀の次の金融政策決定会合を見たい。",
-   "next": "ドル円は159.42円で円安が続いており、海外の利上げが続くと円が売られやすい状況は変わりにくい可能性がある。日銀の判断も注目されやすくなる。",
+   "plain": "JTは、ロシア子会社を連結から外し、約1兆3770億円の損失を計上する。あわせて配当を25%減らす。",
+   "context": "配当は、企業が利益の一部を株主に配るお金だ。大きな損失が出ると、配当を減らして財務を守る判断をすることがある。配当を目当てに株を持つ人にとっては、受け取る額に直結する。",
+   "impact": "配当が減るため、株主の収入が減り、個人投資家や年金など配当を重視する投資家の評価が変わるかもしれない。ただ、損失が出尽くしたと受け止められる場合は、株価が落ち着く可能性もある。",
+   "watch": "配当の減額後の水準と、JTが今後の株主還元をどう説明するか。決算発表後の株価の反応を見る。",
+   "next": "配当が25%減額され、株主還元に響く。",
    "tags": [],
-   "cat": "global",
+   "cat": "industry",
    "level": 2,
    "related": []
   },
   {
-   "id": "n39",
-   "title": "経常黒字でも円安続く「仮面の黒字国」日本は変わるか？植田総裁講演から読み解く海外投資と国内回帰の行方 - 日銀 早耳深掘",
-   "link": "https://diamond.jp/articles/-/403649",
-   "source": "ダイヤモンド・オンライン",
-   "time": "2026-11-19T04:13:00+09:00",
-   "group": "経済誌・ネットメディア",
-   "plain": "経常黒字が膨らんでも円高にならない「仮面の黒字国」日本を論じる記事だ。背景に、企業の海外投資と現地にとどまる収益があるとする。植田総裁の講演を手掛かりに、人手不足による国内投資の拡大がこの構造を変える可能性を探っている。",
-   "context": "経常黒字は、海外とのモノやお金のやりとりの黒字だ。本来は円を買う動きにつながりやすい。ただ海外で稼いだ利益が現地に残ると、円に替えられず円買いにならない。",
-   "impact": "国内投資が増えて、海外の利益が円に戻る動きが強まれば、円安に歯止めがかかるかもしれない。ただ時間がかかる可能性がある。ドル円が159円台にあるなか、円安が続けば輸入物価を通じて家計の負担も重くなる。",
-   "watch": "企業の国内投資の動きと、海外収益が日本に戻る規模を示す統計を見たい。",
-   "next": "企業の海外投資が円買いにつながりにくい構造を示す。",
+   "id": "n24",
+   "title": "東京為替：ドル・円は伸び悩み、午後は失速",
+   "link": "https://news.google.com/rss/articles/CBMiS0FVX3lxTE1TZnRVM2dlWjZMOXNuQllsNUp0Um9KeUt1RkNDLUstajh6Vm5fTE9QUHF1T3VvdXA3cDNRLUpMRVFCaXVFczMweWVScw?oc=5",
+   "source": "47NEWS",
+   "time": "2026-11-19T16:08:46+09:00",
+   "group": "新聞・放送・通信",
+   "plain": "東京外国為替市場で、ドル円は伸び悩み、午後には失速した。上昇の勢いが続かなかった形だ。",
+   "context": "ドル円は、日米の金利差や市場のリスク意識で動く。",
+   "impact": "ドル円が高止まりしたままなら、輸入品の値上がりを通じて家計の負担が続くかもしれない。逆に失速が続けば、円安の勢いが和らぐ可能性がある。ただ、値動きの理由は材料からはわからない。",
+   "watch": "米国の長期金利の動きも確かめる。",
+   "next": "ドル円は伸び悩み、午後に失速した。",
    "tags": [],
    "cat": "fx",
    "level": 2,
    "related": []
   },
   {
-   "id": "n232",
-   "title": "日銀・植田総裁、消費減税の物価影響「一時要因を除いて判断」",
-   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE43OGtxb0VDcHRmVklyYXFSQjFaSHlXbUZNamNWVjhfWWF5MmFkTFhYYkdEdkNpa0ZORlY0QzNWOHAtUDVXYmVSb3lVVHdoY0hreTFWQlY5WmhJV0xhdlM4Y3JXNjhLTHRIVksydQ?oc=5",
-   "source": "日本経済新聞",
-   "time": "2026-11-18T17:37:16+09:00",
-   "group": "新聞・放送・通信",
-   "plain": "日銀の植田総裁は、消費減税が物価に与える影響について「一時要因を除いて判断」すると述べた。",
-   "context": "消費減税で物価の数字は一時的に下がりうる。日銀は、物価が基調として安定して上がっているかを見て利上げを判断する。そのため一時的な動きは分けて考える。",
-   "impact": "減税で物価が下がって見えても、基調が強いと判断すれば、日銀は利上げを進めるかもしれない。その場合、日本の長期金利は上がりやすく、住宅ローンの金利にも響く可能性がある。判断が慎重なら、円安が続くかもしれない。",
-   "watch": "日銀の次の金融政策決定会合での説明と、物価の基調を示す指標を見たい。",
-   "next": "消費減税の物価への影響の見方が日銀の判断に響く。",
+   "id": "n213",
+   "title": "【概要説明】植田総裁「通貨及び金融の調節に関する報告書」（参議院財政金融委員会）",
+   "link": "http://www.boj.or.jp/mopo/diet/d_state/dst261119a.htm",
+   "source": "日本銀行",
+   "time": "2026-11-19T10:13:00+09:00",
+   "group": "公的機関",
+   "plain": "内容の概要が公表された。",
+   "context": "この報告書は、日銀が金融政策をどう運営してきたかを国会に報告するものだ。総裁の説明は、利上げの時期のヒントとして市場に注目される。",
+   "impact": "説明で物価や賃金への自信が強く示されれば、利上げ観測が高まるかもしれない。その場合は金利が上がり、円高に動く可能性や、変動金利の住宅ローンの負担増も意識される。逆に慎重な姿勢なら、円安が進むこともある。",
+   "watch": "質疑での利上げの時期への言及と、次の金融政策決定会合に向けた発言。長期金利の反応を見る。",
+   "next": "植田総裁の説明が日銀の利上げ観測に響く。",
    "tags": [],
    "cat": "policy",
    "level": 2,
    "related": []
   },
   {
-   "id": "n212",
-   "title": "大樹生命が初の「逆ざや」解消、金利上昇で生保の運用環境改善",
-   "link": "https://news.google.com/rss/articles/CBMijgFBVV95cUxPZERDZFNFWVZBT3VyZG9DVm1ITXlRdDFjMlY2TFdKTERGOHpPMDdLQkZnVy1IdnNqZWxGSlpGR05BS3FqUjgxY2Q0TE9PRmt4Wk5lZld5R0U1ZmdJRGxwQkR1aHdXc2xBNGVuUWhGTXAwU3FuNTNlZEpNQ3NSTnpuVmpRbkY1c2Nkb0IzaU1R?oc=5",
+   "id": "n28",
+   "title": "農林中金、4－9月期の純利益は92%増1627億円－通期予想据え置き",
+   "link": "https://news.google.com/rss/articles/CBMid0FVX3lxTE9FRkNLYXE3WjctdlFWMDNPbTdnUFprWXA4RW1qd0JUR3lyYVlMR01wekdScnM1bWVUbXkya1lmYUQ5a3VFdmVPLWFGMHU2V3lCWjRnNU5MLU9UdTZQcW5FTmRFVTVmVkV2TTIxTkV3T3JMLXNyVUFv?oc=5",
    "source": "Bloomberg.com",
-   "time": "2026-11-18T18:13:03+09:00",
+   "time": "2026-11-19T16:04:00+09:00",
    "group": "新聞・放送・通信",
-   "plain": "大樹生命が、初めて「逆ざや」を解消した。金利上昇で生保の運用環境が改善している。",
-   "context": "逆ざやは、契約者に約束した利回りより運用の利回りが低い状態だ。金利が低い時期に運用が難しくなった。金利が上がると、新しく買う債券の利回りが高くなり、運用に追い風になる。",
-   "impact": "日本の10年国債利回りが高い水準で続けば、生保の運用収益は伸びやすいかもしれない。それが保険料や商品の条件に影響する可能性もある。ただ金利が急に上がると、保有する債券に含み損が出るおそれもある。",
-   "watch": "日本の10年国債利回りの推移と、ほかの生保の決算を見たい。",
-   "next": "金利上昇で生保の運用環境が改善している。",
-   "tags": [],
-   "cat": "rates",
-   "level": 1,
-   "related": []
-  },
-  {
-   "id": "n228",
-   "title": "日本生命の基礎利益22%増7565億円 4〜9月最高益、債券運用好調",
-   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTFBjRVhuQzdRd0ZtNEVPRmJXWUMtd2RRS2h2UGZuYlVjZ2VRNHdJUjNOU05fd25vanhiM042Rm1YSXRQVndkM0RrMGNtS1RHRTdQQ0ZMeW92TlVsT1hvTlhuZDNvN0ZsbV9wX1NpSg?oc=5",
-   "source": "日本経済新聞",
-   "time": "2026-11-18T17:43:06+09:00",
-   "group": "新聞・放送・通信",
-   "plain": "日本生命の基礎利益は22%増の7565億円になった。4〜9月期として最高益で、債券運用が好調だった。",
-   "context": "基礎利益は、保険本業の収益力を示す利益だ。生保は集めた保険料を国債などの債券で運用する。金利が上がると、運用で得られる利息が増えやすい。",
-   "impact": "金利が高い状態が続けば、生保の収益は支えられるかもしれない。国債の買い手として生保が積極的になれば、国債の需給にも影響する可能性がある。ただ金利が急に変われば、評価損が出て逆風になりうる。",
-   "watch": "通期の見通しと、運用方針で国債や外債をどう扱うかを見たい。",
-   "next": "債券運用の好調が生保の収益を押し上げている。",
+   "plain": "農林中金の4〜9月期の純利益は、前年の同じ時期より92%増え、1627億円になった。運用で利益が出た。通期の予想は据え置いた。",
+   "context": "農林中金は、農協などから集めた資金を、債券や株などで運用する金融機関だ。金利や市場の動きで、運用の成績が大きく変わる。金利が上がると、持っている債券に含み損が出ることもある。",
+   "impact": "運用環境がよければ、金融機関の収益は好調になるかもしれない。ただ、通期予想を据え置いたため、下期は慎重に見ている可能性もある。米国の長期金利が5%台と高く、債券の評価損が膨らむと収益の重しになることもある。",
+   "watch": "下期の運用の状況と、通期予想を上げるかどうか。ほかの金融機関の決算も比べる。",
+   "next": "運用益が出て、金融機関の収益に追い風になった。",
    "tags": [],
    "cat": "industry",
    "level": 1,
    "related": []
   },
   {
-   "id": "n30",
-   "title": "新築湾岸タワマン価格が2000万円以上の下落！中古マンションも在庫激増中…いったい何が起こっているのか？【マンションインフルエンサー座談会1】 - マンション羅針盤 管理＆売買",
-   "link": "https://diamond.jp/articles/-/403669",
-   "source": "ダイヤモンド・オンライン",
-   "time": "2026-11-19T04:30:00+09:00",
-   "group": "経済誌・ネットメディア",
-   "plain": "ダイヤモンド・オンラインが、マンション市況が逆回転を始めたと伝えた。転売目的の層や外国人が撤退した影響で、新築マンションの値下げや中古マンションの在庫急増が起きている。見出しは湾岸のタワーマンションで2000万円以上の下落があるとしている。",
-   "context": "マンション価格は、買う人が増えれば上がり、減れば下がる。転売目的の買い手は、値上がりを見込んで買う。そのため、買い手が引くと需要が急に弱まりやすい。中古の在庫が増えると、売り手どうしの値下げ競争も起きやすい。",
-   "impact": "値下がりが広がれば、これから買う人には選択肢が増えるかもしれない。一方、すでに高値で買った人は、売るときに損が出る可能性がある。長期金利が高い状態が続くと、住宅ローンの負担も重くなり、需要がさらに弱まるかもしれない。",
-   "watch": "中古マンションの在庫件数と成約価格が、今後も続けて下がるかを確かめたい。新築の値引きが他の地域に広がるかも見る。",
-   "next": "新築や中古マンションの値下がりが広がるかが焦点。",
+   "id": "n92",
+   "title": "首都圏マンション、10月発売戸数は24％減 平均価格3カ月連続下落＝不動産経済研",
+   "link": "https://news.google.com/rss/articles/CBMihgFBVV95cUxPMGV0aWNGN0diZFczRzJyR3g0THRhZEpidVFUWUVOOURKTE1wLWNVQ1NYZFRMS251Ujd6U2pkMER5ZTNsNXZmTlJFclg2Tmx4ekQ2ZEwtS28tUDY4Rlh4eHJMMGNWdFhVVWktajVJQmhKQ1BpMmNlcnlUUVFNUHFES211ZGhlQQ?oc=5",
+   "source": "Reuters",
+   "time": "2026-11-19T14:36:00+09:00",
+   "group": "新聞・放送・通信",
+   "plain": "首都圏の新築マンションの10月の発売戸数は、前年の同じ月より24%減った。平均価格は3か月連続で下がった。不動産経済研究所が発表した。",
+   "context": "マンションは、価格が高くなると買える人が減り、売り手が発売を控えることがある。建築費の上昇や住宅ローンの金利も、買い手の判断に影響する。発売戸数は、市場の勢いを見る目安の一つだ。",
+   "impact": "価格の下落が続けば、買いたい人には選びやすくなるかもしれない。一方、不動産会社の業績には重しになる可能性がある。日銀の利上げで住宅ローンの金利が上がると、需要がさらに弱まることもある。",
+   "watch": "次の月の発売戸数と平均価格の動き。住宅ローン金利の変化も確かめる。",
+   "next": "マンションの販売減と価格下落が、不動産市場に響く。",
    "tags": [
     {
      "node": "realestate",
@@ -744,207 +694,89 @@
    "related": []
   },
   {
-   "id": "n169",
-   "title": "日本株、指標面の調整進む 予想PERは15倍割れ・配当利回り2%",
-   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE5HcHoxNXFYR1FLNkZJcHFPTUxCeFVwZVBTMkRYdTJPbXFCTUJmcHpmbEJmajVELVBYcVhFWXBRVUZQLWNzWUdqUnQ4bHNqUlM3T242NDlVdS02aERLZjdyc3BJeVEtbk9iVEcxVQ?oc=5",
-   "source": "日本経済新聞",
-   "time": "2026-11-18T20:08:37+09:00",
+   "id": "n262",
+   "title": "金・銀が14カ月ぶり安値に急落、米12月利上げ観測とドル高が直撃",
+   "link": "https://news.google.com/rss/articles/CBMiWkFVX3lxTFBCNDg0YnJNYjhkTEFKMDVSSVhtQ3lfZ3NZaXVPWXN1MzllME05Y3pPR1ZSRThVME44Y29lTklUNzh6VFh1Rmp6TDFUM0NIYllHSEtlV2Z3UUtWdw?oc=5",
+   "source": "Forbes JAPAN",
+   "time": "2026-11-19T07:30:00+09:00",
+   "group": "ニュースのまとめ",
+   "plain": "金と銀の価格が、14か月ぶりの安値に急落した。",
+   "context": "金は利息を生まない資産なので、金利が上がると持つ魅力が薄れやすい。また金はドルで取引されるため、ドル高になると他の通貨で割高になり、売られやすい。",
+   "impact": "米国の利上げ観測が続くなら、金は上がりにくいかもしれない。日本では、円安が進むと円建ての金価格が下がりにくい面もある。逆に利上げ観測が弱まれば、金が反発する可能性がある。",
+   "watch": "米国の物価や雇用の指標と、FRBの利上げをめぐる発言。ドル高が続くかも見る。",
+   "next": "米の利上げ観測とドル高が金の重しになった。",
+   "tags": [],
+   "cat": "market",
+   "level": 2,
+   "related": []
+  },
+  {
+   "id": "n3",
+   "title": "［徹底予測2027 機械］工作機械、AI特需で受注が過去最高へ　部品供給追いつかず (徹底予測2027)",
+   "link": "https://business.nikkei.com/atcl/gen/19/00951/111600006/",
+   "source": "日経ビジネス",
+   "time": "2026-11-19T17:00:00+09:00",
+   "group": "経済誌・ネットメディア",
+   "plain": "工作機械の受注高が、AI・半導体向けの需要拡大を背景に右肩上がりだ。日経ビジネスは、受注が過去最高へ向かうと見る。ただ部品の供給が追いつかず、供給網の整備が急がれている。",
+   "context": "工作機械は、金属を削るなどして部品や製品をつくる機械だ。「機械をつくる機械」とも呼ばれる。企業が工場に投資するときに買うため、受注は設備投資の勢いを映しやすい。注文があっても部品が足りなければ、納品できず売る機会を逃す。",
+   "impact": "AI・半導体向けの投資が続けば、機械メーカーの売上や利益が伸びるかもしれない。部品不足が長引けば、納期の遅れで受注を取りこぼす可能性がある。逆に投資が鈍れば、受注が急に減る恐れもある。円安が続く今の水準（ドル円159円台）は、輸出する機械メーカーの採算には追い風になりうる。",
+   "watch": "工作機械の受注統計で、AI・半導体向けの伸びが続くか。あわせて、部品メーカーの増産や供給網の整備の動きを確かめたい。",
+   "next": "AI向け投資が機械メーカーの受注を押し上げる。",
+   "tags": [],
+   "cat": "industry",
+   "level": 2,
+   "related": []
+  },
+  {
+   "id": "n197",
+   "title": "税制改正へ議論本格化、自民税調が総会 非上場株評価見直しには距離",
+   "link": "https://news.google.com/rss/articles/CBMihgFBVV95cUxQdEw0NkR1OTJlOTJBcnl6Z0tuaGN0U2thNm9TclZFbGVJbTI3VlcteDlrb3BJWmxKcm9BYWY1bkFPbTBvVDN4OFA0Snd4OExXYS13WUtKaFhUYWJNOWJnalFNb1gzVTlLelF5NDNtMWFCd2ZQMFkweW0tMlJfb2tkZ1JlQkY1QQ?oc=5",
+   "source": "Reuters",
+   "time": "2026-11-19T11:00:00+09:00",
    "group": "新聞・放送・通信",
-   "plain": "日本経済新聞が、日本株で指標面の調整が進んだと伝えた。予想PER(株価が利益の何倍かを示す目安)は15倍を割り込み、配当利回りは2%になった。日本株の割安感が意識されている。",
-   "context": "予想PERが低いほど、利益に比べて株価が安いと見られやすい。配当利回りは、株価に対する配当の割合だ。株価が下がると配当利回りは上がる。ただ、割安に見えても、利益の見通しが悪ければ株価は戻らないことがある。",
-   "impact": "割安感から買いが入れば、日本株の下支えになるかもしれない。ただ、日本の10年国債利回りは2.925%と高めだ。米国の長期金利も5.07%にある。金利の高さが重しになれば、割安でも株価が上がりにくい可能性がある。",
-   "watch": "企業の利益見通しが下がらないかを見たい。日本と米国の長期金利の動きも、株価を左右する決め手になる。",
-   "next": "日本株の割安感が意識されている。",
+   "plain": "自民党の税制調査会が総会を開き、税制改正の議論が本格化した。非上場株の評価の見直しについては、距離を置く姿勢だと伝えられた。",
+   "context": "非上場株は、証券取引所に上場していない会社の株だ。値段がつきにくいので、相続や事業を引き継ぐときは、決まった方法で評価額を計算する。この評価額が税額に直結する。税制改正は毎年、年末に向けて与党の税調が議論し、方針をまとめる流れだ。",
+   "impact": "評価の見直しが見送られれば、中小企業の経営者が会社を引き継ぐときの税負担は、当面大きく変わらないかもしれない。見直しが入れば、相続や事業承継の計画に影響する可能性がある。ただ今回は距離を置く姿勢なので、すぐの変更は考えにくい。",
+   "watch": "今後の税調の議論で、非上場株の評価が論点として残るか。年末にまとまる税制改正の方針に、どこまで盛り込まれるかを見たい。",
+   "next": "税制改正の議論が相続や企業経営に響く。",
+   "tags": [],
+   "cat": "politics",
+   "level": 1,
+   "related": []
+  },
+  {
+   "id": "n11",
+   "title": "台湾、株式相場下支えで空売り規制を強化－08年以来の月間下落率",
+   "link": "https://news.google.com/rss/articles/CBMijgFBVV95cUxOMFI5ZVlEMEFzSk56ak91bkFDWnhiUktyM2dIcTloWnRhbDdBZENwNmw0OTRfRjZrTHhiZUtVRWtaMlFMZXBRdlRCQ01ld3dycmtDTld2RkY2UDJlaEpieXlYNmxyRXVmRnFGc191UWVrblZPTUdDc1ZxZjl5VlQwNDZtMkRTSTRNb255bmR3?oc=5",
+   "source": "Bloomberg.com",
+   "time": "2026-11-19T16:56:00+09:00",
+   "group": "新聞・放送・通信",
+   "plain": "台湾が、株式相場を下支えするため、空売りの規制を強化した。",
+   "context": "空売りは、株を借りて先に売り、値下がり後に買い戻して差益を狙う取引だ。売りが膨らむと株価を押し下げやすい。そこで急落時に、当局が空売りを制限することがある。規制は売りの勢いを一時的に抑える狙いで、株安の原因そのものを解決するわけではない。",
+   "impact": "台湾株の不安が他のアジア市場に広がれば、日本株も売られるかもしれない。台湾は半導体の供給網で存在感が大きく、関連企業の多い日本株にも響く可能性がある。投資家がリスクを避けて動けば、為替の動きも荒くなりうる。",
+   "watch": "規制のあとも台湾株の下落が続くか、落ち着くか。日経平均や、アジアの他の株式市場に波及するかを確かめたい。",
+   "next": "台湾株の急落への対策で、アジア市場の不安に響く。",
    "tags": [],
    "cat": "market",
    "level": 1,
    "related": []
   },
   {
-   "id": "n259",
-   "title": "26年の訪日客、5年ぶり前年割れか　中国人客の大幅減が影響",
-   "link": "https://www.asahi.com/articles/ASVCK7W1QVCKULFA01VM.html?ref=rss",
-   "source": "朝日新聞",
-   "time": "2026-11-18T16:21:26+09:00",
-   "group": "新聞・放送・通信",
-   "plain": "朝日新聞は、2026年の訪日客が5年ぶりに前年を下回る可能性があると伝えた。中国からの客が大きく減っていることが響いている。",
-   "context": "中国は日本の主要な訪日客の送り出し元の一つだ。中国客は買い物や宿泊に使う額が大きいとされ、減ると小売や観光地の売上に響きやすい。政治や外交の関係、航空便の事情も人の動きを左右する。",
-   "impact": "中国客の減少が続くなら、百貨店、ホテル、免税店などの業績に重しとなるかもしれない。他の国・地域からの客が増えて補えるかが分かれ目になる。訪日客が減れば、円を買う需要がやや弱まる可能性もある。",
-   "watch": "中国客の回復の兆しと、ほかの国・地域からの訪日客の増え方を確かめたい。",
-   "next": "中国人客の減少が訪日消費に響く。",
-   "tags": [
-    {
-     "node": "inbound",
-     "dir": "down"
-    }
-   ],
-   "cat": "economy",
-   "level": 2,
-   "related": []
-  },
-  {
-   "id": "n262",
-   "title": "１０月の訪日外国人客３９１万２５００人、単月で過去最高…韓国・欧米など幅広い国・地域で前年同月比増",
-   "link": "https://news.google.com/rss/articles/CBMiZEFVX3lxTFBPSUpRQ21jWlQ1ZTdXZFZ1X2w5RDhrTDk4SUxZYXZVVUNkY0ZGZTNwWWRHaG9sLTFyUHFTMmpob1lxbjdzTkJLeEdBbFJ6cGUwZ0xrUmwtOFhLV0s3QjVhMURqOFQ?oc=5",
-   "source": "読売新聞",
-   "time": "2026-11-18T16:15:00+09:00",
-   "group": "ニュースのまとめ",
-   "plain": "読売新聞によると、10月の訪日外国人客は391万2500人で、単月として過去最高になった。韓国や欧米など幅広い国・地域で、前年の同じ月より増えた。",
-   "context": "訪日客が日本で使うお金は、輸出と同じように海外からの収入になる。宿泊や飲食、買い物などの売上が増え、地域経済も支えられる。円が安いと、外国人にとって日本の物価が割安に感じられ、旅行しやすくなる面がある。",
-   "impact": "訪日客が増え続ければ、宿泊・小売り・交通の企業の業績を支えるかもしれない。ドル円が159円台の円安は、旅行先としての日本の割安感を保つ可能性がある。一方、混雑や人手不足、物価への影響が地域によって強まるかもしれない。",
-   "watch": "次の月の訪日客数が高い水準を保つかを確かめたい。",
-   "next": "10月は訪日客が単月で過去最高になった。",
-   "tags": [
-    {
-     "node": "inbound",
-     "dir": "up"
-    }
-   ],
-   "cat": "economy",
-   "level": 2,
-   "related": []
-  },
-  {
-   "id": "n343",
-   "title": "減速し始めた個人消費、実質賃金は9カ月連続プラスだが…連続利上げの日銀が直面する景気判断の難所【唐鎌大輔の為替から見る日本】実質GDPが4四半期ぶりにマイナス成長、消費減速を特殊要因だけで説明できるか？",
-   "link": "https://jbpress.ismedia.jp/articles/-/98093?utm_source=ldr&utm_medium=feed&utm_campaign=link&utm_content=link",
-   "source": "JBpress",
-   "time": "2026-11-18T06:00:00+09:00",
-   "group": "経済誌・ネットメディア",
-   "plain": "個人消費が減速し始めたと指摘されている。実質賃金は9か月連続でプラスだ。一方、実質GDPは4四半期ぶりにマイナス成長となった。記事は、消費の弱さを特殊要因だけで説明できるかを問う。",
-   "context": "実質賃金は、物価の上昇分を引いた賃金だ。プラスなら本来は消費が増えやすい。それでも消費が弱いなら、景気の基調が落ちている可能性がある。日銀は景気を見ながら利上げを判断する。",
-   "impact": "消費の弱さが本物なら、日銀は追加利上げに慎重になるかもしれない。その場合、日米金利差が開いたままとなり、円安が続く可能性がある。一方、特殊要因なら利上げが進み、住宅ローンの変動金利にも響きうる。",
-   "watch": "次の消費や賃金の統計と、日銀の総裁会見で景気判断がどう語られるかを確かめたい。",
-   "next": "個人消費の減速が日銀の判断を難しくする。",
-   "tags": [],
-   "cat": "economy",
-   "level": 2,
-   "related": []
-  },
-  {
-   "id": "n285",
-   "title": "中小の8割超が賃上げへ　「防衛的賃上げ」が62.4%に高止まり、賃上げ率は前年割れ",
-   "link": "https://www.itmedia.co.jp/business/articles/2611/18/news052.html",
-   "source": "ITmedia ビジネス",
-   "time": "2026-11-18T14:45:00+09:00",
-   "group": "経済誌・ネットメディア",
-   "plain": "日本商工会議所の2026年度調査で、中小企業の賃上げが広がっていることがわかった。9月時点で賃上げした企業は61.3%だった。10月以降に予定する17.5%と合わせて8割を超える。ただ、防衛的な賃上げが62.4%と高いままで、賃上げ率は前年を下回った。",
-   "context": "防衛的賃上げとは、業績が良いからではなく、人手を確保したり辞めるのを防いだりするために上げることだ。余裕がないまま上げると、利益が圧迫される。賃金が上がっても、物価の上昇に追いつかなければ、暮らしは楽にならない。",
-   "impact": "賃上げが広がれば、家計の収入が増えて消費を支えるかもしれない。ただ、上げ幅が前年より小さいなら、物価高を上回る実感は持ちにくい。企業の利益が薄ければ、来年以降の賃上げが続かない可能性もある。日銀の利上げ判断にも関わる材料だ。",
-   "watch": "賃金が物価の上昇を上回るかと、来年の春季労使交渉（春闘）の動きを確かめたい。",
-   "next": "賃上げは広がるが、防衛的な賃上げが多い。",
-   "tags": [
-    {
-     "node": "wages",
-     "dir": "up"
-    }
-   ],
-   "cat": "economy",
-   "level": 2,
-   "related": []
-  },
-  {
-   "id": "n137",
-   "title": "新給付の対象「年収下限は56万円程度」案 政府・与党が公明に提示",
-   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE85TEs4alFxaFRpN3lCNUVkS2tXYjU5OFZLRVRJajBmQ3pZQU9oaGpSLTRtdk5NMktwa0FkdkxrV1NDU1ZvNDYtWkYtX2RhVHFhYjZTMnFZMjNaZ1lDQk1DM1R0Q3BfVlhOSmpYNw?oc=5",
-   "source": "日本経済新聞",
-   "time": "2026-11-18T22:00:00+09:00",
-   "group": "新聞・放送・通信",
-   "plain": "給付をどんな人に配るかの線引きが具体的になってきた。",
-   "context": "給付金は、政府が国債を発行して賄うことが多い。国債が増えると、市場では返済への不安から買い手が減り、国債の値段が下がって利回りが上がりやすい。利回りは長期金利の目安になる。",
-   "impact": "給付の規模が大きく、国債の増発が見込まれれば、長期金利が上がるかもしれない。金利が上がると、住宅ローンや企業の借入れの負担が重くなる可能性がある。一方、対象の家計には、物価高の負担を和らげる効果が出るかもしれない。",
-   "watch": "給付の総額と、その財源を国債でどれだけ賄うかを確かめたい。日本の10年国債利回りが2.925%からどう動くかも見る。",
-   "next": "新たな給付は財政負担と長期金利に響く。",
-   "tags": [],
-   "cat": "politics",
-   "level": 2,
-   "related": []
-  },
-  {
-   "id": "n60",
-   "title": "Target shares rise 7% as retailer posts best sales growth in five years, hikes guidance",
-   "link": "https://www.cnbc.com/2026/11/18/target-tgt-q3-2026-earnings.html",
-   "source": "CNBC",
-   "time": "2026-11-19T02:56:50+09:00",
-   "group": "海外（英語）",
-   "plain": "立て直しを続けるなか、業績見通しも引き上げた。",
-   "context": "小売り企業の売上は、消費者の財布のひもが緩いか固いかを映す。",
-   "impact": "米国の消費が強いままなら、米国の長期金利が高止まりするかもしれない。現在は5.07%だ。米国の金利が高いと日米金利差が広がり、ドル円が159円台の円安に傾きやすい。日本の輸出企業には追い風だが、輸入物価は上がりやすい。",
-   "watch": "ほかの米小売り企業の決算で、消費の強さが続くかを確かめたい。米国の長期金利とドル円の動きも見る。",
-   "next": "米小売りの売上が堅調で、消費の底堅さを示す。",
-   "tags": [],
-   "cat": "industry",
-   "level": 1,
-   "related": [],
-   "lang": "en"
-  },
-  {
-   "id": "n123",
-   "title": "ソフトバンクGの孫社長「AIバブルではない」投資継続の考え",
-   "link": "https://news.web.nhk/newsweb/na/nd-20261118de78044",
-   "source": "NHK",
-   "time": "2026-11-18T22:33:00+09:00",
-   "group": "新聞・放送・通信",
-   "plain": "NHKによると、ソフトバンクグループの孫正義社長は18日、都内で講演した。世界でAI投資への懸念が広がるなかでも、成長が見込めるとして、AIインフラへの投資を続ける考えを示した。「AIバブルではない」と述べた。",
-   "context": "AIインフラは、AIを動かすための半導体やデータセンターなどの設備だ。巨額の資金が必要で、収益化まで時間がかかる。そのため、投資が行き過ぎではないかという見方が市場にある。経営者の発言は、あくまで本人の見方だ。",
-   "impact": "投資が続けば、半導体や電力、通信などの関連企業の需要を支えるかもしれない。ただ、金利が高い局面では、資金を借りる負担が重くなる。成長への期待がしぼめば、関連株が株安になる可能性もある。",
-   "watch": "AI関連企業の決算で、投資に見合う収益が出ているかを確かめたい。長期金利の動きも見る。",
-   "next": "AI投資の継続姿勢が関連投資を支える。",
-   "tags": [],
-   "cat": "industry",
-   "level": 1,
-   "related": []
-  },
-  {
-   "id": "n20",
-   "title": "【自動車16社】倒産危険度ランキング2027最新版！13位河西工業、10位ファルテック、ワースト3に入った完成車メーカーとは？ - 27年版・倒産危険度ランキング【危険水域360社】 「金利ショック」が招く大量淘汰",
-   "link": "https://diamond.jp/articles/-/403662",
-   "source": "ダイヤモンド・オンライン",
-   "time": "2026-11-19T04:55:00+09:00",
-   "group": "経済誌・ネットメディア",
-   "plain": "ダイヤモンド・オンラインが、自動車16社の倒産危険度ランキングを紹介した。中国勢が台頭し、トヨタ自動車、ホンダ、日産自動車の中国事業は苦境にある。東南アジアや中南米でも中国勢が伸び、部品メーカーを含め、日系メーカーの収益力が悪化している。",
-   "context": "自動車は部品メーカーが多く、裾野が広い産業だ。借入れが多い会社は、金利が上がると利息の負担が増える。収益が弱いままだと、返済が難しくなる。これが倒産危険度を高める要因になりうる。",
-   "impact": "日本の長期金利が高い状態が続けば、借入れの多い部品メーカーほど負担が重くなるかもしれない。取引先の経営悪化が広がれば、雇用や地域経済にも響く可能性がある。一方、円安は輸出の採算を支えるが、中国勢との競争は別の問題として残る。",
-   "watch": "各社の決算で、利益率と借入れの負担がどう変わるかを確かめたい。中国や東南アジアでの販売の動きも見る。",
-   "next": "金利上昇が自動車関連の経営を圧迫する可能性がある。",
-   "tags": [],
-   "cat": "industry",
-   "level": 1,
-   "related": []
-  },
-  {
-   "id": "n77",
-   "title": "NY外為：ドル底堅い、ウォラーFRB理事は0.5％の利上げを推奨",
-   "link": "https://news.google.com/rss/articles/CBMiS0FVX3lxTE5zUHdRMHlsRTRua05lX0I1eUVjREYyOFQyMFdrUE9CQkJVQ1BfSUs0R3RYbG5yd2ZRVmVrRFlMUFVIa3gtc25FbWZORQ?oc=5",
+   "id": "n38",
+   "title": "【速報】JT、7240億円の赤字転落へ",
+   "link": "https://news.google.com/rss/articles/CBMiS0FVX3lxTFA2TTJzYXhYRWdUQXZUeFh6aVYzYkRBeWMzeHc2TUx6R2dkRDY5aDVnXzFWM3NqR1RUTWN6TEgtaV9yMExyel9DLVdHTQ?oc=5",
    "source": "47NEWS",
-   "time": "2026-11-19T01:06:13+09:00",
+   "time": "2026-11-19T15:56:55+09:00",
    "group": "新聞・放送・通信",
    "tags": [],
    "cat": "",
-   "plain": "ウォラーFRB理事は、0.5%の利上げを推奨した。",
-   "next": "米国で利上げが進むとの見方が強まれば、米国の長期金利が上がり、日米金利差が広がるかもしれない。その場合、ドル円は159円台からさらに円安に進む可能性がある。円安が進めば、輸入品の値上がりで家計の負担が増えるかもしれない。",
+   "plain": "JTが、7240億円の赤字に転落する見通しだと速報で伝えられた。材料は見出しのみで、赤字になる理由や、いつの期間の数字かは、ここからは分からない。",
+   "next": "本業の稼ぐ力は変わらず、一時的な損失が主因なら、影響は限られるかもしれない。逆に本業の悪化が原因なら、配当や株価の見方が変わる可能性がある。理由が分かるまでは、判断を急がないほうがよい。",
    "level": 1,
    "related": [],
-   "context": "FRBは米国の中央銀行にあたる。利上げは、物価の上昇を抑えるため政策金利を引き上げることだ。利上げが意識されると、ドルを持つ魅力が高まり、ドル高になりやすい。理事は、ほかの理事と同じく政策を決める立場にある。",
-   "impact": "米国で利上げが進むとの見方が強まれば、米国の長期金利が上がり、日米金利差が広がるかもしれない。その場合、ドル円は159円台からさらに円安に進む可能性がある。円安が進めば、輸入品の値上がりで家計の負担が増えるかもしれない。",
-   "watch": "FOMCなど他の理事の発言が、利上げに同調するかを確かめたい。米国の物価指標と、ドル円の動きも見る。"
-  },
-  {
-   "id": "n114",
-   "title": "【市場反応】米10月住宅着工件数は予想上回る、住宅建設許可件数はパンデミック来の低水準、ドルもみ合い",
-   "link": "https://news.google.com/rss/articles/CBMiUkFVX3lxTFBENGVZYmk5dmlnekY4dGVranRBT1NodXJRb1VCRDc1cnJFSFNobi1FbEwxQS0xbkZLOVBTMWtoY1BFdXRGWFlzdjI5TWxXdkZoVWc?oc=5",
-   "source": "ザイFX！",
-   "time": "2026-11-18T23:03:00+09:00",
-   "group": "ニュースのまとめ",
-   "tags": [],
-   "cat": "",
-   "plain": "ザイFX!一方、住宅建設許可件数はパンデミック以来の低水準だった。ドルはもみ合った。",
-   "next": "許可件数の低迷が続けば、今後の住宅投資が弱まり、米国景気の重しになるかもしれない。ただ、着工は強く、評価が割れた。ドルがもみ合ったのは、そのためと考えられる。景気減速が意識されれば、金利やドル円に影響する可能性がある。",
-   "level": 1,
-   "related": [],
-   "context": "住宅着工は、実際に建て始めた戸数だ。建設許可は、これから建てる計画の先行指標になる。住宅は金利の影響を受けやすい。ローン金利が高いと、買い手が減り、新規の計画も抑えられやすい。",
-   "impact": "許可件数の低迷が続けば、今後の住宅投資が弱まり、米国景気の重しになるかもしれない。ただ、着工は強く、評価が割れた。ドルがもみ合ったのは、そのためと考えられる。景気減速が意識されれば、金利やドル円に影響する可能性がある。",
-   "watch": "次の住宅関連の指標で、許可件数が回復するかを確かめたい。米国の長期金利とドル円の反応も見る。"
+   "context": "赤字転落は、これまで黒字だった会社が最終的な損益で赤字になることだ。赤字には、本業の不振のほか、事業や資産の価値を引き下げる損失など、一時的な要因もある。理由によって、会社の先行きへの意味が大きく変わる。",
+   "impact": "本業の稼ぐ力は変わらず、一時的な損失が主因なら、影響は限られるかもしれない。逆に本業の悪化が原因なら、配当や株価の見方が変わる可能性がある。理由が分かるまでは、判断を急がないほうがよい。",
+   "watch": "JTの正式な発表で、赤字の原因が一時的な損失か本業の悪化か。あわせて、配当の方針に変更があるかを確かめたい。"
   }
  ],
  "experts": [
@@ -954,78 +786,14 @@
    "name": "後藤達也",
    "role": "経済ジャーナリスト（元日経記者）",
    "kind": "投稿",
-   "title": "【昼メモ】 NVIDIA 暫定CEOの発言は？",
-   "link": "https://note.com/goto_finance/n/nf8ce9d99ed03",
+   "title": "【朝メモ】Anthropic 公開価格 引き上げ",
+   "link": "https://note.com/goto_finance/n/n6f86e3a893b9",
    "source": "後藤達也",
-   "time": "2026-11-18T12:03:19+09:00",
-   "view": "エヌビディアは暫定CEOの発言が焦点で、経営の先行きを注視する",
-   "reason": "決算説明会のポイントを確認している",
-   "stance": "中立",
-   "tags": [
-    {
-     "node": "ai_semis",
-     "dir": "up"
-    }
-   ]
-  },
-  {
-   "id": "e1",
-   "expert": "goto",
-   "name": "後藤達也",
-   "role": "経済ジャーナリスト（元日経記者）",
-   "kind": "投稿",
-   "title": "【朝メモ】🇺🇸半導体 対中輸出規制を強化",
-   "link": "https://note.com/goto_finance/n/nbcd773bff314",
-   "source": "後藤達也",
-   "time": "2026-11-17T07:38:00+09:00",
-   "view": "対中輸出規制の強化で、半導体株が大きく売られたとみる",
-   "reason": "ナスダック2.5%安、半導体指数5%超安を挙げる",
-   "stance": "慎重",
-   "tags": [
-    {
-     "node": "ai_semis",
-     "dir": "down"
-    },
-    {
-     "node": "us_stocks",
-     "dir": "down"
-    }
-   ]
-  },
-  {
-   "id": "e2",
-   "expert": "goto",
-   "name": "後藤達也",
-   "role": "経済ジャーナリスト（元日経記者）",
-   "kind": "投稿",
-   "title": "【コラム】 フアン氏 異例のNVIDIA復帰論",
-   "link": "https://note.com/goto_finance/n/n2c40c600f10c",
-   "source": "後藤達也",
-   "time": "2026-11-16T21:23:22+09:00",
-   "view": "フアン氏の復帰論は異例で、企業統治の面でも注目点になる",
-   "reason": "通常の上場企業では考えにくい展開と指摘",
+   "time": "2026-11-19T08:24:56+09:00",
+   "view": "原油と金の3%超の下落と、AI上場の動きを市場の焦点とみる",
+   "reason": "指標ボードで前日の値動きを確認している",
    "stance": "中立",
    "tags": []
-  },
-  {
-   "id": "e4",
-   "expert": "goto",
-   "name": "後藤達也",
-   "role": "経済ジャーナリスト（元日経記者）",
-   "kind": "投稿",
-   "title": "【コラム】 NVIDIAマネー 強さと脆さは？",
-   "link": "https://note.com/goto_finance/n/n4ab3c65628f9",
-   "source": "後藤達也",
-   "time": "2026-11-15T20:32:27+09:00",
-   "view": "AIをめぐるお金の巡りには、強さと脆さの両面があるとみる",
-   "reason": "決算前にお金の流れを掘り下げている",
-   "stance": "慎重",
-   "tags": [
-    {
-     "node": "ai_semis",
-     "dir": "down"
-    }
-   ]
   },
   {
    "id": "e6",
@@ -1037,220 +805,39 @@
    "link": "https://news.google.com/rss/articles/CBMiX0FVX3lxTE93UEhUUFhyRVgtTWVKNUlnNV85ZXljMnpRTVA3VGdSMDZYODlkZ3VwaERrOEhrRVQzZGl1TE5BeW52M3RGbmh2dFNESTFfXzBseEpQRFRNV0dXZzVISGZn?oc=5",
    "source": "JBpress",
    "time": "2026-11-18T06:00:00+09:00",
-   "view": "消費の減速を特殊要因だけで説明できるか疑い、日銀の景気判断は難しいとみる",
-   "reason": "実質GDPがマイナスで、実質賃金はプラスなのに消費が弱い",
+   "view": "消費の減速は特殊要因だけでは説明しにくく、日銀の判断は難しいとみる",
+   "reason": "GDPがマイナス成長で、実質賃金は上がっても消費が弱いため",
    "stance": "慎重",
    "tags": [
     {
      "node": "consumption",
      "dir": "down"
-    },
-    {
-     "node": "boj",
-     "dir": "up"
     }
    ]
   },
   {
-   "id": "e8",
-   "expert": "kumano",
-   "name": "熊野英生",
-   "role": "エコノミスト（ABC経済研究所 代表）",
+   "id": "e7",
+   "expert": "karakama",
+   "name": "唐鎌大輔",
+   "role": "エコノミスト（みずほ銀行）",
    "kind": "記事",
-   "title": "【長期金利３％台へ急伸】借金負担増で国民につけ 財政の信認高め事態打開を ＡＢＣ経済研究所代表エコノミスト 熊野英生",
-   "link": "https://news.google.com/rss/articles/CBMiUkFVX3lxTE5BOGYzdjJSUWJzV2lmZGh3LUJ3QVc2Y0E1SWJaXzljUVlTUmpUUHM5WXZLMTM3RXAyV09VSnp2MVNGV2pPdE5lS0hnXzJHU1ZMemc?oc=5",
-   "source": "山陽新聞",
-   "time": "2026-11-14T17:00:00+09:00",
-   "view": "長期金利の急上昇は借金の負担を重くし、財政の信認を高めるべきとみる",
-   "reason": "利払いが増え、国民の負担になる",
+   "title": "JT問題が浮き彫りにした地政学リスク、安全通貨「円」を支えた巨額の対外純資産が日本の弱点になり得るという逆説 【唐鎌大輔の為替から見る日本】ロシアによる一時管理が突きつけた資産保全の問題、中国・米国への投資に潜むリスク(1/5)",
+   "link": "https://news.google.com/rss/articles/CBMiVkFVX3lxTE92VEJISW4wLUVqbXZRM25YUjlGOUVlUFVuVk9Ka0wxTXVySGwzZWVHOHBhZ0ZlaVFUSmJFdVdWVkNOUEV3cmI0V3JLbTk2MjFWZXJwcllB?oc=5",
+   "source": "JBpress",
+   "time": "2026-11-13T06:00:00+09:00",
+   "view": "JT問題で、巨額の海外資産が日本の弱点になりうるとみる",
+   "reason": "ロシアの一時管理で、資産を守れない危険が見えたため",
    "stance": "慎重",
    "tags": [
     {
-     "node": "jgb10",
-     "dir": "up"
-    },
-    {
-     "node": "fiscal",
-     "dir": "up"
-    }
-   ]
-  },
-  {
-   "id": "e10",
-   "expert": "kumano",
-   "name": "熊野英生",
-   "role": "エコノミスト（ABC経済研究所 代表）",
-   "kind": "記事",
-   "title": "コラム：エヌビディアのフアンＣＥＯ辞任、ＡＩ半導体バブルは弾けるのか＝熊野英生氏",
-   "link": "https://news.google.com/rss/articles/CBMijgFBVV95cUxNblVZZDh0TEFCaGRDakdvREUzb3NDUmNBaFRZT1FXVVkxX1RyeWhVVWtmNGVTUDBaYnVxYldNeGtSNDFKbVJiMzJvNkdQU2ZZSFZMOVItaks3eFc4RzBRS3lTcDVsUF82S0FWaV9YanFMUGc5MlFXR0FhaVNnRUNPTzJCV0haSFVhNXZCZ0p3?oc=5",
-   "source": "Reuters",
-   "time": "2026-11-13T11:01:00+09:00",
-   "view": "フアン氏の辞任でAI半導体バブルが弾けるかが問われるとみる",
-   "reason": "",
-   "stance": "慎重",
-   "tags": [
-    {
-     "node": "ai_semis",
-     "dir": "down"
-    }
-   ]
-  },
-  {
-   "id": "e11",
-   "expert": "kiuchi",
-   "name": "木内登英",
-   "role": "エコノミスト（野村総合研究所・元日銀審議委員）",
-   "kind": "記事",
-   "title": "【第２次高市改造内閣】財務相留任に大きな意味 市場は首相のスタンス凝視 野村総合研究所エグゼクティブ・エコノミスト 木内登英氏",
-   "link": "https://news.google.com/rss/articles/CBMiUkFVX3lxTFBUckxyV21vUlpjMWUxY2RGRDJRWmJpOHhpLWhOX0paWmlMemxCY2hfdkVXZFZvMVlTclJvSzVOelFsU2JEb1hOeHNwaXpUSE9RMUE?oc=5",
-   "source": "山陽新聞",
-   "time": "2026-11-14T17:00:00+09:00",
-   "view": "財務相の留任には大きな意味があり、市場は首相の姿勢を見ているとみる",
-   "reason": "",
-   "stance": "中立",
-   "tags": [
-    {
-     "node": "fiscal",
-     "dir": "up"
-    }
-   ]
-  },
-  {
-   "id": "e12",
-   "expert": "kiuchi",
-   "name": "木内登英",
-   "role": "エコノミスト（野村総合研究所・元日銀審議委員）",
-   "kind": "記事",
-   "title": "【高市１強の行方】４の（２）＜経済政策＞野村総合研究所の木内登英さん 金融市場の警鐘に耳傾けよ 積極財政姿勢、修正を",
-   "link": "https://news.google.com/rss/articles/CBMiUkFVX3lxTE5rbzNDV3oybkFkZDFkVngxcDJMQi1mbkkxd1pnd2NmM3NUQ25nNTl2bjRrb2haZHNXWEU4OUZTTnY3LWxVeVAzQm9idGhZcGo1M1E?oc=5",
-   "source": "山陽新聞",
-   "time": "2026-11-13T17:00:00+09:00",
-   "view": "積極財政は修正し、金融市場の警鐘に耳を傾けるべきとみる",
-   "reason": "財政への不安が長期金利に表れている",
-   "stance": "慎重",
-   "tags": [
-    {
-     "node": "fiscal",
-     "dir": "up"
-    },
-    {
-     "node": "jgb10",
-     "dir": "up"
-    }
-   ]
-  },
-  {
-   "id": "e15",
-   "expert": "nli",
-   "name": "ニッセイ基礎研究所",
-   "role": "シンクタンク（研究員のレポート）",
-   "kind": "レポート",
-   "title": "為替介入再発動の可能性は？～マーケット・カルテ12月号",
-   "link": "https://www.nli-research.co.jp/topics_detail1/id=87407?site=nli",
-   "source": "ニッセイ基礎研究所",
-   "time": "2026-11-18T15:39:30+09:00",
-   "view": "米の利上げ観測がドル高を支え、日本の介入警戒が円安の歯止めとみる",
-   "reason": "米の物価・雇用指標が上振れ、FRB高官が利上げに前向き",
-   "stance": "中立",
-   "tags": [
-    {
-     "node": "usdjpy",
-     "dir": "up"
-    },
-    {
-     "node": "fed",
-     "dir": "up"
-    }
-   ]
-  },
-  {
-   "id": "e17",
-   "expert": "nli",
-   "name": "ニッセイ基礎研究所",
-   "role": "シンクタンク（研究員のレポート）",
-   "kind": "レポート",
-   "title": "貿易統計26年10月－中東からの原油輸入量の減少幅が縮小",
-   "link": "https://www.nli-research.co.jp/topics_detail1/id=87404?site=nli",
-   "source": "ニッセイ基礎研究所",
-   "time": "2026-11-18T10:36:20+09:00",
-   "view": "中東からの原油輸入量の減少幅が縮んだ点に注目している",
-   "reason": "",
-   "stance": "中立",
-   "tags": []
-  },
-  {
-   "id": "e18",
-   "expert": "nli",
-   "name": "ニッセイ基礎研究所",
-   "role": "シンクタンク（研究員のレポート）",
-   "kind": "レポート",
-   "title": "家計消費の動向（二人以上世帯：～2026年9月）－実質賃金９か月連続プラスも、「守る支出」にも抑制広がる",
-   "link": "https://www.nli-research.co.jp/topics_detail1/id=87403?site=nli",
-   "source": "ニッセイ基礎研究所",
-   "time": "2026-11-18T09:56:48+09:00",
-   "view": "実質賃金がプラスでも、生活に必要な支出まで抑える動きが広がるとみる",
-   "reason": "家計の節約が「守る支出」に及んでいる",
-   "stance": "慎重",
-   "tags": [
-    {
-     "node": "consumption",
-     "dir": "down"
-    },
-    {
-     "node": "household",
+     "node": "geopolitics",
      "dir": "up"
     }
    ]
   }
  ],
  "debates": [],
- "scenarios": [
-  {
-   "event": "植田総裁の参院財金委（半期報告）",
-   "date": "2026-11-19",
-   "focus": "円安と物価への見方、利上げへの姿勢が示されるか",
-   "cases": [
-    {
-     "label": "利上げに前向きな発言",
-     "paths": [
-      [
-       {
-        "node": "usdjpy",
-        "dir": "down"
-       }
-      ],
-      [
-       {
-        "node": "jgb10",
-        "dir": "up"
-       },
-       {
-        "node": "mortgage",
-        "dir": "up"
-       }
-      ]
-     ],
-     "text": "利上げに前向きと受け取られれば、円高や長期金利の上昇につながるかもしれない。発言だけで利上げが決まるわけではない。"
-    },
-    {
-     "label": "慎重な発言",
-     "paths": [
-      [
-       {
-        "node": "usdjpy",
-        "dir": "up"
-       },
-       {
-        "node": "import_prices",
-        "dir": "up"
-       }
-      ]
-     ],
-     "text": "慎重と受け取られれば、円安が進み、輸入物価が上がる可能性がある。"
-    }
-   ]
-  }
- ],
+ "scenarios": [],
  "calendar": [
   {
    "date": "2026-12-08",
@@ -1441,10 +1028,6 @@
    "source": "財務省 国債金利情報",
    "series": [
     {
-     "d": "2026-09-28",
-     "v": 3.082
-    },
-    {
      "d": "2026-09-29",
      "v": 3.082
     },
@@ -1579,6 +1162,10 @@
     {
      "d": "2026-11-17",
      "v": 2.925
+    },
+    {
+     "d": "2026-11-18",
+     "v": 2.916
     }
    ]
   },
@@ -1734,19 +1321,19 @@
  "terms": [
   {
    "term": "議事要旨",
-   "explain": "会議でどんな意見が出たかをまとめた記録。後日公表される。"
+   "explain": "会議で話し合われた内容をまとめた文書。"
   },
   {
-   "term": "理事",
-   "explain": "FRBの幹部のひとり。金融政策を決める会合のメンバー。"
+   "term": "IPO",
+   "explain": "会社が初めて株を売り出し、株式市場に上場すること。"
   },
   {
-   "term": "半期報告",
-   "explain": "日銀が国会に、金融政策の運営状況を報告するもの。"
+   "term": "評価額",
+   "explain": "会社の価値を金額で表したもの。"
   },
   {
-   "term": "第三国",
-   "explain": "当事者の二国以外の国。"
+   "term": "機械受注",
+   "explain": "企業が機械を注文した額。設備投資の目安になる。"
   }
  ],
  "sources": [
@@ -1755,7 +1342,7 @@
    "group": "新聞・放送・通信",
    "lang": "ja",
    "collected": 45,
-   "shown": 7,
+   "shown": 5,
    "related": 0
   },
   {
@@ -1763,7 +1350,7 @@
    "group": "ニュースのまとめ",
    "lang": "ja",
    "collected": 30,
-   "shown": 3,
+   "shown": 2,
    "related": 0
   },
   {
@@ -1771,7 +1358,7 @@
    "group": "新聞・放送・通信",
    "lang": "ja",
    "collected": 25,
-   "shown": 3,
+   "shown": 2,
    "related": 0
   },
   {
@@ -1787,7 +1374,7 @@
    "group": "経済誌・ネットメディア",
    "lang": "ja",
    "collected": 15,
-   "shown": 4,
+   "shown": 0,
    "related": 0
   },
   {
@@ -1795,15 +1382,15 @@
    "group": "経済誌・ネットメディア",
    "lang": "ja",
    "collected": 12,
-   "shown": 1,
+   "shown": 0,
    "related": 0
   },
   {
    "name": "日本銀行",
    "group": "公的機関",
    "lang": "ja",
-   "collected": 2,
-   "shown": 0,
+   "collected": 4,
+   "shown": 1,
    "related": 0
   },
   {
@@ -1811,7 +1398,7 @@
    "group": "新聞・放送・通信",
    "lang": "ja",
    "collected": 25,
-   "shown": 5,
+   "shown": 3,
    "related": 0
   },
   {
@@ -1819,7 +1406,7 @@
    "group": "新聞・放送・通信",
    "lang": "ja",
    "collected": 25,
-   "shown": 8,
+   "shown": 7,
    "related": 0
   },
   {
@@ -1827,7 +1414,7 @@
    "group": "新聞・放送・通信",
    "lang": "ja",
    "collected": 20,
-   "shown": 1,
+   "shown": 2,
    "related": 0
   },
   {
@@ -1835,7 +1422,7 @@
    "group": "新聞・放送・通信",
    "lang": "ja",
    "collected": 20,
-   "shown": 1,
+   "shown": 0,
    "related": 0
   },
   {
@@ -1843,7 +1430,7 @@
    "group": "新聞・放送・通信",
    "lang": "ja",
    "collected": 20,
-   "shown": 2,
+   "shown": 3,
    "related": 0
   },
   {
@@ -1851,7 +1438,7 @@
    "group": "経済誌・ネットメディア",
    "lang": "ja",
    "collected": 15,
-   "shown": 1,
+   "shown": 2,
    "related": 0
   },
   {
@@ -1859,7 +1446,7 @@
    "group": "経済誌・ネットメディア",
    "lang": "ja",
    "collected": 10,
-   "shown": 1,
+   "shown": 0,
    "related": 0
   },
   {
@@ -1882,7 +1469,7 @@
    "name": "内閣府",
    "group": "公的機関",
    "lang": "ja",
-   "collected": 0,
+   "collected": 5,
    "shown": 0,
    "related": 0
   },
@@ -1890,7 +1477,7 @@
    "name": "BBCニュース日本語",
    "group": "海外（日本語）",
    "lang": "ja",
-   "collected": 10,
+   "collected": 12,
    "shown": 0,
    "related": 0
   },
@@ -1899,15 +1486,15 @@
    "group": "海外（日本語）",
    "lang": "ja",
    "collected": 12,
-   "shown": 0,
+   "shown": 1,
    "related": 0
   },
   {
    "name": "CNBC",
    "group": "海外（英語）",
    "lang": "en",
-   "collected": 13,
-   "shown": 1,
+   "collected": 10,
+   "shown": 0,
    "related": 0
   },
   {
@@ -1923,7 +1510,7 @@
    "group": "海外（英語）",
    "lang": "en",
    "collected": 10,
-   "shown": 1,
+   "shown": 0,
    "related": 0
   },
   {
@@ -1931,7 +1518,7 @@
    "group": "海外（英語）",
    "lang": "en",
    "collected": 10,
-   "shown": 1,
+   "shown": 2,
    "related": 0
   }
  ]
